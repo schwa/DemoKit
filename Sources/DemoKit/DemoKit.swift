@@ -75,7 +75,7 @@ public extension DemoMetadata {
 
 @resultBuilder
 public struct DemosBuilder {
-    static func buildBlock(_ components: any Demo...) -> [AnyDemo] {
+    public static func buildBlock(_ components: any Demo...) -> [AnyDemo] {
         return components.map { AnyDemo($0) }
     }
 }
@@ -101,6 +101,18 @@ extension DemoModel {
             demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "", lastLaunched: nil, lastDuration: nil)
         }
     }
+
+    var demos: [AnyDemo] {
+        get {
+            return Array(allDemos.values)
+        }
+        set {
+            for demo in newValue {
+                allDemos[demo.id] = demo
+                demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "", lastLaunched: nil, lastDuration: nil)
+            }
+        }
+    }
 }
 
 
@@ -111,18 +123,7 @@ public struct DemosView: View {
     @Environment(\.scenePhase)
     var scenePhase
 
-    @StateObject
-    var model = DemoModel {
-        AnyDemo("Red Demo") {
-            Color.red
-        }
-        AnyDemo("Green Demo") {
-            Color.green
-        }
-        AnyDemo("Blue Demo") {
-            Color.blue
-        }
-    }
+    var model = DemoModel()
 
     @AppStorage("selectedDemo") // TODO: Should be SceneStorage
     var sidebarSelection: String = ""
@@ -137,8 +138,8 @@ public struct DemosView: View {
             .sorted(using: MySortComparator(\.title)))
     }
 
-    public init() {
-        logger.log("INIT")
+    public init(@DemosBuilder _ demos: () -> [AnyDemo]) {
+        model.demos = demos()
     }
 
     public var body: some View {
