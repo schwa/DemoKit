@@ -169,7 +169,7 @@ only_rules:
 - shorthand_operator
 - single_test_class
 - sorted_first_last
-# - sorted_imports
+- sorted_imports
 - statement_position
 - static_operator
 - strict_fileprivate

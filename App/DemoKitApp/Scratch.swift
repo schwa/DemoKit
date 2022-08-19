@@ -1,5 +1,5 @@
-import SwiftUI
 @_spi(DemoKit) import DemoKit
+import SwiftUI
 
 struct UserDefaultsView: View {
     struct Record: Identifiable {
