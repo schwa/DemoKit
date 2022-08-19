@@ -1,7 +1,6 @@
 import Foundation
 
-class MiniDatabase <Value: Codable> {
-
+class MiniDatabase<Value: Codable> {
     typealias Key = String
 
     @Published
@@ -32,8 +31,7 @@ class MiniDatabase <Value: Codable> {
             let record: Record
             if let newValue = newValue {
                 record = .set(key, newValue)
-            }
-            else {
+            } else {
                 record = .delete(key)
             }
             try! write(record: record, handle: journal)
@@ -45,20 +43,18 @@ class MiniDatabase <Value: Codable> {
 
         // TODO: remove backup
 
-
         var snapshot: Record?
         if FileManager().fileExists(at: url) {
-
             let input = try FileHandle(forReadingFrom: url)
             var values: [Key: Value] = [:]
             while let data = try input.readPrefixedRecord() {
                 let record = try JSONDecoder().decode(Record.self, from: data)
                 switch record {
-                case .set(let key, let value):
+                case let .set(key, value):
                     values[key] = value
-                case .delete(let key):
+                case let .delete(key):
                     values[key] = nil
-                case .snapshot(let values):
+                case let .snapshot(values):
                     self.values = values
                 default:
                     fatalError()
@@ -70,7 +66,7 @@ class MiniDatabase <Value: Codable> {
         // TODO: Not atomic
         try FileManager().removeItemIfExists(at: url)
         try FileManager().createFile(at: url, createIntermediates: true)
-        self.journal = try FileHandle(forWritingTo: url)
+        journal = try FileHandle(forWritingTo: url)
         if let snapshot {
             try write(record: snapshot, handle: journal)
         }
@@ -82,40 +78,33 @@ class MiniDatabase <Value: Codable> {
                 logger.log("Writing: \(String(describing: record))")
                 let data = try JSONEncoder().encode(record)
                 try handle.writePrefixedRecord(data)
-            }
-            catch {
+            } catch {
                 logger.error("Failed to write: \(error)")
             }
         }
     }
 }
 
-
-extension MiniDatabase: ObservableObject {
-}
+extension MiniDatabase: ObservableObject {}
 
 extension MiniDatabase: Sequence {
-
     struct Iterator: IteratorProtocol {
-
         func next() -> (Key, Value)? {
             fatalError()
         }
-
     }
 
     func makeIterator() -> Iterator {
         fatalError()
     }
-
 }
 
 extension MiniDatabase: Collection {
-    func index(after i: Index) -> Index {
+    func index(after _: Index) -> Index {
         fatalError()
     }
 
-    subscript(position: Index) -> Element {
+    subscript(_: Index) -> Element {
         _read {
             fatalError()
         }
@@ -124,7 +113,7 @@ extension MiniDatabase: Collection {
     typealias Element = (Key, Value)
 
     struct Index: Comparable {
-        static func < (lhs: Self, rhs: Self) -> Bool {
+        static func < (_: Self, _: Self) -> Bool {
             fatalError()
         }
     }
@@ -132,17 +121,16 @@ extension MiniDatabase: Collection {
     var startIndex: Index {
         fatalError()
     }
+
     var endIndex: Index {
         fatalError()
     }
-
 }
 
 extension MiniDatabase: BidirectionalCollection {
-    func index(before i: Index) -> Index {
+    func index(before _: Index) -> Index {
         fatalError()
     }
 }
 
-extension MiniDatabase: RandomAccessCollection {
-}
+extension MiniDatabase: RandomAccessCollection {}

@@ -2,7 +2,6 @@ import SwiftUI
 @_spi(DemoKit) import DemoKit
 
 struct UserDefaultsView: View {
-
     struct Record: Identifiable {
         let id: [AnyHashable]
         let key: String
@@ -43,6 +42,7 @@ struct UserDefaultsView: View {
                 return type
             }
         }
+
         let value: Value
     }
 
@@ -57,7 +57,7 @@ struct UserDefaultsView: View {
 
     init() {
         let items: [(key: String, value: Any)] = Array(UserDefaults.standard.dictionaryRepresentation())
-        let records = items.enumerated().map { (index, item) in
+        let records = items.enumerated().map { index, item in
             let value: Record.Value
             switch item.value {
             case let o as Bool:
@@ -72,9 +72,9 @@ struct UserDefaultsView: View {
                 value = .data(o)
             case let o as Date:
                 value = .date(o)
-            case let o as Array<Any>:
+            case let o as [Any]:
                 value = .array(o)
-            case let o as Dictionary<String, Any>:
+            case let o as [String: Any]:
                 value = .dictionary(o)
             default:
                 value = .unknown(item.value)
@@ -91,30 +91,30 @@ struct UserDefaultsView: View {
         Table(filteredRecords) {
             TableColumn("Key", value: \.key)
             TableColumn("Type") { record in
-                return Text(verbatim: record.value.typeName)
+                Text(verbatim: record.value.typeName)
             }
             TableColumn("Value") { record in
                 switch record.value {
-                case .boolean(let value):
+                case let .boolean(value):
                     Toggle(isOn: .constant(value)) {
                         EmptyView()
                     }
                     .toggleStyle(SwitchToggleStyle())
-                case .integer(let value):
+                case let .integer(value):
                     Text(value, format: .number).monospacedDigit()
-                case .float(let value):
+                case let .float(value):
                     Text(value, format: .number).monospacedDigit()
-                case .string(let value):
+                case let .string(value):
                     Text(verbatim: value)
-                case .array(let value):
+                case let .array(value):
                     ArrayView(array: value)
-                case .dictionary(let value):
+                case let .dictionary(value):
                     Text(verbatim: String(describing: value))
-                case .data(let value):
+                case let .data(value):
                     Text("\(value.count) bytes")
-                case .date(let value):
+                case let .date(value):
                     Text(value, style: .date)
-                case .unknown(let value):
+                case let .unknown(value):
                     Text(verbatim: String(describing: value))
                 }
             }
@@ -128,7 +128,7 @@ struct UserDefaultsView: View {
                         return true
                     }
                     return record.key.contains(pattern)
-                    || String(describing: record.value).contains(pattern)
+                        || String(describing: record.value).contains(pattern)
                 }
                 .sorted(using: MySortComparator(\.key))
 
@@ -149,4 +149,3 @@ struct ArrayView: View {
         }
     }
 }
-

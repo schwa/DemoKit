@@ -1,9 +1,9 @@
-import SwiftUI
 import Foundation
-import RegexBuilder
 import os
+import RegexBuilder
+import SwiftUI
 #if os(macOS)
-import AppKit
+    import AppKit
 #endif
 import AsyncAlgorithms
 
@@ -23,10 +23,10 @@ public struct AnyDemo: Demo {
     public let title: String
     let view: () -> AnyView
 
-    public init <Base>(_ base: Base) where Base: Demo {
-        self.id = base.id
-        self.title = base.title
-        self.view = {
+    public init<Base>(_ base: Base) where Base: Demo {
+        id = base.id
+        title = base.title
+        view = {
             AnyView(base.body)
         }
     }
@@ -37,10 +37,10 @@ public struct AnyDemo: Demo {
 }
 
 public extension AnyDemo {
-    init <Content>(_ title: String, @ViewBuilder body: @escaping () -> Content) where Content: View {
-        self.id = title
+    init<Content>(_ title: String, @ViewBuilder body: @escaping () -> Content) where Content: View {
+        id = title
         self.title = title
-        self.view = {
+        view = {
             AnyView(body())
         }
     }
@@ -61,18 +61,16 @@ public extension DemoMetadata {
             if newValue {
                 logger.log("INSERTING")
                 tags.insert("starred")
-            }
-            else {
+            } else {
                 logger.log("REMOVING")
                 tags.remove("starred")
             }
-
         }
     }
 }
 
 @resultBuilder
-public struct DemosBuilder {
+public enum DemosBuilder {
     public static func buildBlock(_ components: any Demo...) -> [AnyDemo] {
         return components.map { AnyDemo($0) }
     }
@@ -81,7 +79,6 @@ public struct DemosBuilder {
 // MARK: Internal Model
 
 class DemoModel: ObservableObject {
-
     @Published
     var allDemos: [String: AnyDemo] = [:]
 
@@ -113,11 +110,9 @@ extension DemoModel {
     }
 }
 
-
 // MARK: Views
 
 public struct DemosView: View {
-
     @Environment(\.scenePhase)
     var scenePhase
 
@@ -160,18 +155,18 @@ public struct DemosView: View {
         .onChange(of: scenePhase) { scenePhase in
             logger.log("\(String(describing: scenePhase))")
         }
-#if os(macOS)
-        //        .task {
-        //            do {
-        //                let n = NotificationCenter.default.notifications(named: NSApplication.willTerminateNotification)
-        //                for try await x in n {
-        //                    logger.log("\(x)")
-        //                }
-        //            }
-        //            catch {
-        //            }
-        //        }
-#endif
+        #if os(macOS)
+            //        .task {
+            //            do {
+            //                let n = NotificationCenter.default.notifications(named: NSApplication.willTerminateNotification)
+            //                for try await x in n {
+            //                    logger.log("\(x)")
+            //                }
+            //            }
+            //            catch {
+            //            }
+            //        }
+        #endif
     }
 }
 
@@ -188,7 +183,6 @@ struct DemoView: View {
 
 // TODO: Doesn't wor
 struct DemoRow: View {
-
     @EnvironmentObject
     var model: DemoModel
 
@@ -225,9 +219,8 @@ struct DemoRow: View {
                 .padding()
             }
         }
-        .onChange(of: metadata) { newValue in
+        .onChange(of: metadata) { _ in
             model.demoMetadata[demo.id] = metadata
         }
     }
 }
-

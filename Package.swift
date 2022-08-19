@@ -9,12 +9,13 @@ let package = Package(
         .macOS(.v13),
         .iOS(.v16),
         .tvOS(.v16),
-        .watchOS(.v9)
+        .watchOS(.v9),
     ],
     products: [
         .library(
             name: "DemoKit",
-            targets: ["DemoKit"]),
+            targets: ["DemoKit"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-async-algorithms", branch: "main"),
@@ -26,6 +27,7 @@ let package = Package(
         ),
         .testTarget(
             name: "DemoKitTests",
-            dependencies: ["DemoKit"]),
+            dependencies: ["DemoKit"]
+        ),
     ]
 )

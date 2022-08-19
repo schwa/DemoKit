@@ -1,9 +1,9 @@
-import SwiftUI
 import DemoKit
+import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        //UserDefaultsView()
+        // UserDefaultsView()
 
         DemosView {
             AnyDemo("Red Demo") {
@@ -18,4 +18,3 @@ struct ContentView: View {
         }
     }
 }
-

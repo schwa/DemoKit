@@ -1,9 +1,9 @@
-import SwiftUI
 import Foundation
-import RegexBuilder
 import os
+import RegexBuilder
+import SwiftUI
 #if os(macOS)
-import AppKit
+    import AppKit
 #endif
 import AsyncAlgorithms
 
@@ -12,13 +12,11 @@ extension View {
         return task(priority: priority) {
             do {
                 try await action()
-            }
-            catch {
+            } catch {
                 fatalError("\(error)")
             }
         }
     }
-
 }
 
 extension Duration: ExpressibleByFloatLiteral {
@@ -34,14 +32,12 @@ extension Duration: ExpressibleByIntegerLiteral {
 }
 
 extension Duration {
-
     init(_ timeInterval: TimeInterval) {
         // 1×10−18
 
         let fraction = timeInterval - floor(timeInterval)
         self = .init(secondsComponent: Int64(timeInterval), attosecondsComponent: Int64(fraction * 1e18))
     }
-
 }
 
 extension FormatStyle where Self == Duration.TimeFormatStyle {
@@ -50,14 +46,14 @@ extension FormatStyle where Self == Duration.TimeFormatStyle {
     }
 }
 
-//extension Text {
+// extension Text {
 //    init<F>(_ input: F.FormatInput, format: F) where F : FormatStyle, F.FormatInput : Equatable, F.FormatOutput == Duration {
 //        fatalError()
 //    }
-//}
+// }
 
 @_spi(DemoKit)
-public struct MySortComparator <Compared, Key>: SortComparator, Hashable where Key: Comparable {
+public struct MySortComparator<Compared, Key>: SortComparator, Hashable where Key: Comparable {
     let keyPath: KeyPath<Compared, Key>
     public var order: SortOrder
 
@@ -72,14 +68,12 @@ public struct MySortComparator <Compared, Key>: SortComparator, Hashable where K
 }
 
 extension ComparisonResult {
-    init <C>(lhs: C, rhs: C, sortOrder: SortOrder = .forward) where C: Comparable {
+    init<C>(lhs: C, rhs: C, sortOrder: SortOrder = .forward) where C: Comparable {
         if lhs < rhs {
             self = sortOrder == .forward ? .orderedAscending : .orderedDescending
-        }
-        else if lhs == rhs {
+        } else if lhs == rhs {
             self = .orderedSame
-        }
-        else {
+        } else {
             self = sortOrder == .forward ? .orderedDescending : .orderedAscending
         }
     }
@@ -105,21 +99,19 @@ struct MyToggleStyle: ToggleStyle {
 }
 
 protocol EncoderProtocol {
-    func encode<T>(_ value: T) throws -> Data where T : Encodable
+    func encode<T>(_ value: T) throws -> Data where T: Encodable
 }
 
-extension JSONEncoder: EncoderProtocol {
-}
+extension JSONEncoder: EncoderProtocol {}
 
 extension Encodable {
-    func write <T>(to url: URL, encoder: T) throws where T: EncoderProtocol {
+    func write<T>(to url: URL, encoder _: T) throws where T: EncoderProtocol {
         let data = try JSONEncoder().encode(self)
         try data.write(to: url)
     }
 }
 
 extension FileManager {
-
     var applicationSupportDirectory: URL {
         guard let url = urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             fatalError()
@@ -135,16 +127,15 @@ extension FileManager {
     }
 
     func directoryExists(at url: URL) -> Bool {
-        var isDirectory: Bool = false
+        var isDirectory = false
         if fileExists(at: url, isDirectory: &isDirectory) {
             return isDirectory
-        }
-        else {
+        } else {
             return false
         }
     }
 
-    func createFile(at url: URL, contents: Data? = nil, attributes: [FileAttributeKey : Any]? = nil, createIntermediates: Bool = false) throws {
+    func createFile(at url: URL, contents: Data? = nil, attributes: [FileAttributeKey: Any]? = nil, createIntermediates: Bool = false) throws {
         logger.log("\(FileManager().currentDirectoryPath)")
 
         if createIntermediates {
@@ -167,8 +158,7 @@ extension FileManager {
         if fileExists(at: at) {
             try removeItem(at: at)
             return true
-        }
-        else {
+        } else {
             return false
         }
     }
@@ -177,14 +167,14 @@ extension FileManager {
         return fileExists(atPath: at.path)
     }
 
-    func copyItem(at: URL, to: URL, replacingIfExists: Bool = false) throws {
+    func copyItem(at: URL, to: URL, replacingIfExists _: Bool = false) throws {
         if fileExists(at: to) {
             try removeItem(at: to)
         }
         try copyItem(at: at, to: to)
     }
 
-    func moveItem(at: URL, to: URL, replacingIfExists: Bool = false) throws {
+    func moveItem(at: URL, to: URL, replacingIfExists _: Bool = false) throws {
         if fileExists(at: to) {
             try removeItem(at: to)
         }
@@ -192,9 +182,7 @@ extension FileManager {
     }
 }
 
-
 extension FileHandle {
-
     func readPrefixedRecord() throws -> Data? {
         guard let count = try read(type: Int.self) else {
             return nil
@@ -205,17 +193,17 @@ extension FileHandle {
         return data
     }
 
-    func writePrefixedRecord <D>(_ data: D) throws where D: DataProtocol {
+    func writePrefixedRecord<D>(_ data: D) throws where D: DataProtocol {
         try withUnsafeBytes(of: data.count) { count in
             let buffer = Data(count) + Data(data)
             try write(contentsOf: buffer)
         }
     }
 
-    func read <T>(type: T.Type) throws -> T? {
+    func read<T>(type _: T.Type) throws -> T? {
         let saved = try offset()
         guard let data = try read(upToCount: MemoryLayout<T>.size), data.count == MemoryLayout<T>.size else {
-            try self.seek(toOffset: saved)
+            try seek(toOffset: saved)
             return nil
         }
         return data.withUnsafeBytes { buffer in
@@ -224,12 +212,12 @@ extension FileHandle {
     }
 }
 
-
-struct LazyView <Content>: View where Content: View {
+struct LazyView<Content>: View where Content: View {
     let content: () -> Content
     init(@ViewBuilder _ content: @escaping () -> Content) {
         self.content = content
     }
+
     var body: Content {
         content()
     }
@@ -237,8 +225,7 @@ struct LazyView <Content>: View where Content: View {
 
 // MARK: -
 
-struct CrashDetectionView <Content>: View where Content: View {
-
+struct CrashDetectionView<Content>: View where Content: View {
     enum Crash: String {
         case unknown
         case potential
@@ -249,7 +236,6 @@ struct CrashDetectionView <Content>: View where Content: View {
         case unstable
         case stable
     }
-
 
     let id: String
     let showLifeCycle: Bool
@@ -280,11 +266,11 @@ struct CrashDetectionView <Content>: View where Content: View {
             switch (lastCrash, override) {
             case (.unknown, _), (_, true):
                 content()
-                    .onAppear() {
+                    .onAppear {
                         logger.log("onAppear: \(id)")
                         markUnstable()
                     }
-                    .onDisappear() {
+                    .onDisappear {
                         logger.log("onDisappear: \(id)")
                         markStable()
                     }
@@ -293,8 +279,7 @@ struct CrashDetectionView <Content>: View where Content: View {
                             try await Task.sleep(until: .now + .seconds(unstableTime), clock: .continuous)
                             logger.log("slept: \(id)")
                             markStable()
-                        }
-                        catch {
+                        } catch {
                             logger.log("Error: \(error)")
                         }
                     }
@@ -315,7 +300,6 @@ struct CrashDetectionView <Content>: View where Content: View {
                 }
             }
         }
-
     }
 
     func markUnstable() {
@@ -335,8 +319,7 @@ struct CrashDetectionView <Content>: View where Content: View {
     }
 }
 
-struct HUDView <Content>: View where Content: View {
-
+struct HUDView<Content>: View where Content: View {
     let content: () -> Content
 
     init(@ViewBuilder content: @escaping () -> Content) {
@@ -350,5 +333,4 @@ struct HUDView <Content>: View where Content: View {
             .overlay(ContainerRelativeShape().strokeBorder(Color.white, lineWidth: 4))
             .containerShape(RoundedRectangle(cornerSize: .init(width: 8, height: 8)))
     }
-
 }
