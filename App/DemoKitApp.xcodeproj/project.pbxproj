@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		457009E228B03CE70082B489 /* DemoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 457009E128B03CE70082B489 /* DemoKit */; };
+		457009E428B03DB40082B489 /* Scratch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457009E328B03DB40082B489 /* Scratch.swift */; };
 		459C820428AEC05F006A9510 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 459C820328AEC05F006A9510 /* AsyncAlgorithms */; };
 		45A5880228AD89A4005D2A9E /* DemoKitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A5880128AD89A4005D2A9E /* DemoKitApp.swift */; };
 		45A5880428AD89A4005D2A9E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A5880328AD89A4005D2A9E /* ContentView.swift */; };
@@ -17,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		4533595928B039AC00CBBCCE /* DemoKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DemoKit; path = ..; sourceTree = "<group>"; };
+		457009E328B03DB40082B489 /* Scratch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scratch.swift; sourceTree = "<group>"; };
 		45A587FE28AD89A4005D2A9E /* DemoKitApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DemoKitApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45A5880128AD89A4005D2A9E /* DemoKitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoKitApp.swift; sourceTree = "<group>"; };
 		45A5880328AD89A4005D2A9E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 			children = (
 				45A5880128AD89A4005D2A9E /* DemoKitApp.swift */,
 				45A5880328AD89A4005D2A9E /* ContentView.swift */,
+				457009E328B03DB40082B489 /* Scratch.swift */,
 				45A5880528AD89A5005D2A9E /* Assets.xcassets */,
 				45A5880728AD89A5005D2A9E /* DemoKitApp.entitlements */,
 				45A5880828AD89A5005D2A9E /* Preview Content */,
@@ -161,6 +164,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				45A5880428AD89A4005D2A9E /* ContentView.swift in Sources */,
+				457009E428B03DB40082B489 /* Scratch.swift in Sources */,
 				45A5880228AD89A4005D2A9E /* DemoKitApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

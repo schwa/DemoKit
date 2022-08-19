@@ -9,7 +9,104 @@ import AsyncAlgorithms
 
 let logger = Logger(subsystem: "TODO", category: "TODO")
 
-struct DemosView: View {
+// MARK: Model
+
+public protocol Demo: Identifiable {
+    associatedtype Content where Content: View
+    var id: String { get }
+    var title: String { get }
+    var body: Content { get }
+}
+
+public struct AnyDemo: Demo {
+    public let id: String
+    public let title: String
+    let view: () -> AnyView
+
+    public init <Base>(_ base: Base) where Base: Demo {
+        self.id = base.id
+        self.title = base.title
+        self.view = {
+            AnyView(base.body)
+        }
+    }
+
+    public var body: some View {
+        return view()
+    }
+}
+
+public extension AnyDemo {
+    init <Content>(_ title: String, @ViewBuilder body: @escaping () -> Content) where Content: View {
+        self.id = title
+        self.title = title
+        self.view = {
+            AnyView(body())
+        }
+    }
+}
+
+public struct DemoMetadata: Equatable, Codable {
+    public let demo: String
+    public var tags: Set<String>
+    public var comments: String
+    public var lastLaunched: Date?
+    public var lastDuration: TimeInterval?
+}
+
+public extension DemoMetadata {
+    var starred: Bool {
+        get {
+            return tags.contains("starred")
+        }
+        set {
+            if newValue {
+                logger.log("INSERTING")
+                tags.insert("starred")
+            }
+            else {
+                logger.log("REMOVING")
+                tags.remove("starred")
+            }
+
+        }
+    }
+}
+
+@resultBuilder
+public struct DemosBuilder {
+    static func buildBlock(_ components: any Demo...) -> [AnyDemo] {
+        return components.map { AnyDemo($0) }
+    }
+}
+
+// MARK: Internal Model
+
+class DemoModel: ObservableObject {
+
+    @Published
+    var allDemos: [String: AnyDemo] = [:]
+
+    @Published
+    //    var demoMetadata: [String: DemoMetadata] = [:]
+    var demoMetadata = try! MiniDatabase<DemoMetadata>(url: FileManager().applicationSupportDirectory.appending(path: "test.journal"))
+}
+
+extension DemoModel {
+    convenience init(@DemosBuilder _ demos: () -> [AnyDemo]) {
+        let demos = demos()
+        self.init()
+        for demo in demos {
+            allDemos[demo.id] = demo
+            demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "", lastLaunched: nil, lastDuration: nil)
+        }
+    }
+}
+
+
+// MARK: Views
+
+public struct DemosView: View {
 
     @Environment(\.scenePhase)
     var scenePhase
@@ -40,11 +137,11 @@ struct DemosView: View {
             .sorted(using: MySortComparator(\.title)))
     }
 
-    init() {
+    public init() {
         logger.log("INIT")
     }
 
-    var body: some View {
+    public var body: some View {
         NavigationSplitView {
             List(selection: $sidebarSelection) {
                 ForEach(filteredDemos) { demo in
@@ -148,96 +245,3 @@ struct DemoRow: View {
     }
 }
 
-
-// MARK: -
-
-class DemoModel: ObservableObject {
-
-    @Published
-    var allDemos: [String: AnyDemo] = [:]
-
-    @Published
-    //    var demoMetadata: [String: DemoMetadata] = [:]
-    var demoMetadata = try! MiniDatabase<DemoMetadata>(url: FileManager().applicationSupportDirectory.appending(path: "test.journal"))
-}
-
-@resultBuilder
-struct DemosBuilder {
-    static func buildBlock(_ components: any Demo...) -> [AnyDemo] {
-        return components.map { AnyDemo($0) }
-    }
-
-}
-
-extension DemoModel {
-    convenience init(@DemosBuilder _ demos: () -> [AnyDemo]) {
-        let demos = demos()
-        self.init()
-        for demo in demos {
-            allDemos[demo.id] = demo
-            demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "", lastLaunched: nil, lastDuration: nil)
-        }
-    }
-}
-
-protocol Demo: Identifiable {
-    associatedtype Content where Content: View
-    var id: String { get }
-    var title: String { get }
-    var body: Content { get }
-}
-
-struct AnyDemo: Demo {
-    let id: String
-    let title: String
-    let view: () -> AnyView
-
-    init <Base>(_ base: Base) where Base: Demo {
-        self.id = base.id
-        self.title = base.title
-        self.view = {
-            AnyView(base.body)
-        }
-    }
-
-    var body: some View {
-        return view()
-    }
-}
-
-extension AnyDemo {
-    init <Content>(_ title: String, @ViewBuilder body: @escaping () -> Content) where Content: View {
-        self.id = title
-        self.title = title
-        self.view = {
-            AnyView(body())
-        }
-    }
-}
-
-struct DemoMetadata: Equatable, Codable {
-    let demo: String
-    var tags: Set<String>
-    var comments: String
-    var lastLaunched: Date?
-    var lastDuration: TimeInterval?
-}
-
-extension DemoMetadata {
-    var starred: Bool {
-        get {
-            return tags.contains("starred")
-        }
-        set {
-            if newValue {
-                logger.log("INSERTING")
-                tags.insert("starred")
-            }
-            else {
-                logger.log("REMOVING")
-                tags.remove("starred")
-            }
-
-        }
-    }
-}
