@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "swift-async-algorithms",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-async-algorithms",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c0fdfdb8aa2b263799ebafc6f11c62f01e838f71"
+      }
+    }
+  ],
+  "version" : 2
+}
