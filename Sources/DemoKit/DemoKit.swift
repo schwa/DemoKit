@@ -50,8 +50,6 @@ public struct DemoMetadata: Equatable, Codable {
     public let demo: String
     public var tags: Set<String>
     public var comments: String
-    public var lastLaunched: Date?
-    public var lastDuration: TimeInterval?
 }
 
 public extension DemoMetadata {
@@ -98,7 +96,7 @@ extension DemoModel {
         self.init()
         for demo in demos {
             allDemos[demo.id] = demo
-            demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "", lastLaunched: nil, lastDuration: nil)
+            demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "")
         }
     }
 
@@ -109,7 +107,7 @@ extension DemoModel {
         set {
             for demo in newValue {
                 allDemos[demo.id] = demo
-                demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "", lastLaunched: nil, lastDuration: nil)
+                demoMetadata[demo.id] = .init(demo: demo.id, tags: [], comments: "")
             }
         }
     }
@@ -222,19 +220,6 @@ struct DemoRow: View {
                     LabeledContent("Tags", value: metadata.tags.joined(separator: ", ")) // TODO: list format
                     LabeledContent("Comments") {
                         TextField("comment", text: $metadata.comments)
-                    }
-                    TimelineView(.animation) { time in
-                        LabeledContent("Last Launched") {
-                            if let value = metadata.lastLaunched {
-                                Text(value, format: .dateTime)
-                            }
-                        }
-                        LabeledContent("Last Duration") {
-                            if let value = metadata.lastDuration {
-                                Text(Duration(value), format: .duration)
-                                //                                Text(value, format: .number)
-                            }
-                        }
                     }
                 }
                 .padding()

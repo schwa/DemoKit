@@ -33,7 +33,6 @@ extension Duration: ExpressibleByIntegerLiteral {
     }
 }
 
-
 extension Duration {
 
     init(_ timeInterval: TimeInterval) {
@@ -51,13 +50,11 @@ extension FormatStyle where Self == Duration.TimeFormatStyle {
     }
 }
 
-
-extension Text {
-    init<F>(_ input: F.FormatInput, format: F) where F : FormatStyle, F.FormatInput : Equatable, F.FormatOutput == Duration {
-        fatalError()
-
-    }
-}
+//extension Text {
+//    init<F>(_ input: F.FormatInput, format: F) where F : FormatStyle, F.FormatInput : Equatable, F.FormatOutput == Duration {
+//        fatalError()
+//    }
+//}
 
 @_spi(DemoKit)
 public struct MySortComparator <Compared, Key>: SortComparator, Hashable where Key: Comparable {
@@ -72,7 +69,6 @@ public struct MySortComparator <Compared, Key>: SortComparator, Hashable where K
     public func compare(_ lhs: Compared, _ rhs: Compared) -> ComparisonResult {
         return ComparisonResult(lhs: lhs[keyPath: keyPath], rhs: rhs[keyPath: keyPath])
     }
-
 }
 
 extension ComparisonResult {
@@ -90,7 +86,6 @@ extension ComparisonResult {
 }
 
 struct MyToggleStyle: ToggleStyle {
-
     let on: String
     let off: String
 
@@ -109,102 +104,11 @@ struct MyToggleStyle: ToggleStyle {
     }
 }
 
-class MiniDatabase <Value: Codable> {
-
-    typealias Key = String
-
-    @Published
-    var values: [Key: Value] = [:]
-    let url: URL
-    var journal: FileHandle!
-
-    var queue = DispatchQueue(label: "minidata-write")
-
-    enum Record: Codable {
-        case start
-        case set(Key, Value)
-        case delete(Key)
-        case snapshot([Key: Value])
-    }
-
-    init(url: URL) throws {
-        self.url = url
-        try read()
-    }
-
-    subscript(key: Key) -> Value? {
-        get {
-            return values[key]
-        }
-        set {
-            values[key] = newValue
-            let record: Record
-            if let newValue = newValue {
-                record = .set(key, newValue)
-            }
-            else {
-                record = .delete(key)
-            }
-            try! write(record: record, handle: journal)
-        }
-    }
-
-    func read() throws {
-        try journal?.close()
-
-        // TODO: remove backup
-
-
-        var snapshot: Record?
-        if FileManager().fileExists(at: url) {
-
-            let input = try FileHandle(forReadingFrom: url)
-            var values: [Key: Value] = [:]
-            while let data = try input.readPrefixedRecord() {
-                let record = try JSONDecoder().decode(Record.self, from: data)
-                switch record {
-                case .set(let key, let value):
-                    values[key] = value
-                case .delete(let key):
-                    values[key] = nil
-                case .snapshot(let values):
-                    self.values = values
-                default:
-                    fatalError()
-                }
-            }
-            snapshot = Record.snapshot(values)
-        }
-
-        // TODO: Not atomic
-        try FileManager().removeItemIfExists(at: url)
-        try FileManager().createFile(at: url, createIntermediates: true)
-        self.journal = try FileHandle(forWritingTo: url)
-        if let snapshot {
-            try write(record: snapshot, handle: journal)
-        }
-    }
-
-    func write(record: Record, handle: FileHandle) throws {
-        queue.async {
-            do {
-                logger.log("Writing: \(String(describing: record))")
-                let data = try JSONEncoder().encode(record)
-                try handle.writePrefixedRecord(data)
-            }
-            catch {
-                logger.error("Failed to write: \(error)")
-            }
-        }
-    }
-}
-
 protocol EncoderProtocol {
     func encode<T>(_ value: T) throws -> Data where T : Encodable
 }
 
 extension JSONEncoder: EncoderProtocol {
-
 }
 
 extension Encodable {
@@ -320,81 +224,27 @@ extension FileHandle {
     }
 }
 
-extension MiniDatabase: ObservableObject {
-}
 
-extension MiniDatabase: Sequence {
-
-    struct Iterator: IteratorProtocol {
-
-        func next() -> (Key, Value)? {
-            fatalError()
-        }
-
-    }
-
-    func makeIterator() -> Iterator {
-        fatalError()
-    }
-
-}
-
-extension MiniDatabase: Collection {
-    func index(after i: Index) -> Index {
-        fatalError()
-    }
-
-    subscript(position: Index) -> Element {
-        _read {
-            fatalError()
-        }
-    }
-
-    typealias Element = (Key, Value)
-
-    struct Index: Comparable {
-        static func < (lhs: Self, rhs: Self) -> Bool {
-            fatalError()
-        }
-    }
-
-    var startIndex: Index {
-        fatalError()
-    }
-    var endIndex: Index {
-        fatalError()
-    }
-
-}
-
-extension MiniDatabase: BidirectionalCollection {
-    func index(before i: Index) -> Index {
-        fatalError()
-    }
-}
-
-extension MiniDatabase: RandomAccessCollection {
-}
-
-public struct LazyView <Content>: View where Content: View {
-    private let content: () -> Content
-    public init(@ViewBuilder _ content: @escaping () -> Content) {
+struct LazyView <Content>: View where Content: View {
+    let content: () -> Content
+    init(@ViewBuilder _ content: @escaping () -> Content) {
         self.content = content
     }
-    public var body: Content {
+    var body: Content {
         content()
     }
 }
 
+// MARK: -
 
-public struct CrashDetectionView <Content>: View where Content: View {
+struct CrashDetectionView <Content>: View where Content: View {
 
-    public enum Crash: String {
+    enum Crash: String {
         case unknown
         case potential
     }
 
-    public enum LifeCycle {
+    enum LifeCycle {
         case unknown
         case unstable
         case stable
@@ -415,7 +265,7 @@ public struct CrashDetectionView <Content>: View where Content: View {
 
     let content: () -> Content
 
-    public init(id: String, showLifeCycle: Bool = false, content: @escaping () -> Content) {
+    init(id: String, showLifeCycle: Bool = false, content: @escaping () -> Content) {
         self.id = id
         self.showLifeCycle = showLifeCycle
         self.content = content
@@ -425,7 +275,7 @@ public struct CrashDetectionView <Content>: View where Content: View {
         self.lastCrash = lastCrash
     }
 
-    public var body: some View {
+    var body: some View {
         Group {
             switch (lastCrash, override) {
             case (.unknown, _), (_, true):
