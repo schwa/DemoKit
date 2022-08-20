@@ -1,5 +1,6 @@
 @_spi(DemoKit) import DemoKit
 import SwiftUI
+@_implementationOnly import RegexBuilder
 
 struct UserDefaultsView: View {
     struct Record: Identifiable {

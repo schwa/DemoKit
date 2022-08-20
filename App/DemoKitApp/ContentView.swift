@@ -1,20 +1,31 @@
-import DemoKit
+@_spi(DemoKit) import DemoKit
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
         // UserDefaultsView()
 
-        DemosView {
-            AnyDemo("Red Demo") {
-                Color.red
+//        DemosView {
+//            AnyDemo("Red Demo") {
+//                Color.red
+//            }
+//            AnyDemo("Green Demo") {
+//                Color.green
+//            }
+//            AnyDemo("Blue Demo") {
+//                Color.blue
+//            }
+//        }
+
+        CrashDetectionView(id: "test", unstableTime: 1, showLifeCycle: true) {
+            VStack {
+                Text("Hello world")
+                Button("Crash") {
+                    fatalError()
+                }
             }
-            AnyDemo("Green Demo") {
-                Color.green
-            }
-            AnyDemo("Blue Demo") {
-                Color.blue
-            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }

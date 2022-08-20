@@ -1,4 +1,7 @@
 import Foundation
+@_implementationOnly import os
+
+private let logger = Logger(subsystem: "TODO", category: "TODO")
 
 class MiniDatabase<Value: Codable> {
     typealias Key = String

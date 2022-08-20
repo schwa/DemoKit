@@ -1,13 +1,16 @@
 import Foundation
-import os
-import RegexBuilder
+@_implementationOnly import os
+@_implementationOnly import RegexBuilder
 import SwiftUI
 #if os(macOS)
-    import AppKit
+@_implementationOnly import AppKit
 #endif
-import AsyncAlgorithms
+@_implementationOnly import AsyncAlgorithms
+
+private let logger = Logger(subsystem: "TODO", category: "TODO")
 
 extension View {
+    /// UNTESTED DO NOT USE
     func throwingTask(priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable () async throws -> Void) -> some View {
         return task(priority: priority) {
             do {
@@ -225,7 +228,8 @@ struct LazyView<Content>: View where Content: View {
 
 // MARK: -
 
-struct CrashDetectionView<Content>: View where Content: View {
+@_spi(DemoKit)
+public struct CrashDetectionView<Content>: View where Content: View {
     enum Crash: String {
         case unknown
         case potential
@@ -238,8 +242,8 @@ struct CrashDetectionView<Content>: View where Content: View {
     }
 
     let id: String
+    let unstableTime: TimeInterval
     let showLifeCycle: Bool
-    let unstableTime: TimeInterval = 2
 
     let lastCrash: Crash
 
@@ -251,17 +255,20 @@ struct CrashDetectionView<Content>: View where Content: View {
 
     let content: () -> Content
 
-    init(id: String, showLifeCycle: Bool = false, content: @escaping () -> Content) {
+    let key: String
+
+    public init(id: String, unstableTime: TimeInterval = 2, showLifeCycle: Bool = false, content: @escaping () -> Content) {
         self.id = id
+        self.unstableTime = unstableTime
         self.showLifeCycle = showLifeCycle
         self.content = content
-
-        let lastCrash = UserDefaults.standard.string(forKey: "\(id)_lastCrash").map { Crash(rawValue: $0)! } ?? .unknown
+        self.key = "io.schwa.crash-detection-view-\(id)-lastcrash"
+        let lastCrash = UserDefaults.standard.string(forKey: key).map { Crash(rawValue: $0)! } ?? .unknown
         logger.log("\(String(describing: lastCrash))")
         self.lastCrash = lastCrash
     }
 
-    var body: some View {
+    public var body: some View {
         Group {
             switch (lastCrash, override) {
             case (.unknown, _), (_, true):
@@ -283,21 +290,26 @@ struct CrashDetectionView<Content>: View where Content: View {
                             logger.log("Error: \(error)")
                         }
                     }
-                    .overlay {
-                        if showLifeCycle {
-                            HUDView {
-                                VStack {
-                                    Text("Life cycle: \(String(describing: lifeCycle))")
-                                    Text("Last Crash: \(String(describing: lastCrash))")
-                                }
-                            }
-                        }
-                    }
             case (.potential, false):
-                Text("Potential crash?")
-                Button("Launch anyway") {
-                    override = true
+                VStack {
+                    Text("Potential crash")
+                    Button("Launch anyway?") {
+                        override = true
+                    }
                 }
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if showLifeCycle {
+                HUDView {
+                    VStack {
+                        Text("Life cycle: \(String(describing: lifeCycle))")
+                        Text("Last Crash: \(String(describing: lastCrash))")
+                    }
+                }
+                .padding()
             }
         }
     }
@@ -306,7 +318,7 @@ struct CrashDetectionView<Content>: View where Content: View {
         logger.log("markUnstable: \(String(describing: lifeCycle)), \(String(describing: lastCrash))")
         if lifeCycle != .unstable {
             lifeCycle = .unstable
-            UserDefaults.standard.set(Crash.potential.rawValue, forKey: "\(id)_lastCrash")
+            UserDefaults.standard.set(Crash.potential.rawValue, forKey: key)
         }
     }
 
@@ -314,7 +326,7 @@ struct CrashDetectionView<Content>: View where Content: View {
         logger.log("stabilize: \(String(describing: lifeCycle)), \(String(describing: lastCrash))")
         if lifeCycle != .stable {
             lifeCycle = .stable
-            UserDefaults.standard.set(Crash.unknown.rawValue, forKey: "\(id)_lastCrash")
+            UserDefaults.standard.set(Crash.unknown.rawValue, forKey: key)
         }
     }
 }

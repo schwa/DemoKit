@@ -1,13 +1,13 @@
 import Foundation
-import os
-import RegexBuilder
+@_implementationOnly import os
+@_implementationOnly import RegexBuilder
 import SwiftUI
 #if os(macOS)
-    import AppKit
+@_implementationOnly import AppKit
 #endif
-import AsyncAlgorithms
+@_implementationOnly import AsyncAlgorithms
 
-let logger = Logger(subsystem: "TODO", category: "TODO")
+private let logger = Logger(subsystem: "TODO", category: "TODO")
 
 // MARK: Model
 
