@@ -137,12 +137,14 @@ public struct DemosView: View {
 
     public var body: some View {
         NavigationSplitView {
+            #if os(macOS)
             List(selection: $sidebarSelection) {
                 ForEach(filteredDemos) { demo in
                     DemoRow(demo: demo, metadata: model.demoMetadata[demo.id]!)
                 }
             }
             .searchable(text: $searchText, placement: .sidebar, prompt: "search…")
+            #endif
         } detail: {
             if let demo = model.allDemos[sidebarSelection] {
                 CrashDetectionView(id: demo.id, showLifeCycle: true) {
