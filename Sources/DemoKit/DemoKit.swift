@@ -135,6 +135,10 @@ public struct DemosView: View {
         model.demos = demos()
     }
 
+    public init(_ demos: [AnyDemo]) {
+        model.demos = demos
+    }
+
     public var body: some View {
         NavigationSplitView {
             #if os(macOS)
