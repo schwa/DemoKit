@@ -44,6 +44,15 @@ public extension AnyDemo {
             AnyView(body())
         }
     }
+
+    init<Content>(@ViewBuilder body: @escaping () -> Content) where Content: View {
+        self.id = String(describing: Content.self)
+        self.title = String(describing: Content.self)
+        view = {
+            AnyView(body())
+        }
+    }
+
 }
 
 public struct DemoMetadata: Equatable, Codable {
