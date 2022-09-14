@@ -196,7 +196,6 @@ struct DemoView: View {
     }
 }
 
-// TODO: Doesn't wor
 struct DemoRow: View {
     @EnvironmentObject
     var model: DemoModel

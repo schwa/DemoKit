@@ -13,19 +13,9 @@ struct ContentView: View {
             AnyDemo("Blue Demo") {
                 Color.blue
             }
+            AnyDemo("Crashing Demo") {
+                  fatalError()
+            }
         }
-
-        // UserDefaultsView()
-
-//        CrashDetectionView(id: "test", unstableTime: 1, showLifeCycle: true) {
-//            VStack {
-//                Text("Hello world")
-//                Button("Crash") {
-//                    fatalError()
-//                }
-//            }
-//            .padding()
-//            .frame(maxWidth: .infinity, maxHeight: .infinity)
-//        }
     }
 }
