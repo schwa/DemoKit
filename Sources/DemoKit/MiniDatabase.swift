@@ -27,7 +27,7 @@ class MiniDatabase<Value: Codable> {
 
     subscript(key: Key) -> Value? {
         get {
-            return values[key]
+            values[key]
         }
         set {
             values[key] = newValue

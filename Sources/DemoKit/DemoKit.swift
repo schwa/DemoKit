@@ -32,7 +32,7 @@ public struct AnyDemo: Demo {
     }
 
     public var body: some View {
-        return view()
+        view()
     }
 }
 
@@ -52,7 +52,6 @@ public extension AnyDemo {
             AnyView(body())
         }
     }
-
 }
 
 public struct DemoMetadata: Equatable, Codable {
@@ -64,7 +63,7 @@ public struct DemoMetadata: Equatable, Codable {
 public extension DemoMetadata {
     var starred: Bool {
         get {
-            return tags.contains("starred")
+            tags.contains("starred")
         }
         set {
             if newValue {
@@ -81,7 +80,7 @@ public extension DemoMetadata {
 @resultBuilder
 public enum DemosBuilder {
     public static func buildBlock(_ components: any Demo...) -> [AnyDemo] {
-        return components.map { AnyDemo($0) }
+        components.map { AnyDemo($0) }
     }
 }
 
@@ -108,7 +107,7 @@ extension DemoModel {
 
     var demos: [AnyDemo] {
         get {
-            return Array(allDemos.values)
+            Array(allDemos.values)
         }
         set {
             for demo in newValue {
@@ -209,7 +208,7 @@ struct DemoRow: View {
     var metadata: DemoMetadata
 
     var body: some View {
-        return HStack {
+        HStack {
             Toggle("Star", isOn: $metadata.starred)
                 .toggleStyle(MyToggleStyle(on: "star.fill", off: "star"))
             Text(demo.title)
