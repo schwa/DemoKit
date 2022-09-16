@@ -7,7 +7,7 @@ import SwiftUI
 #endif
 @_implementationOnly import AsyncAlgorithms
 
-private let logger = Logger(subsystem: "TODO", category: "TODO")
+private let logger: Logger? = nil // Logger(subsystem: "TODO", category: "TODO")
 
 extension View {
     /// UNTESTED DO NOT USE
@@ -139,7 +139,7 @@ extension FileManager {
     }
 
     func createFile(at url: URL, contents: Data? = nil, attributes: [FileAttributeKey: Any]? = nil, createIntermediates: Bool = false) throws {
-        logger.log("\(FileManager().currentDirectoryPath)")
+        logger?.log("\(FileManager().currentDirectoryPath)")
 
         if createIntermediates {
             let parent = url.deletingLastPathComponent()
@@ -257,14 +257,14 @@ public struct CrashDetectionView<Content>: View where Content: View {
 
     let key: String
 
-    public init(id: String, unstableTime: TimeInterval = 2, showLifeCycle: Bool = false, content: @escaping () -> Content) {
+    public init(id: String, unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, content: @escaping () -> Content) {
         self.id = id
         self.unstableTime = unstableTime
         self.showLifeCycle = showLifeCycle
         self.content = content
         self.key = "io.schwa.crash-detection-view-\(id)-lastcrash"
         let lastCrash = UserDefaults.standard.string(forKey: key).map { Crash(rawValue: $0)! } ?? .unknown
-        logger.log("\(String(describing: lastCrash))")
+        logger?.log("\(String(describing: lastCrash))")
         self.lastCrash = lastCrash
     }
 
@@ -274,29 +274,33 @@ public struct CrashDetectionView<Content>: View where Content: View {
             case (.unknown, _), (_, true):
                 content()
                     .onWillAppear {
-                        logger.log("onAppear: \(id)")
+                        logger?.log("onAppear: \(id)")
                         markUnstable()
                     }
                     .onDisappear {
-                        logger.log("onDisappear: \(id)")
+                        logger?.log("onDisappear: \(id)")
                         markStable()
                     }
                     .task {
                         do {
                             try await Task.sleep(until: .now + .seconds(unstableTime), clock: .continuous)
-                            logger.log("slept: \(id)")
+                            logger?.log("slept: \(id)")
                             markStable()
                         } catch {
-                            logger.log("Error: \(error)")
+                            logger?.log("Error: \(error)")
                         }
                     }
             case (.potential, false):
                 VStack {
-                    Text("Potential crash")
-                    Button("Launch anyway?") {
+                    Label("Potential Crash", systemImage: "exclamationmark.triangle").font(.headline)
+                    Text("Launch regardless?").font(.subheadline)
+                    Button("Launch") {
                         override = true
                     }
                 }
+                .padding()
+                .background(Color.red)
+                .border(Color.white)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -317,7 +321,7 @@ public struct CrashDetectionView<Content>: View where Content: View {
     func markUnstable() {
         if lifeCycle != .unstable {
             lifeCycle = .unstable
-            logger.log("markUnstable: \(String(describing: lifeCycle)), \(String(describing: lastCrash))")
+            logger?.log("markUnstable: \(String(describing: lifeCycle)), \(String(describing: lastCrash))")
             UserDefaults.standard.set(Crash.potential.rawValue, forKey: key)
         }
     }
@@ -325,7 +329,7 @@ public struct CrashDetectionView<Content>: View where Content: View {
     func markStable() {
         if lifeCycle != .stable {
             lifeCycle = .stable
-            logger.log("stabilize: \(String(describing: lifeCycle)), \(String(describing: lastCrash))")
+            logger?.log("stabilize: \(String(describing: lifeCycle)), \(String(describing: lastCrash))")
             UserDefaults.standard.set(Crash.unknown.rawValue, forKey: key)
         }
     }
