@@ -14,19 +14,28 @@ public protocol Demo: Identifiable {
     var id: String { get }
     var title: String { get }
     var body: Content { get }
+    var tags: Set<String> { get }
+}
+
+public extension Demo {
+    var tags: Set <String> {
+        return []
+    }
 }
 
 public struct AnyDemo: Demo {
     public let id: String
     public let title: String
+    public let tags: Set <String>
     let view: () -> AnyView
 
-    public init<Base>(_ base: Base) where Base: Demo {
+    public init<Base>(_ base: Base, extraTags: Set<String> = []) where Base: Demo {
         id = base.id
         title = base.title
         view = {
             AnyView(base.body)
         }
+        tags = base.tags.union(extraTags)
     }
 
     public var body: some View {
@@ -35,20 +44,34 @@ public struct AnyDemo: Demo {
 }
 
 public extension AnyDemo {
-    init<Content>(_ title: String, @ViewBuilder body: @escaping () -> Content) where Content: View {
+    init<Content>(_ title: String, tags: Set<String> = [], @ViewBuilder body: @escaping () -> Content) where Content: View {
         id = title
         self.title = title
+        self.tags = tags
         view = {
             AnyView(body())
         }
     }
 
-    init<Content>(@ViewBuilder body: @escaping () -> Content) where Content: View {
+    init<Content>(tags: Set<String> = [], @ViewBuilder body: @escaping () -> Content) where Content: View {
         self.id = String(describing: Content.self)
         self.title = String(describing: Content.self)
+        self.tags = tags
         view = {
             AnyView(body())
         }
+    }
+}
+
+public extension Demo {
+    func tagged(_ tags: Set<String>) -> some Demo {
+        return AnyDemo(self, extraTags: tags)
+    }
+    
+    func grouped(_ group: String) -> some Demo {
+        var tags = self.tags.filter({ $0.hasPrefix("group") == false })
+        tags.insert("group:\(group)")
+        return tagged(tags)
     }
 }
 

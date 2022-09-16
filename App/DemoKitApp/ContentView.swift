@@ -7,12 +7,15 @@ struct ContentView: View {
             AnyDemo("Red Demo") {
                 Color.red
             }
+            .tagged(["red"])
             AnyDemo("Green Demo") {
                 Color.green
             }
+            .tagged(["green"])
             AnyDemo("Blue Demo") {
                 Color.blue
             }
+            .tagged(["blue"])
             AnyDemo("Crashing Demo") {
                 fatalError()
             }
