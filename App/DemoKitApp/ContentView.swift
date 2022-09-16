@@ -14,7 +14,7 @@ struct ContentView: View {
                 Color.blue
             }
             AnyDemo("Crashing Demo") {
-                  fatalError()
+                fatalError()
             }
         }
     }

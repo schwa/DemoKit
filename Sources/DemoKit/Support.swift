@@ -230,7 +230,7 @@ struct LazyView<Content>: View where Content: View {
 
 @_spi(DemoKit)
 public struct CrashDetectionView<Content>: View where Content: View {
-    enum Crash: String {
+    public enum Crash: String {
         case unknown
         case potential
     }
@@ -241,31 +241,30 @@ public struct CrashDetectionView<Content>: View where Content: View {
         case stable
     }
 
-    let id: String
-    let unstableTime: TimeInterval
-    let showLifeCycle: Bool
+    private let id: String
+    private let unstableTime: TimeInterval
+    private let showLifeCycle: Bool
+    private let content: () -> Content
 
-    let lastCrash: Crash
+    private let key: String
+    private let lastCrash: Crash
 
     @State
-    var lifeCycle = LifeCycle.unknown
+    private var lifeCycle = LifeCycle.unknown
 
     @State
-    var override = false
+    private var override = false
 
-    let content: () -> Content
-
-    let key: String
-
-    public init(id: String, unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, content: @escaping () -> Content) {
+    public init(id: String, unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, didCrash: ((Crash) -> Void)? = nil, content: @escaping () -> Content) {
         self.id = id
         self.unstableTime = unstableTime
         self.showLifeCycle = showLifeCycle
         self.content = content
         self.key = "io.schwa.crash-detection-view-\(id)-lastcrash"
         let lastCrash = UserDefaults.standard.string(forKey: key).map { Crash(rawValue: $0)! } ?? .unknown
-        logger?.log("\(String(describing: lastCrash))")
         self.lastCrash = lastCrash
+        logger?.log("\(String(describing: lastCrash))")
+        didCrash?(lastCrash)
     }
 
     public var body: some View {
