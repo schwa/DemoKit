@@ -16,6 +16,9 @@ struct ContentView: View {
             AnyDemo("Crashing Demo") {
                 fatalError()
             }
+            AnyDemo("Crashing Demo 2") {
+                fatalError()
+            }
         }
     }
 }

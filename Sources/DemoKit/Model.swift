@@ -65,11 +65,22 @@ public extension DemoMetadata {
         }
         set {
             if newValue {
-                logger?.log("INSERTING")
                 tags.insert("starred")
             } else {
-                logger?.log("REMOVING")
                 tags.remove("starred")
+            }
+        }
+    }
+    
+    var crashed: Bool {
+        get {
+            tags.contains("crashed")
+        }
+        set {
+            if newValue {
+                tags.insert("crashed")
+            } else {
+                tags.remove("crashed")
             }
         }
     }

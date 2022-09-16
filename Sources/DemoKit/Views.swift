@@ -61,9 +61,9 @@ public struct DemosView: View {
                     var tags = model.demoMetadata[demo.id]!.tags
                     switch crash {
                     case .potential:
-                        tags.insert("Crashed")
+                        tags.insert("crashed")
                     case .unknown:
-                        tags.remove("Crashed")
+                        tags.remove("crashed")
                     }
                     model.demoMetadata[demo.id]!.tags = tags
                 }
@@ -119,6 +119,10 @@ internal struct DemoRow: View {
         HStack {
             Toggle("Star", isOn: $metadata.starred)
                 .toggleStyle(MyToggleStyle(on: "star.fill", off: "star"))
+            if metadata.crashed {
+                Image(systemName: "exclamationmark.triangle").foregroundColor(Color.red)
+            }
+            
             Text(demo.title)
             Spacer()
             Button {
