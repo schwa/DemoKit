@@ -23,12 +23,20 @@ public extension Demo {
     }
 }
 
-public struct AnyDemo: Demo {
+public struct AnyDemo: Demo, Hashable {
     public let id: String
     public let title: String
     public let tags: Set <String>
     let view: () -> AnyView
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id
+    }
 
+    public func hash(into hasher: inout Hasher) {
+        id.hash(into: &hasher)
+    }
+    
     public init<Base>(_ base: Base, extraTags: Set<String> = []) where Base: Demo {
         id = base.id
         title = base.title

@@ -17,8 +17,8 @@ public struct DemosView: View {
     
     var model = DemoModel()
     
-    @AppStorage("selectedDemo") // TODO: Should be SceneStorage
-    var sidebarSelection: String = ""
+    @SceneStorage("selectedDemo")
+    var sidebarSelection: String?
     
     @State
     var searchText: String = ""
@@ -33,20 +33,20 @@ public struct DemosView: View {
     let unstableTime: TimeInterval
     let showLifeCycle: Bool
     
+    struct Group: Identifiable {
+        let id: String
+        let title: String
+        let children: [AnyDemo]
+    }
+
     var groups: [Group] {
         let groupNames = Set(filteredDemos.compactMap {
             $0.tags.first(where: { $0.hasPrefix("group:") })?.trimmingPrefix("group:")
         })
-        return groupNames.map { groupName in
+        return groupNames.sorted().map { groupName in
             let groupName = String(groupName)
-            return Group(id: groupName, title: groupName, children: filteredDemos.filter { $0.tags.contains("group:\(groupName)") })
+            return Group(id: groupName, title: groupName, children: filteredDemos.filter { $0.tags.contains("group:\(groupName)") }.sorted(by: { $0.title < $1.title }))
         }
-    }
-    
-    struct Group: Identifiable {
-        let id: String
-        let title: String
-        let children: [AnyDemo]?
     }
     
     public init(unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, _ demos: [AnyDemo]) {
@@ -61,10 +61,10 @@ public struct DemosView: View {
     
     public var body: some View {
         NavigationSplitView(sidebar: { sidebar }, detail: { detail })
-        .environmentObject(model)
-        .onChange(of: scenePhase) { scenePhase in
-            logger?.log("\(String(describing: scenePhase))")
-        }
+            .environmentObject(model)
+            .onChange(of: scenePhase) { scenePhase in
+                logger?.log("\(String(describing: scenePhase))")
+            }
     }
     
     @ViewBuilder
@@ -72,13 +72,10 @@ public struct DemosView: View {
         List(selection: $sidebarSelection) {
             ForEach(groups) { group in
                 Section(group.title) {
-                    ForEach(group.children ?? []) { demo in
+                    ForEach(group.children) { demo in
                         DemoRow(demo: demo, metadata: model.demoMetadata[demo.id]!)
-                        
                     }
-                    
                 }
-                
             }
         }
         .searchable(text: $searchText, placement: .sidebar, prompt: "search…")
@@ -86,16 +83,9 @@ public struct DemosView: View {
     
     @ViewBuilder
     var detail: some View {
-        if let demo = model.allDemos[sidebarSelection] {
+        if let sidebarSelection, let demo = model.allDemos[sidebarSelection] {
             CrashDetectionView(id: demo.id, unstableTime: unstableTime, showLifeCycle: showLifeCycle) { crash in
-                var tags = model.demoMetadata[demo.id]!.tags
-                switch crash {
-                case .potential:
-                    tags.insert("crashed")
-                case .unknown:
-                    tags.remove("crashed")
-                }
-                model.demoMetadata[demo.id]!.tags = tags
+                model.demoMetadata[demo.id]?.crashed = crash == .potential
             }
         content: {
             DemoView(demo: demo)
