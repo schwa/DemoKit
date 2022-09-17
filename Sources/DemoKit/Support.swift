@@ -119,6 +119,9 @@ extension FileManager {
         guard let url = urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             fatalError()
         }
+        if directoryExists(at: url) == false {
+            try! createDirectory(at: url, withIntermediateDirectories: true)
+        }
         return url
     }
 

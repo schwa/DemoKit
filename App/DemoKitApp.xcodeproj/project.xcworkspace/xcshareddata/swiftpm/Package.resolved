@@ -6,7 +6,16 @@
       "location" : "https://github.com/apple/swift-async-algorithms",
       "state" : {
         "branch" : "main",
-        "revision" : "c0fdfdb8aa2b263799ebafc6f11c62f01e838f71"
+        "revision" : "2b5fbf3c91294b5e741c628144a0615b021446b0"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "f504716c27d2e5d4144fa4794b12129301d17729",
+        "version" : "1.0.3"
       }
     }
   ],

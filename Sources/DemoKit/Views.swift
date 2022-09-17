@@ -33,10 +33,20 @@ public struct DemosView: View {
     let unstableTime: TimeInterval
     let showLifeCycle: Bool
     
-    public init(unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, @DemosBuilder _ demos: () -> [AnyDemo]) {
-        self.unstableTime = unstableTime
-        self.showLifeCycle = showLifeCycle
-        model.demos = demos()
+    var groups: [Group] {
+        let groupNames = Set(filteredDemos.compactMap {
+            $0.tags.first(where: { $0.hasPrefix("group:") })?.trimmingPrefix("group:")
+        })
+        return groupNames.map { groupName in
+            let groupName = String(groupName)
+            return Group(id: groupName, title: groupName, children: filteredDemos.filter { $0.tags.contains("group:\(groupName)") })
+        }
+    }
+    
+    struct Group: Identifiable {
+        let id: String
+        let title: String
+        let children: [AnyDemo]?
     }
     
     public init(unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, _ demos: [AnyDemo]) {
@@ -45,50 +55,53 @@ public struct DemosView: View {
         model.demos = demos
     }
     
+    public init(unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, @DemosBuilder _ demos: () -> [AnyDemo]) {
+        self = DemosView(unstableTime: unstableTime, showLifeCycle: showLifeCycle, demos())
+    }
+    
     public var body: some View {
-        NavigationSplitView {
-#if os(macOS)
-            List(selection: $sidebarSelection) {
-                ForEach(filteredDemos) { demo in
-                    DemoRow(demo: demo, metadata: model.demoMetadata[demo.id]!)
-                }
-            }
-            .searchable(text: $searchText, placement: .sidebar, prompt: "search…")
-#endif
-        } detail: {
-            if let demo = model.allDemos[sidebarSelection] {
-                CrashDetectionView(id: demo.id, unstableTime: unstableTime, showLifeCycle: showLifeCycle) { crash in
-                    var tags = model.demoMetadata[demo.id]!.tags
-                    switch crash {
-                    case .potential:
-                        tags.insert("crashed")
-                    case .unknown:
-                        tags.remove("crashed")
-                    }
-                    model.demoMetadata[demo.id]!.tags = tags
-                }
-                content: {
-                    DemoView(demo: demo)
-                }
-                .id(demo.id)
-            }
-        }
+        NavigationSplitView(sidebar: { sidebar }, detail: { detail })
         .environmentObject(model)
         .onChange(of: scenePhase) { scenePhase in
             logger?.log("\(String(describing: scenePhase))")
         }
-#if os(macOS)
-        //        .task {
-        //            do {
-        //                let n = NotificationCenter.default.notifications(named: NSApplication.willTerminateNotification)
-        //                for try await x in n {
-        //                    logger?.log("\(x)")
-        //                }
-        //            }
-        //            catch {
-        //            }
-        //        }
-#endif
+    }
+    
+    @ViewBuilder
+    var sidebar: some View {
+        List(selection: $sidebarSelection) {
+            ForEach(groups) { group in
+                Section(group.title) {
+                    ForEach(group.children ?? []) { demo in
+                        DemoRow(demo: demo, metadata: model.demoMetadata[demo.id]!)
+                        
+                    }
+                    
+                }
+                
+            }
+        }
+        .searchable(text: $searchText, placement: .sidebar, prompt: "search…")
+    }
+    
+    @ViewBuilder
+    var detail: some View {
+        if let demo = model.allDemos[sidebarSelection] {
+            CrashDetectionView(id: demo.id, unstableTime: unstableTime, showLifeCycle: showLifeCycle) { crash in
+                var tags = model.demoMetadata[demo.id]!.tags
+                switch crash {
+                case .potential:
+                    tags.insert("crashed")
+                case .unknown:
+                    tags.remove("crashed")
+                }
+                model.demoMetadata[demo.id]!.tags = tags
+            }
+        content: {
+            DemoView(demo: demo)
+        }
+        .id(demo.id)
+        }
     }
 }
 
