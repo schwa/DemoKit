@@ -1,3 +1,3 @@
 # DemoKit
 
-A description of this package.
+Package for presenting demo views.
