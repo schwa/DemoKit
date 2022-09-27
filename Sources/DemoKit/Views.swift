@@ -43,10 +43,18 @@ public struct DemosView: View {
         let groupNames = Set(filteredDemos.compactMap {
             $0.tags.first(where: { $0.hasPrefix("group:") })?.trimmingPrefix("group:")
         })
-        return groupNames.sorted().map { groupName in
+        let groups = groupNames.sorted().map { groupName in
             let groupName = String(groupName)
             return Group(id: groupName, title: groupName, children: filteredDemos.filter { $0.tags.contains("group:\(groupName)") }.sorted(by: { $0.title < $1.title }))
         }
+
+        let groupedDemos = Set(groups.flatMap { $0.children })
+
+        let remainingDemos = filteredDemos.filter {
+            !groupedDemos.contains($0)
+        }
+        let remainingGroup = Group(id: "_untitled", title: "Ungrouped", children: remainingDemos)
+        return [remainingGroup] + groups
     }
     
     public init(unstableTime: TimeInterval = 0.5, showLifeCycle: Bool = false, _ demos: [AnyDemo]) {
@@ -69,7 +77,8 @@ public struct DemosView: View {
     
     @ViewBuilder
     var sidebar: some View {
-        List(selection: $sidebarSelection) {
+        print(groups)
+        return List(selection: $sidebarSelection) {
             ForEach(groups) { group in
                 Section(group.title) {
                     ForEach(group.children) { demo in
@@ -87,9 +96,9 @@ public struct DemosView: View {
             CrashDetectionView(id: demo.id, unstableTime: unstableTime, showLifeCycle: showLifeCycle) { crash in
                 model.demoMetadata[demo.id]?.crashed = crash == .potential
             }
-        content: {
-            DemoView(demo: demo)
-        }
+            content: {
+                DemoView(demo: demo)
+            }
         .id(demo.id)
         }
     }
