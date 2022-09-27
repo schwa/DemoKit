@@ -77,8 +77,7 @@ public struct DemosView: View {
     
     @ViewBuilder
     var sidebar: some View {
-        print(groups)
-        return List(selection: $sidebarSelection) {
+        List(selection: $sidebarSelection) {
             ForEach(groups) { group in
                 Section(group.title) {
                     ForEach(group.children) { demo in

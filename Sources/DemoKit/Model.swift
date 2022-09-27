@@ -72,11 +72,11 @@ public extension AnyDemo {
 }
 
 public extension Demo {
-    func tagged(_ tags: Set<String>) -> some Demo {
+    func tagged(_ tags: Set<String>) -> AnyDemo {
         return AnyDemo(self, extraTags: tags)
     }
     
-    func grouped(_ group: String) -> some Demo {
+    func grouped(_ group: String) -> AnyDemo {
         var tags = self.tags.filter({ $0.hasPrefix("group") == false })
         tags.insert("group:\(group)")
         return tagged(tags)
