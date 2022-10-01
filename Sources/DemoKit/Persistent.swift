@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 @_implementationOnly import os
 
-private let logger: Logger? = Logger(subsystem: "TODO", category: "MiniDatabase")
+private let logger: Logger? = nil // = Logger(subsystem: "TODO", category: "MiniDatabase")
 
 @propertyWrapper
 struct Persistent <Value> where Value: Codable {
