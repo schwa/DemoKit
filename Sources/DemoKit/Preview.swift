@@ -4,6 +4,7 @@ struct SampleDemoView1: DemoView {
     static var metadata = DemoMetadata(
         name: "Sample Demo 1",
         description: "This is a sample demo view 1",
+        group: "Group A",
         keywords: ["tag 1", "tag 2"]
     )
     init() {}
@@ -15,6 +16,7 @@ struct SampleDemoView2: DemoView {
     static var metadata = DemoMetadata(
         name: "Sample Demo 2",
         description: "This is a sample demo view 2",
+        group: "Group A",
         keywords: ["long tag 1", "long tag 2"]
     )
     init() {}
