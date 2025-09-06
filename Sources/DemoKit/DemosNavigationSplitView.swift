@@ -12,10 +12,25 @@ struct DemosNavigationSplitView: View {
 
     var body: some View {
         let elements = demos.map { (type: $0, metadata: $0.metadata) }
+        
+        let grouped = Dictionary(grouping: elements) { $0.metadata.group }
+        let sortedGroups = grouped.keys.compactMap { $0 }.sorted()
+        let ungroupedElements = grouped[nil] ?? []
+        
         NavigationSplitView {
             List(selection: $selection) {
-                ForEach(elements, id: \.metadata.id) { type, metadata in
-                    navigationLink(for: metadata)
+                if !ungroupedElements.isEmpty {
+                    ForEach(ungroupedElements, id: \.metadata.id) { type, metadata in
+                        navigationLink(for: metadata)
+                    }
+                }
+                
+                ForEach(sortedGroups, id: \.self) { group in
+                    Section(group) {
+                        ForEach(grouped[group] ?? [], id: \.metadata.id) { type, metadata in
+                            navigationLink(for: metadata)
+                        }
+                    }
                 }
             }
         } detail: {
