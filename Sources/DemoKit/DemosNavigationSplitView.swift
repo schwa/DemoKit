@@ -43,6 +43,17 @@ struct DemosNavigationSplitView: View {
         }
         .onAppear {
             if selection == nil {
+                // First check environment variable
+                if let envSelection = ProcessInfo.processInfo.environment["DEMO_SELECTION"],
+                   !envSelection.isEmpty {
+                    let envID = DemoMetadata.ID(envSelection)
+                    if elements.contains(where: { $0.metadata.id == envID }) {
+                        selection = envID
+                        return
+                    }
+                }
+                
+                // Then check stored selection
                 if !storedSelection.isEmpty {
                     let storedID = DemoMetadata.ID(storedSelection)
                     if elements.contains(where: { $0.metadata.id == storedID }) {
