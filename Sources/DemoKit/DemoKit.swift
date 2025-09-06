@@ -115,21 +115,28 @@ struct DemosNavigationSplitView: View {
     }
 }
 
+struct TagView: View {
+    var text: String
+
+    var body: some View {
+        Text(text)
+            .fixedSize()
+            .font(.caption)
+            .foregroundStyle(.white)
+            .padding([.leading, .trailing], 4)
+            .padding([.top, .bottom], 2)
+            .background(Color.accentColor, in: Capsule())
+
+    }
+}
+
 struct KeywordsView: View {
     let keywords: [String]
 
-
     var body: some View {
-
-        DiscardingHStack {
+        OverflowingHStack {
             ForEach(keywords, id: \.self) { keyword in
-                Text(keyword)
-                    .fixedSize()
-                    .font(.caption)
-                    .foregroundStyle(.white)
-                    .padding([.leading, .trailing], 4)
-                    .padding([.top, .bottom], 2)
-                    .background(Color.green, in: Capsule())
+                TagView(text: keyword)
             }
 
         }
@@ -137,75 +144,47 @@ struct KeywordsView: View {
     }
 }
 
-struct DiscardingHStack: Layout {
-
+struct OverflowingHStack <Overflow, Content>: View where Overflow: View, Content: View {
     let spacing: CGFloat
 
-    init(spacing: CGFloat = 8) {
+    let overflow: Overflow
+    let content: Content
+
+    init(spacing: CGFloat = 8, overflow: Overflow, content: () -> Content) {
         self.spacing = spacing
+        self.overflow = overflow
+        self.content = content()
     }
 
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        // Determine the maximum width we can use; if unspecified, lay out all subviews.
-        let maxWidth = proposal.width ?? .infinity
-
-        var usedWidth: CGFloat = 0
-        var maxHeight: CGFloat = 0
-
-        for subview in subviews {
-            // Propose remaining width for each subview, unlimited height.
-            let remainingWidth = max(0, maxWidth.isFinite ? maxWidth - usedWidth : .infinity)
-            let subProposal = ProposedViewSize(width: remainingWidth.isFinite ? remainingWidth : nil, height: proposal.height)
-            let size = subview.sizeThatFits(subProposal)
-
-            // If placing this subview would exceed the available width, discard the rest.
-            if maxWidth.isFinite, usedWidth + size.width > maxWidth {
-                break
+    var body: some View {
+        Group(subviews: content) { subviews in
+            ViewThatFits(in: .horizontal) {
+                ForEach(subviews.indices.reversed(), id: \.self) { endIndex in
+                    HStack(spacing: spacing) {
+                        let subset = subviews[...endIndex]
+                        subset
+                        if subset.count < subviews.count {
+                            overflow
+                        }
+                    }
+                }
             }
-
-            usedWidth += size.width
-            maxHeight = max(maxHeight, size.height)
-        }
-
-        // Respect proposed height if given, otherwise use measured height.
-        let height = proposal.height ?? maxHeight
-        // If width is unspecified, report usedWidth; if specified, cap at that.
-        let width = proposal.width ?? usedWidth
-        return CGSize(width: width, height: height)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var x = bounds.minX
-        let y = bounds.minY
-        let maxX = bounds.maxX
-
-        for subview in subviews {
-            let remainingWidth = max(0, maxX - x)
-            // If no remaining width, stop placing further subviews.
-            if remainingWidth <= 0 { break }
-
-            let subProposal = ProposedViewSize(width: remainingWidth, height: bounds.height)
-            let size = subview.sizeThatFits(subProposal)
-
-            // If this subview doesn't fit, stop placing more (discard remainder).
-            if x + size.width > maxX {
-                break
-            }
-
-            subview.place(
-                at: CGPoint(x: x, y: y),
-                proposal: ProposedViewSize(width: size.width, height: bounds.height)
-            )
-            x += size.width
         }
     }
 }
+
+extension OverflowingHStack where Overflow == Text {
+    init(spacing: CGFloat = 8, content: () -> Content) {
+        self.init(spacing: spacing, overflow: Text("…"), content: content)
+    }
+}
+
 
 struct SampleDemoView1: DemoView {
     static var metadata = DemoMetadata(
         name: "Sample Demo 1",
         description: "This is a sample demo view 1",
-        keywords: ["sample", "demo"]
+        keywords: ["tag 1", "tag 2"]
     )
     init() {}
     var body: some View {
@@ -216,7 +195,7 @@ struct SampleDemoView2: DemoView {
     static var metadata = DemoMetadata(
         name: "Sample Demo 2",
         description: "This is a sample demo view 2",
-        keywords: ["sample", "demo"]
+        keywords: ["long tag 1", "long tag 2"]
     )
     init() {}
     var body: some View {
@@ -228,7 +207,6 @@ struct SampleDemoView3: DemoView {
         name: "Sample Demo 3",
         systemImage: "gear",
         description: "This is a sample demo view 3",
-        keywords: ["sample", "demo"],
         color: .blue
     )
     init() {}
