@@ -3,6 +3,9 @@ import SwiftUI
 struct DemosNavigationSplitView: View {
     private let demos: [any DemoView.Type]
 
+    @AppStorage("DemosNavigationSplitView.selection")
+    private var storedSelection: String = ""
+    
     @State
     private var selection: DemoMetadata.ID?
 
@@ -40,8 +43,20 @@ struct DemosNavigationSplitView: View {
         }
         .onAppear {
             if selection == nil {
-                selection = elements.first?.metadata.id
+                if !storedSelection.isEmpty {
+                    let storedID = DemoMetadata.ID(storedSelection)
+                    if elements.contains(where: { $0.metadata.id == storedID }) {
+                        selection = storedID
+                    } else {
+                        selection = elements.first?.metadata.id
+                    }
+                } else {
+                    selection = elements.first?.metadata.id
+                }
             }
+        }
+        .onChange(of: selection) {
+            storedSelection = selection?.rawValue ?? ""
         }
     }
 
