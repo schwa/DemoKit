@@ -1,4 +1,5 @@
 import SwiftUI
+internal import os
 
 public struct DemoMetadata: Identifiable, Sendable {
     public var id: ID
@@ -51,3 +52,4 @@ public protocol DemoView: View {
 //    init()
 //}
 
+let logger: Logger? = Logger(subsystem: "DemoKit", category: "DemoKit")

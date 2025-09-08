@@ -42,28 +42,28 @@ struct DemosNavigationSplitView: View {
             }
         }
         .onAppear {
-            print("ON APPEAR: \(selection)")
-            guard selection == nil else {
-                return
-            }
+            guard selection == nil else { return }
+            
             // First check environment variable
             if let envSelection = ProcessInfo.processInfo.environment["DEMOVIEW"], !envSelection.isEmpty {
-                print(envSelection)
+                logger?.info("Selecting demo from environment variable: \(envSelection)")
                 let envID = DemoMetadata.ID(envSelection)
                 if elements.contains(where: { $0.metadata.id == envID }) {
                     selection = envID
                     return
                 }
             }
-
+            
             // Then check stored selection
-            if !storedSelection.isEmpty {
-                let storedID = DemoMetadata.ID(storedSelection)
-                if elements.contains(where: { $0.metadata.id == storedID }) {
-                    selection = storedID
-                } else {
-                    selection = elements.first?.metadata.id
-                }
+            guard !storedSelection.isEmpty else {
+                logger?.info("Selecting demo from stored selection: \(storedSelection)")
+                selection = elements.first?.metadata.id
+                return
+            }
+            
+            let storedID = DemoMetadata.ID(storedSelection)
+            if elements.contains(where: { $0.metadata.id == storedID }) {
+                selection = storedID
             } else {
                 selection = elements.first?.metadata.id
             }
