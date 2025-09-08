@@ -1,4 +1,3 @@
-import OSLog
 import SwiftUI
 
 private extension View {
@@ -14,36 +13,28 @@ private extension View {
 }
 
 struct DemosNavigationSplitView: View {
-    @Bindable
-    var viewModel: DemoPickerViewModel
+    @Environment(DemoPickerViewModel.self)
+    private var viewModel: DemoPickerViewModel
 
     @State
     private var searchText: String = ""
 
-    init(viewModel: DemoPickerViewModel) {
-        self.viewModel = viewModel
-    }
-
     var body: some View {
         let elements = viewModel.demos.map { (type: $0, metadata: $0.metadata) }
 
-        // Filter elements based on search text
         let filteredElements = searchText.isEmpty ? elements : elements.filter { element in
             let metadata = element.metadata
             let searchLower = searchText.lowercased()
 
-            // Search in title
             if metadata.name.lowercased().contains(searchLower) {
                 return true
             }
 
-            // Search in description
             if let description = metadata.description,
                description.lowercased().contains(searchLower) {
                 return true
             }
 
-            // Search in keywords
             if metadata.keywords.contains(where: { $0.lowercased().contains(searchLower) }) {
                 return true
             }
@@ -56,6 +47,9 @@ struct DemosNavigationSplitView: View {
         let ungroupedElements = grouped[nil] ?? []
 
         NavigationSplitView {
+            @Bindable
+            var viewModel = viewModel
+
             List(selection: $viewModel.selection) {
                 if filteredElements.isEmpty, !searchText.isEmpty {
                     ContentUnavailableView.search(text: searchText)
@@ -76,7 +70,7 @@ struct DemosNavigationSplitView: View {
                     }
                 }
             }
-            .id(searchText) // Force List to update when search changes
+            .id(searchText)
         } detail: {
             if let id = viewModel.selection,
                let element = elements.first(where: { $0.metadata.id == id }) {
@@ -89,7 +83,6 @@ struct DemosNavigationSplitView: View {
         }
         .onChange(of: viewModel.selection) { oldValue, newValue in
             guard oldValue != newValue else { return }
-            logger?.debug("Selection changed from '\(oldValue?.rawValue ?? "nil")' to '\(newValue?.rawValue ?? "nil")'")
             viewModel.selectionDidChange()
         }
         .applySearchable(searchText: $searchText, shouldShow: elements.count >= 6)

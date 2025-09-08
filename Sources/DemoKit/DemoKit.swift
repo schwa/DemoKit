@@ -44,10 +44,6 @@ public struct DemoMetadata: Identifiable, Sendable {
     }
 }
 
-// let defaultName = "\(type(of: Self.self))"
-//    .replacingOccurrences(of: ".Type", with: "")
-//    .replacingOccurrences(of: "DemoView", with: "")
-
 public protocol DemoView: View {
     static var metadata: DemoMetadata { get }
 

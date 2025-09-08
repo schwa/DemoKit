@@ -9,6 +9,6 @@ struct DemoApp: App {
             DemoView2.self,
             DemoView3.self
         ])
-        .handleDemoURLScheme("x-demo")
+        .handleDemoURL(scheme: "x-demo")
     }
 }

@@ -5,13 +5,13 @@ extension EnvironmentValues {
 }
 
 public extension View {
-    func handleDemoURLScheme(_ scheme: String) -> some View {
+    func handleDemoURL(scheme: String) -> some View {
         self.environment(\.demoURLScheme, scheme)
     }
 }
 
 public extension Scene {
-    func handleDemoURLScheme(_ scheme: String) -> some Scene {
+    func handleDemoURL(scheme: String) -> some Scene {
         self.environment(\.demoURLScheme, scheme)
     }
 }
