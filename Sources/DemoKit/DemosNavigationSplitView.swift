@@ -42,7 +42,10 @@ struct DemosNavigationSplitView: View {
             return false
         }
 
-        let grouped = Dictionary(grouping: filteredElements) { $0.metadata.group }
+        let pinnedElements = filteredElements.filter { viewModel.isPinned($0.metadata.id) }
+        let unpinnedElements = filteredElements.filter { !viewModel.isPinned($0.metadata.id) }
+        
+        let grouped = Dictionary(grouping: unpinnedElements) { $0.metadata.group }
         let sortedGroups = grouped.keys.compactMap(\.self).sorted()
         let ungroupedElements = grouped[nil] ?? []
 
@@ -55,16 +58,24 @@ struct DemosNavigationSplitView: View {
                     ContentUnavailableView.search(text: searchText)
                 }
                 else {
+                    if !pinnedElements.isEmpty {
+                        Section("Pinned") {
+                            ForEach(pinnedElements, id: \.metadata.id) { element in
+                                navigationLink(for: element.metadata, showPinIcon: true)
+                            }
+                        }
+                    }
+                    
                     if !ungroupedElements.isEmpty {
                         ForEach(ungroupedElements, id: \.metadata.id) { element in
-                            navigationLink(for: element.metadata)
+                            navigationLink(for: element.metadata, showPinIcon: false)
                         }
                     }
 
                     ForEach(sortedGroups, id: \.self) { group in
                         Section(group) {
                             ForEach(grouped[group] ?? [], id: \.metadata.id) { element in
-                                navigationLink(for: element.metadata)
+                                navigationLink(for: element.metadata, showPinIcon: false)
                             }
                         }
                     }
@@ -88,10 +99,15 @@ struct DemosNavigationSplitView: View {
         .applySearchable(searchText: $searchText, shouldShow: elements.count >= 6)
     }
 
-    func navigationLink(for metadata: DemoMetadata) -> some View {
+    func navigationLink(for metadata: DemoMetadata, showPinIcon: Bool) -> some View {
         NavigationLink(value: metadata.id) {
             VStack(alignment: .leading) {
                 HStack {
+                    if showPinIcon {
+                        Image(systemName: "pin.fill")
+                            .foregroundStyle(.tint)
+                            .imageScale(.small)
+                    }
                     Label(metadata.name, systemImage: metadata.systemImage)
                         .layoutPriority(1)
                         .truncationMode(.tail)
@@ -106,6 +122,11 @@ struct DemosNavigationSplitView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+        }
+        .contextMenu {
+            Button(viewModel.isPinned(metadata.id) ? "Unpin" : "Pin") {
+                viewModel.togglePin(for: metadata.id)
             }
         }
         .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")")

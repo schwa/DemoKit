@@ -6,6 +6,7 @@ import SwiftUI
 public final class DemoPickerViewModel {
     public let demos: [any DemoView.Type]
     public var selection: DemoMetadata.ID?
+    public var pinnedDemoIDs: Set<DemoMetadata.ID> = []
 
     @ObservationIgnored
     @AppStorage("demoview")
@@ -16,8 +17,17 @@ public final class DemoPickerViewModel {
         }
     }
 
+    @ObservationIgnored
+    @AppStorage("pinnedDemos")
+    private var storedPinnedDemos: String = "" {
+        didSet {
+            loadPinnedDemos()
+        }
+    }
+
     public init(demos: [any DemoView.Type]) {
         self.demos = demos
+        loadPinnedDemos()
         loadInitialSelection()
     }
 
@@ -61,6 +71,33 @@ public final class DemoPickerViewModel {
 
     func selectionDidChange() {
         storedSelection = selection?.rawValue ?? ""
+    }
+
+    func togglePin(for id: DemoMetadata.ID) {
+        if pinnedDemoIDs.contains(id) {
+            pinnedDemoIDs.remove(id)
+        } else {
+            pinnedDemoIDs.insert(id)
+        }
+        savePinnedDemos()
+    }
+
+    func isPinned(_ id: DemoMetadata.ID) -> Bool {
+        pinnedDemoIDs.contains(id)
+    }
+
+    private func loadPinnedDemos() {
+        guard !storedPinnedDemos.isEmpty else {
+            pinnedDemoIDs = []
+            return
+        }
+        
+        let ids = storedPinnedDemos.split(separator: ",").map { DemoMetadata.ID(String($0)) }
+        pinnedDemoIDs = Set(ids)
+    }
+
+    private func savePinnedDemos() {
+        storedPinnedDemos = pinnedDemoIDs.map(\.rawValue).sorted().joined(separator: ",")
     }
 
     func handleURL(_ url: URL, urlScheme: String?) {
