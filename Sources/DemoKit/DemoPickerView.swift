@@ -15,6 +15,7 @@ public struct DemoPickerView: View {
             }
     }
     
+    @MainActor
     private func handleURL(_ url: URL) {
         guard let urlScheme = urlScheme,
               url.scheme == urlScheme else { return }
@@ -39,8 +40,16 @@ public struct DemoPickerView: View {
         if let demoID = demoID {
             logger?.info("DemoID: \(demoID)")
             let id = DemoMetadata.ID(demoID)
-            if viewModel.demos.contains(where: { $0.metadata.id == id }) {
-                viewModel.selection = id
+            
+            // Defer the selection change to ensure view is ready
+            Task { @MainActor in
+                if viewModel.demos.contains(where: { $0.metadata.id == id }) {
+                    logger?.info("Setting selection to: \(id.rawValue)")
+                    viewModel.selection = id
+                    logger?.info("Selection is now: \(viewModel.selection?.rawValue ?? "nil")")
+                } else {
+                    logger?.warning("Demo with ID \(demoID) not found in demos")
+                }
             }
         }
     }
