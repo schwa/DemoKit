@@ -151,7 +151,7 @@ struct DemosNavigationSplitView: View {
                             .layoutPriority(1)
                             .truncationMode(.tail)
                             .lineLimit(1)
-                            .foregroundStyle(metadata.color ?? Color.primary)
+                            .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (metadata.color ?? Color.primary))
                             .labelStyle(.titleAndIcon)
                         KeywordsView(keywords: metadata.keywords)
                     }
