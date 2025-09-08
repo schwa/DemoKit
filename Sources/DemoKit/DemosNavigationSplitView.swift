@@ -50,6 +50,17 @@ struct DemosNavigationSplitView: View {
                 if filteredElements.isEmpty, !searchText.isEmpty {
                     ContentUnavailableView.search(text: searchText)
                 }
+                else if elements.isEmpty && !viewModel.hiddenDemoIDs.isEmpty {
+                    ContentUnavailableView {
+                        Label("All Demos Hidden", systemImage: "eye.slash")
+                    } description: {
+                        Text("\(viewModel.hiddenDemoIDs.count) demo\(viewModel.hiddenDemoIDs.count == 1 ? " is" : "s are") hidden")
+                    } actions: {
+                        Button("Unhide All") {
+                            viewModel.unhideAll()
+                        }
+                    }
+                }
                 else {
                     if !pinnedElements.isEmpty {
                         Section("Pinned") {
@@ -75,14 +86,12 @@ struct DemosNavigationSplitView: View {
                 }
             }
             .id(searchText)
-            .toolbar {
+            .contextMenu {
                 if !viewModel.hiddenDemoIDs.isEmpty {
-                    ToolbarItem(placement: .automatic) {
-                        Button {
-                            viewModel.unhideAll()
-                        } label: {
-                            Label("Unhide All (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
-                        }
+                    Button {
+                        viewModel.unhideAll()
+                    } label: {
+                        Label("Unhide All Demos (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
                     }
                 }
             }
@@ -168,6 +177,14 @@ struct DemosNavigationSplitView: View {
                 viewModel.toggleHidden(for: metadata.id)
             } label: {
                 Label("Hide Demo", systemImage: "eye.slash")
+            }
+            
+            if !viewModel.hiddenDemoIDs.isEmpty {
+                Button {
+                    viewModel.unhideAll()
+                } label: {
+                    Label("Unhide All Demos (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
+                }
             }
         }
         .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")")
