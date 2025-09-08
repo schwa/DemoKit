@@ -30,7 +30,7 @@ struct OverflowingHStack <Overflow, Content>: View where Overflow: View, Content
 }
 
 extension OverflowingHStack where Overflow == Text {
-    init(spacing: CGFloat = 8, content: () -> Content) {
-        self.init(spacing: spacing, overflow: Text("…"), content: content)
+    init(spacing: CGFloat = 8, overflow: String = "…", content: () -> Content) {
+        self.init(spacing: spacing, overflow: Text(overflow), content: content)
     }
 }

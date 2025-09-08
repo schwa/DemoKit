@@ -3,7 +3,7 @@ import SwiftUI
 struct DemosNavigationSplitView: View {
     private let demos: [any DemoView.Type]
 
-    @AppStorage("DemosNavigationSplitView.selection")
+    @AppStorage("demoview")
     private var storedSelection: String = ""
     
     @State
@@ -42,28 +42,30 @@ struct DemosNavigationSplitView: View {
             }
         }
         .onAppear {
-            if selection == nil {
-                // First check environment variable
-                if let envSelection = ProcessInfo.processInfo.environment["DEMO_SELECTION"],
-                   !envSelection.isEmpty {
-                    let envID = DemoMetadata.ID(envSelection)
-                    if elements.contains(where: { $0.metadata.id == envID }) {
-                        selection = envID
-                        return
-                    }
+            print("ON APPEAR: \(selection)")
+            guard selection == nil else {
+                return
+            }
+            // First check environment variable
+            if let envSelection = ProcessInfo.processInfo.environment["DEMOVIEW"], !envSelection.isEmpty {
+                print(envSelection)
+                let envID = DemoMetadata.ID(envSelection)
+                if elements.contains(where: { $0.metadata.id == envID }) {
+                    selection = envID
+                    return
                 }
-                
-                // Then check stored selection
-                if !storedSelection.isEmpty {
-                    let storedID = DemoMetadata.ID(storedSelection)
-                    if elements.contains(where: { $0.metadata.id == storedID }) {
-                        selection = storedID
-                    } else {
-                        selection = elements.first?.metadata.id
-                    }
+            }
+
+            // Then check stored selection
+            if !storedSelection.isEmpty {
+                let storedID = DemoMetadata.ID(storedSelection)
+                if elements.contains(where: { $0.metadata.id == storedID }) {
+                    selection = storedID
                 } else {
                     selection = elements.first?.metadata.id
                 }
+            } else {
+                selection = elements.first?.metadata.id
             }
         }
         .onChange(of: selection) {
@@ -76,6 +78,7 @@ struct DemosNavigationSplitView: View {
             VStack(alignment: .leading) {
                 HStack {
                     Label(metadata.name, systemImage: metadata.systemImage)
+                        .layoutPriority(1)
                         .truncationMode(.tail)
                         .lineLimit(1)
                         .foregroundStyle(metadata.color ?? Color.primary)
@@ -93,3 +96,17 @@ struct DemosNavigationSplitView: View {
     }
 }
 
+//extension View {
+//
+//    func foo() -> some View {
+//        self.onOpenURL { url in
+//            let id = DemoMetadata.ID(url.lastPathComponent)
+//            guard elements.contains(where: { $0.metadata.id == id }) else {
+//                return
+//            }
+////            selection = id
+//        }
+//
+//    }
+//
+//}

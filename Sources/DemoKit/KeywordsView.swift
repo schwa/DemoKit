@@ -8,9 +8,7 @@ struct KeywordsView: View {
             ForEach(keywords, id: \.self) { keyword in
                 TagView(text: keyword)
             }
-
         }
-
     }
 }
 
