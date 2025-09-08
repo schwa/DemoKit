@@ -49,52 +49,8 @@ struct DemosNavigationSplitView: View {
     }
     
     var body: some View {
-
         NavigationSplitView {
-            @Bindable
-            var viewModel = viewModel
-
-            List(selection: $viewModel.selection) {
-                if filteredElements.isEmpty, !searchText.isEmpty {
-                    ContentUnavailableView.search(text: searchText)
-                }
-                else if visibleElements.isEmpty && !viewModel.hiddenDemoIDs.isEmpty {
-                    allDemosHiddenView
-                }
-                else {
-                    if !pinnedElements.isEmpty {
-                        Section("Pinned") {
-                            ForEach(pinnedElements, id: \.metadata.id) { element in
-                                navigationLink(for: element.metadata)
-                            }
-                        }
-                    }
-                    
-                    if !ungroupedElements.isEmpty {
-                        ForEach(ungroupedElements, id: \.metadata.id) { element in
-                            navigationLink(for: element.metadata)
-                        }
-                    }
-
-                    ForEach(sortedGroups, id: \.self) { group in
-                        Section(group) {
-                            ForEach(groupedElements[group] ?? [], id: \.metadata.id) { element in
-                                navigationLink(for: element.metadata)
-                            }
-                        }
-                    }
-                }
-            }
-            .id(searchText)
-            .contextMenu {
-                if !viewModel.hiddenDemoIDs.isEmpty {
-                    Button {
-                        viewModel.unhideAll()
-                    } label: {
-                        Label("Unhide All Demos (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
-                    }
-                }
-            }
+            demoList
         } detail: {
             detailView
         }
@@ -103,6 +59,63 @@ struct DemosNavigationSplitView: View {
             viewModel.selectionDidChange()
         }
         .applySearchable(searchText: $searchText, shouldShow: visibleElements.count >= 6)
+    }
+    
+    @ViewBuilder
+    private var demoList: some View {
+        @Bindable var viewModel = viewModel
+        
+        List(selection: $viewModel.selection) {
+            listContent
+        }
+        .id(searchText)
+        .contextMenu {
+            if !viewModel.hiddenDemoIDs.isEmpty {
+                Button {
+                    viewModel.unhideAll()
+                } label: {
+                    Label("Unhide All Demos (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var listContent: some View {
+        if filteredElements.isEmpty, !searchText.isEmpty {
+            ContentUnavailableView.search(text: searchText)
+        }
+        else if visibleElements.isEmpty && !viewModel.hiddenDemoIDs.isEmpty {
+            allDemosHiddenView
+        }
+        else {
+            demosContent
+        }
+    }
+    
+    @ViewBuilder
+    private var demosContent: some View {
+        if !pinnedElements.isEmpty {
+            Section("Pinned") {
+                ForEach(pinnedElements, id: \.metadata.id) { element in
+                    navigationLink(for: element.metadata)
+                }
+            }
+        }
+        
+        if !ungroupedElements.isEmpty {
+            ForEach(ungroupedElements, id: \.metadata.id) { element in
+                navigationLink(for: element.metadata)
+            }
+        }
+
+        ForEach(sortedGroups, id: \.self) { group in
+            Section(group) {
+                ForEach(groupedElements[group] ?? [], id: \.metadata.id) { element in
+                    navigationLink(for: element.metadata)
+                }
+            }
+        }
     }
     
     @ViewBuilder
