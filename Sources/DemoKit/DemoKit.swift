@@ -21,7 +21,6 @@ public struct DemoMetadata: Identifiable, Sendable {
     }
 
     public init(id: ID? = nil, name: String? = nil, systemImage: String = "puzzlepiece", description: String? = nil, group: String? = nil, keywords: [String] = [], color: Color? = nil, isEnabled: Bool = true, variants: [Self] = []) {
-        // Store what we're given - will be filled by protocol extension if needed
         if let id = id {
             self.id = id
             self.name = name ?? Self.humanReadable(from: id.rawValue)
@@ -29,9 +28,7 @@ public struct DemoMetadata: Identifiable, Sendable {
             self.id = ID(Self.kebabCase(name))
             self.name = name
         } else {
-            // Both nil - will be filled by filledMetadata
-            self.id = ID("")
-            self.name = ""
+            fatalError("DemoMetadata must have either a name or an id")
         }
         self.systemImage = systemImage
         self.description = description
@@ -61,52 +58,6 @@ public protocol DemoView: View {
 
     @MainActor
     init()
-}
-
-public extension DemoView {
-    static var filledMetadata: DemoMetadata {
-        var meta = metadata
-        
-        // If name or id is empty, compute from type
-        if meta.name.isEmpty || meta.id.rawValue.isEmpty {
-            let (name, id) = DemoMetadata.computeNameAndID(
-                type: Self.self,
-                name: meta.name.isEmpty ? nil : meta.name,
-                id: meta.id.rawValue.isEmpty ? nil : meta.id.rawValue
-            )
-            
-            if meta.name.isEmpty {
-                meta.name = name
-            }
-            if meta.id.rawValue.isEmpty {
-                meta.id = DemoMetadata.ID(id)
-            }
-        }
-        
-        return meta
-    }
-    
-    static var defaultMetadata: DemoMetadata {
-        let typeName = String(describing: Self.self)
-        var cleanedTypeName = typeName
-        
-        // Only strip suffixes
-        if cleanedTypeName.hasSuffix("DemoView") {
-            cleanedTypeName = String(cleanedTypeName.dropLast(8))
-        } else if cleanedTypeName.hasSuffix("Demo") {
-            cleanedTypeName = String(cleanedTypeName.dropLast(4))
-        } else if cleanedTypeName.hasSuffix("View") {
-            cleanedTypeName = String(cleanedTypeName.dropLast(4))
-        }
-        cleanedTypeName = cleanedTypeName.trimmingCharacters(in: .whitespaces)
-        
-        let finalName = cleanedTypeName.isEmpty ? typeName : cleanedTypeName
-        
-        return DemoMetadata(
-            id: DemoMetadata.ID(DemoMetadata.kebabCase(finalName)),
-            name: DemoMetadata.humanReadable(from: finalName)
-        )
-    }
 }
 
 extension DemoMetadata {

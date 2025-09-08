@@ -23,7 +23,7 @@ struct DemosNavigationSplitView: View {
     private var hoveredID: DemoMetadata.ID?
 
     var body: some View {
-        let elements = viewModel.demos.map { (type: $0, metadata: $0.filledMetadata) }
+        let elements = viewModel.demos.map { (type: $0, metadata: $0.metadata) }
 
         let filteredElements = searchText.isEmpty ? elements : elements.filter { element in
             let metadata = element.metadata

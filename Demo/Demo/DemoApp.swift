@@ -7,7 +7,7 @@ struct DemoApp: App {
         DemoPickerScene(demos: [
             DemoView1.self,
             DemoView2.self,
-            MyComplexDemoView.self
+            DemoView3.self
         ])
         .handleDemoURL(scheme: "x-demo")
     }
