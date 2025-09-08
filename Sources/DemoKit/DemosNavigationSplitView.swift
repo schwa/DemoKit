@@ -1,6 +1,17 @@
 import SwiftUI
 import OSLog
 
+private extension View {
+    @ViewBuilder
+    func applySearchable(searchText: Binding<String>, shouldShow: Bool) -> some View {
+        if shouldShow {
+            self.searchable(text: searchText, placement: .sidebar, prompt: "Search Demos")
+        } else {
+            self
+        }
+    }
+}
+
 struct DemosNavigationSplitView: View {
     @Bindable
     var viewModel: DemoPickerViewModel
@@ -78,7 +89,7 @@ struct DemosNavigationSplitView: View {
             logger?.debug("Selection changed from '\(oldValue?.rawValue ?? "nil")' to '\(newValue?.rawValue ?? "nil")'")
             viewModel.selectionDidChange()
         }
-        .searchable(text: $searchText, placement: .sidebar, prompt: "Search Demos")
+        .applySearchable(searchText: $searchText, shouldShow: elements.count >= 6)
     }
 
     func navigationLink(for metadata: DemoMetadata) -> some View {
