@@ -1,17 +1,5 @@
 import SwiftUI
 
-private extension View {
-    @ViewBuilder
-    func applySearchable(searchText: Binding<String>, shouldShow: Bool) -> some View {
-        if shouldShow {
-            self.searchable(text: searchText, placement: .sidebar, prompt: "Search Demos")
-        }
-        else {
-            self
-        }
-    }
-}
-
 struct DemosNavigationSplitView: View {
     @Environment(DemoPickerViewModel.self)
     private var viewModel: DemoPickerViewModel
@@ -23,7 +11,9 @@ struct DemosNavigationSplitView: View {
     private var hoveredID: DemoMetadata.ID?
 
     var body: some View {
-        let elements = viewModel.demos.map { (type: $0, metadata: $0.metadata) }
+        let elements = viewModel.demos
+            .map { (type: $0, metadata: $0.metadata) }
+            .filter { !viewModel.isHidden($0.metadata.id) }
 
         let filteredElements = searchText.isEmpty ? elements : elements.filter { element in
             let metadata = element.metadata
@@ -85,6 +75,17 @@ struct DemosNavigationSplitView: View {
                 }
             }
             .id(searchText)
+            .toolbar {
+                if !viewModel.hiddenDemoIDs.isEmpty {
+                    ToolbarItem(placement: .automatic) {
+                        Button {
+                            viewModel.unhideAll()
+                        } label: {
+                            Label("Unhide All (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
+                        }
+                    }
+                }
+            }
         } detail: {
             if let id = viewModel.selection,
                let element = elements.first(where: { $0.metadata.id == id }) {
@@ -160,7 +161,27 @@ struct DemosNavigationSplitView: View {
                 Label(viewModel.isPinned(metadata.id) ? "Unpin Demo" : "Pin Demo", 
                       systemImage: viewModel.isPinned(metadata.id) ? "pin.slash" : "pin")
             }
+            
+            Divider()
+            
+            Button {
+                viewModel.toggleHidden(for: metadata.id)
+            } label: {
+                Label("Hide Demo", systemImage: "eye.slash")
+            }
         }
         .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")")
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func applySearchable(searchText: Binding<String>, shouldShow: Bool) -> some View {
+        if shouldShow {
+            self.searchable(text: searchText, placement: .sidebar, prompt: "Search Demos")
+        }
+        else {
+            self
+        }
     }
 }

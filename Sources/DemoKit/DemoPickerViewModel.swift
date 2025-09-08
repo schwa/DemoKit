@@ -7,6 +7,7 @@ public final class DemoPickerViewModel {
     public let demos: [any DemoView.Type]
     public var selection: DemoMetadata.ID?
     public var pinnedDemoIDs: Set<DemoMetadata.ID> = []
+    public var hiddenDemoIDs: Set<DemoMetadata.ID> = []
 
     @ObservationIgnored
     @AppStorage("demoview")
@@ -25,9 +26,18 @@ public final class DemoPickerViewModel {
         }
     }
 
+    @ObservationIgnored
+    @AppStorage("hiddenDemos")
+    private var storedHiddenDemos: String = "" {
+        didSet {
+            loadHiddenDemos()
+        }
+    }
+
     public init(demos: [any DemoView.Type]) {
         self.demos = demos
         loadPinnedDemos()
+        loadHiddenDemos()
         loadInitialSelection()
     }
 
@@ -98,6 +108,42 @@ public final class DemoPickerViewModel {
 
     private func savePinnedDemos() {
         storedPinnedDemos = pinnedDemoIDs.map(\.rawValue).sorted().joined(separator: ",")
+    }
+
+    func toggleHidden(for id: DemoMetadata.ID) {
+        if hiddenDemoIDs.contains(id) {
+            hiddenDemoIDs.remove(id)
+        } else {
+            hiddenDemoIDs.insert(id)
+            // If we're hiding the selected demo, clear selection
+            if selection == id {
+                selection = nil
+            }
+        }
+        saveHiddenDemos()
+    }
+
+    func isHidden(_ id: DemoMetadata.ID) -> Bool {
+        hiddenDemoIDs.contains(id)
+    }
+
+    func unhideAll() {
+        hiddenDemoIDs.removeAll()
+        saveHiddenDemos()
+    }
+
+    private func loadHiddenDemos() {
+        guard !storedHiddenDemos.isEmpty else {
+            hiddenDemoIDs = []
+            return
+        }
+        
+        let ids = storedHiddenDemos.split(separator: ",").map { DemoMetadata.ID(String($0)) }
+        hiddenDemoIDs = Set(ids)
+    }
+
+    private func saveHiddenDemos() {
+        storedHiddenDemos = hiddenDemoIDs.map(\.rawValue).sorted().joined(separator: ",")
     }
 
     func handleURL(_ url: URL, urlScheme: String?) {
