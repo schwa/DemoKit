@@ -102,7 +102,10 @@ extension DemoMetadata {
     static func humanReadable(from string: String) -> String {
         // Convert from kebab-case or camelCase to human readable
         let fromKebab = string.replacingOccurrences(of: "-", with: " ")
-        let fromCamel = fromKebab.replacingOccurrences(of: "([A-Z])", with: " $1", options: .regularExpression)
+        // Add space before capital letters and numbers
+        let fromCamel = fromKebab
+            .replacingOccurrences(of: "([A-Z])", with: " $1", options: .regularExpression)
+            .replacingOccurrences(of: "([0-9]+)", with: " $1", options: .regularExpression)
         return fromCamel
             .trimmingCharacters(in: .whitespaces)
             .split(separator: " ")
