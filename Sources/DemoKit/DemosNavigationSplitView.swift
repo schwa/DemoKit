@@ -2,7 +2,11 @@ import SwiftUI
 import OSLog
 
 struct DemosNavigationSplitView: View {
-    @Bindable var viewModel: DemoPickerViewModel
+    @Bindable
+    var viewModel: DemoPickerViewModel
+
+    @State
+    var searchText: String = ""
 
     init(viewModel: DemoPickerViewModel) {
         self.viewModel = viewModel
@@ -11,26 +15,55 @@ struct DemosNavigationSplitView: View {
     var body: some View {
         let elements = viewModel.demos.map { (type: $0, metadata: $0.metadata) }
         
-        let grouped = Dictionary(grouping: elements) { $0.metadata.group }
+        // Filter elements based on search text
+        let filteredElements = searchText.isEmpty ? elements : elements.filter { element in
+            let metadata = element.metadata
+            let searchLower = searchText.lowercased()
+            
+            // Search in title
+            if metadata.name.lowercased().contains(searchLower) {
+                return true
+            }
+            
+            // Search in description
+            if let description = metadata.description,
+               description.lowercased().contains(searchLower) {
+                return true
+            }
+            
+            // Search in keywords
+            if metadata.keywords.contains(where: { $0.lowercased().contains(searchLower) }) {
+                return true
+            }
+            
+            return false
+        }
+        
+        let grouped = Dictionary(grouping: filteredElements) { $0.metadata.group }
         let sortedGroups = grouped.keys.compactMap { $0 }.sorted()
         let ungroupedElements = grouped[nil] ?? []
         
         NavigationSplitView {
             List(selection: $viewModel.selection) {
-                if !ungroupedElements.isEmpty {
-                    ForEach(ungroupedElements, id: \.metadata.id) { type, metadata in
-                        navigationLink(for: metadata)
+                if filteredElements.isEmpty && !searchText.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
+                } else {
+                    if !ungroupedElements.isEmpty {
+                        ForEach(ungroupedElements, id: \.metadata.id) { element in
+                            navigationLink(for: element.metadata)
+                        }
                     }
-                }
-                
-                ForEach(sortedGroups, id: \.self) { group in
-                    Section(group) {
-                        ForEach(grouped[group] ?? [], id: \.metadata.id) { type, metadata in
-                            navigationLink(for: metadata)
+                    
+                    ForEach(sortedGroups, id: \.self) { group in
+                        Section(group) {
+                            ForEach(grouped[group] ?? [], id: \.metadata.id) { element in
+                                navigationLink(for: element.metadata)
+                            }
                         }
                     }
                 }
             }
+            .id(searchText) // Force List to update when search changes
         } detail: {
             if let id = viewModel.selection,
                let element = elements.first(where: { $0.metadata.id == id }) {
@@ -45,6 +78,7 @@ struct DemosNavigationSplitView: View {
             logger?.debug("Selection changed from '\(oldValue?.rawValue ?? "nil")' to '\(newValue?.rawValue ?? "nil")'")
             viewModel.selectionDidChange()
         }
+        .searchable(text: $searchText, placement: .sidebar, prompt: "Search Demos")
     }
 
     func navigationLink(for metadata: DemoMetadata) -> some View {
