@@ -8,10 +8,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>demo</string>
+			<string>x-demo</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>demo</string>
+				<string>x-demo</string>
 			</array>
 		</dict>
 	</array>

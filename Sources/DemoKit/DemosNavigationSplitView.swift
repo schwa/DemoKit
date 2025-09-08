@@ -1,27 +1,21 @@
 import SwiftUI
 
 struct DemosNavigationSplitView: View {
-    private let demos: [any DemoView.Type]
+    @Bindable var viewModel: DemoPickerViewModel
 
-    @AppStorage("demoview")
-    private var storedSelection: String = ""
-    
-    @State
-    private var selection: DemoMetadata.ID?
-
-    init(demos: [any DemoView.Type]) {
-        self.demos = demos
+    init(viewModel: DemoPickerViewModel) {
+        self.viewModel = viewModel
     }
 
     var body: some View {
-        let elements = demos.map { (type: $0, metadata: $0.metadata) }
+        let elements = viewModel.demos.map { (type: $0, metadata: $0.metadata) }
         
         let grouped = Dictionary(grouping: elements) { $0.metadata.group }
         let sortedGroups = grouped.keys.compactMap { $0 }.sorted()
         let ungroupedElements = grouped[nil] ?? []
         
         NavigationSplitView {
-            List(selection: $selection) {
+            List(selection: $viewModel.selection) {
                 if !ungroupedElements.isEmpty {
                     ForEach(ungroupedElements, id: \.metadata.id) { type, metadata in
                         navigationLink(for: metadata)
@@ -37,39 +31,12 @@ struct DemosNavigationSplitView: View {
                 }
             }
         } detail: {
-            if let id = selection, let element = elements.first(where: { $0.metadata.id == id }) {
+            if let id = viewModel.selection, let element = elements.first(where: { $0.metadata.id == id }) {
                 AnyView(element.type.init()).id(id)
             }
         }
-        .onAppear {
-            guard selection == nil else { return }
-            
-            // First check environment variable
-            if let envSelection = ProcessInfo.processInfo.environment["DEMOVIEW"], !envSelection.isEmpty {
-                logger?.info("Selecting demo from environment variable: \(envSelection)")
-                let envID = DemoMetadata.ID(envSelection)
-                if elements.contains(where: { $0.metadata.id == envID }) {
-                    selection = envID
-                    return
-                }
-            }
-            
-            // Then check stored selection
-            guard !storedSelection.isEmpty else {
-                logger?.info("Selecting demo from stored selection: \(storedSelection)")
-                selection = elements.first?.metadata.id
-                return
-            }
-            
-            let storedID = DemoMetadata.ID(storedSelection)
-            if elements.contains(where: { $0.metadata.id == storedID }) {
-                selection = storedID
-            } else {
-                selection = elements.first?.metadata.id
-            }
-        }
-        .onChange(of: selection) {
-            storedSelection = selection?.rawValue ?? ""
+        .onChange(of: viewModel.selection) {
+            viewModel.selectionDidChange()
         }
     }
 
@@ -95,18 +62,3 @@ struct DemosNavigationSplitView: View {
         }
     }
 }
-
-//extension View {
-//
-//    func foo() -> some View {
-//        self.onOpenURL { url in
-//            let id = DemoMetadata.ID(url.lastPathComponent)
-//            guard elements.contains(where: { $0.metadata.id == id }) else {
-//                return
-//            }
-////            selection = id
-//        }
-//
-//    }
-//
-//}
