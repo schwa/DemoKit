@@ -1,5 +1,5 @@
-import SwiftUI
 import DemoKit
+import SwiftUI
 
 @main
 struct DemoApp: App {
@@ -7,7 +7,7 @@ struct DemoApp: App {
         DemoPickerScene(demos: [
             DemoView1.self,
             DemoView2.self,
-            DemoView3.self,
+            DemoView3.self
         ])
         .handleDemoURLScheme("x-demo")
     }

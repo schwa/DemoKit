@@ -1,5 +1,5 @@
-import SwiftUI
 import OSLog
+import SwiftUI
 
 private extension View {
     @ViewBuilder
@@ -17,7 +17,7 @@ struct DemosNavigationSplitView: View {
     var viewModel: DemoPickerViewModel
 
     @State
-    var searchText: String = ""
+    private var searchText: String = ""
 
     init(viewModel: DemoPickerViewModel) {
         self.viewModel = viewModel
@@ -25,38 +25,38 @@ struct DemosNavigationSplitView: View {
 
     var body: some View {
         let elements = viewModel.demos.map { (type: $0, metadata: $0.metadata) }
-        
+
         // Filter elements based on search text
         let filteredElements = searchText.isEmpty ? elements : elements.filter { element in
             let metadata = element.metadata
             let searchLower = searchText.lowercased()
-            
+
             // Search in title
             if metadata.name.lowercased().contains(searchLower) {
                 return true
             }
-            
+
             // Search in description
             if let description = metadata.description,
                description.lowercased().contains(searchLower) {
                 return true
             }
-            
+
             // Search in keywords
             if metadata.keywords.contains(where: { $0.lowercased().contains(searchLower) }) {
                 return true
             }
-            
+
             return false
         }
-        
+
         let grouped = Dictionary(grouping: filteredElements) { $0.metadata.group }
-        let sortedGroups = grouped.keys.compactMap { $0 }.sorted()
+        let sortedGroups = grouped.keys.compactMap(\.self).sorted()
         let ungroupedElements = grouped[nil] ?? []
-        
+
         NavigationSplitView {
             List(selection: $viewModel.selection) {
-                if filteredElements.isEmpty && !searchText.isEmpty {
+                if filteredElements.isEmpty, !searchText.isEmpty {
                     ContentUnavailableView.search(text: searchText)
                 } else {
                     if !ungroupedElements.isEmpty {
@@ -64,7 +64,7 @@ struct DemosNavigationSplitView: View {
                             navigationLink(for: element.metadata)
                         }
                     }
-                    
+
                     ForEach(sortedGroups, id: \.self) { group in
                         Section(group) {
                             ForEach(grouped[group] ?? [], id: \.metadata.id) { element in

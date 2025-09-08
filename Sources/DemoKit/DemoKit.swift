@@ -1,5 +1,5 @@
-import SwiftUI
 internal import os
+import SwiftUI
 
 public struct DemoMetadata: Identifiable, Sendable {
     public var id: ID
@@ -10,7 +10,7 @@ public struct DemoMetadata: Identifiable, Sendable {
     public var keywords: [String]
     public var color: Color?
     public var isEnabled: Bool
-    public var variants: [DemoMetadata] = []
+    public var variants: [Self] = []
 
     public struct ID: Hashable, Sendable {
         public var rawValue: String
@@ -20,7 +20,7 @@ public struct DemoMetadata: Identifiable, Sendable {
         }
     }
 
-    public init(id: ID? = nil, name: String, systemImage: String = "puzzlepiece", description: String? = nil, group: String? = nil, keywords: [String] = [], color: Color? = nil, isEnabled: Bool = true, variants: [DemoMetadata] = []) {
+    public init(id: ID? = nil, name: String, systemImage: String = "puzzlepiece", description: String? = nil, group: String? = nil, keywords: [String] = [], color: Color? = nil, isEnabled: Bool = true, variants: [Self] = []) {
         self.id = id ?? ID(Self.kebabCase(name))
         self.name = name
         self.systemImage = systemImage
@@ -31,7 +31,7 @@ public struct DemoMetadata: Identifiable, Sendable {
         self.isEnabled = isEnabled
         self.variants = variants
     }
-    
+
     private static func kebabCase(_ string: String) -> String {
         // Convert to kebab-case: "My Demo View" -> "my-demo-view"
         string
@@ -44,10 +44,9 @@ public struct DemoMetadata: Identifiable, Sendable {
     }
 }
 
-//let defaultName = "\(type(of: Self.self))"
+// let defaultName = "\(type(of: Self.self))"
 //    .replacingOccurrences(of: ".Type", with: "")
 //    .replacingOccurrences(of: "DemoView", with: "")
-
 
 public protocol DemoView: View {
     static var metadata: DemoMetadata { get }
@@ -70,37 +69,39 @@ public extension DemoView {
         variants: [DemoMetadata] = []
     ) -> DemoMetadata {
         let typeName = String(describing: Self.self)
-        
+
         // Remove "DemoView" suffix if present, otherwise use full type name
-        let cleanedTypeName = typeName.hasSuffix("DemoView") 
+        let cleanedTypeName = typeName.hasSuffix("DemoView")
             ? String(typeName.dropLast(8))  // Remove "DemoView" (8 characters)
             : typeName
-        
+
         // Generate default name from type name: "MyDemoView" -> "My Demo View"
         let defaultName = name ?? cleanedTypeName
             .reduce("") { result, char in
-                if char.isUppercase && !result.isEmpty {
+                if char.isUppercase, !result.isEmpty {
                     return result + " " + String(char)
-                } else if char.isNumber && !result.isEmpty && !result.last!.isNumber {
+                }
+                if char.isNumber, !result.isEmpty, !result.last!.isNumber {
                     return result + " " + String(char)
                 }
                 return result + String(char)
             }
             .trimmingCharacters(in: .whitespaces)
-        
+
         // Generate default ID from type name in kebab-case
         let defaultID = id ?? DemoMetadata.ID(
             cleanedTypeName
                 .reduce("") { result, char in
-                    if char.isUppercase && !result.isEmpty {
+                    if char.isUppercase, !result.isEmpty {
                         return result + "-" + String(char).lowercased()
-                    } else if char.isNumber && !result.isEmpty && !result.last!.isNumber {
+                    }
+                    if char.isNumber, !result.isEmpty, !result.last!.isNumber {
                         return result + "-" + String(char)
                     }
                     return result + String(char).lowercased()
                 }
         )
-        
+
         return DemoMetadata(
             id: defaultID,
             name: defaultName,
@@ -115,11 +116,11 @@ public extension DemoView {
     }
 }
 
-//protocol DemoScene: Scene {
+// protocol DemoScene: Scene {
 //    static var metadata: DemoMetadata { get }
 //
 //    @MainActor
 //    init()
-//}
+// }
 
 let logger: Logger? = Logger(subsystem: "DemoKit", category: "DemoKit")

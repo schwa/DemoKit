@@ -13,4 +13,3 @@ struct TagView: View {
             .background(Color.accentColor, in: Capsule())
     }
 }
-

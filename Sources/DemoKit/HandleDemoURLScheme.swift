@@ -1,7 +1,7 @@
 import SwiftUI
 
 extension EnvironmentValues {
-    @Entry var demoURLScheme: String? = nil
+    @Entry var demoURLScheme: String?
 }
 
 public extension View {

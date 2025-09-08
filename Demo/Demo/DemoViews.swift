@@ -1,5 +1,5 @@
-import SwiftUI
 import DemoKit
+import SwiftUI
 
 struct DemoView1: DemoView {
     static var metadata = makeMetadata(
