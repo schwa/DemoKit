@@ -127,7 +127,7 @@ Enable URL scheme support to open specific demos while the app is running.
 2. Enable the URL handler in your app:
 ```swift
 DemoPickerScene(demos: demos)
-    .handleDemoURLScheme("x-demo")
+    .handleDemoURL(scheme: "x-demo")
 ```
 
 #### Usage
@@ -204,10 +204,10 @@ Extensions for handling URL schemes:
 
 ```swift
 // For Views
-func handleDemoURLScheme(_ scheme: String) -> some View
+func handleDemoURL(scheme: String) -> some View
 
-// For Scenes
-func handleDemoURLScheme(_ scheme: String) -> some Scene
+// For Scenes  
+func handleDemoURL(scheme: String) -> some Scene
 ```
 
 ## Requirements
@@ -274,7 +274,7 @@ struct DemoApp: App {
             AnimationDemo.self,
             GestureDemo.self
         ])
-        .handleDemoURLScheme("x-demo")
+        .handleDemoURL(scheme: "x-demo")
     }
 }
 ```
