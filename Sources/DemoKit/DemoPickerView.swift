@@ -10,9 +10,9 @@ public struct DemoPickerView: View {
 
     public var body: some View {
         DemosNavigationSplitView()
-        .environment(viewModel)
-        .onOpenURL { url in
-            viewModel.handleURL(url, urlScheme: urlScheme)
-        }
+            .environment(viewModel)
+            .onOpenURL { url in
+                viewModel.handleURL(url, urlScheme: urlScheme)
+            }
     }
 }

@@ -22,6 +22,7 @@ public final class DemoPickerViewModel {
     }
 
     private func loadInitialSelection() {
+        // swiftlint:disable:next prefer_key_path
         let elements = demos.map { $0.metadata }
 
         if let envSelection = ProcessInfo.processInfo.environment["DEMOVIEW"],
@@ -40,6 +41,7 @@ public final class DemoPickerViewModel {
     }
 
     private func loadStoredSelection() {
+        // swiftlint:disable:next prefer_key_path
         let elements = demos.map { $0.metadata }
 
         guard !storedSelection.isEmpty else {

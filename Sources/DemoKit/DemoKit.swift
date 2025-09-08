@@ -51,8 +51,6 @@ public protocol DemoView: View {
     init()
 }
 
-
-
 // protocol DemoScene: Scene {
 //    static var metadata: DemoMetadata { get }
 //
