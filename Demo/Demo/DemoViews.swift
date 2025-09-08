@@ -6,7 +6,8 @@ struct DemoView1: DemoView {
         name: "Demo View 1",
         description: "This is a demo view 1",
         group: "Group A",
-        keywords: ["tag 1", "tag 2"]
+        keywords: ["tag 1", "tag 2"],
+        color: .green
     )
     init() {}
     var body: some View {
@@ -17,6 +18,7 @@ struct DemoView1: DemoView {
 struct DemoView2: DemoView {
     static var metadata = DemoMetadata(
         name: "Demo View 2",
+        systemImage: "star",
         description: "This is a demo view 2",
         group: "Group A"
     )

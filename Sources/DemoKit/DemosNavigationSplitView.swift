@@ -18,6 +18,9 @@ struct DemosNavigationSplitView: View {
 
     @State
     private var searchText: String = ""
+    
+    @State
+    private var hoveredID: DemoMetadata.ID?
 
     var body: some View {
         let elements = viewModel.demos.map { (type: $0, metadata: $0.metadata) }
@@ -61,21 +64,21 @@ struct DemosNavigationSplitView: View {
                     if !pinnedElements.isEmpty {
                         Section("Pinned") {
                             ForEach(pinnedElements, id: \.metadata.id) { element in
-                                navigationLink(for: element.metadata, showPinIcon: true)
+                                navigationLink(for: element.metadata)
                             }
                         }
                     }
                     
                     if !ungroupedElements.isEmpty {
                         ForEach(ungroupedElements, id: \.metadata.id) { element in
-                            navigationLink(for: element.metadata, showPinIcon: false)
+                            navigationLink(for: element.metadata)
                         }
                     }
 
                     ForEach(sortedGroups, id: \.self) { group in
                         Section(group) {
                             ForEach(grouped[group] ?? [], id: \.metadata.id) { element in
-                                navigationLink(for: element.metadata, showPinIcon: false)
+                                navigationLink(for: element.metadata)
                             }
                         }
                     }
@@ -99,34 +102,63 @@ struct DemosNavigationSplitView: View {
         .applySearchable(searchText: $searchText, shouldShow: elements.count >= 6)
     }
 
-    func navigationLink(for metadata: DemoMetadata, showPinIcon: Bool) -> some View {
-        NavigationLink(value: metadata.id) {
-            VStack(alignment: .leading) {
-                HStack {
-                    if showPinIcon {
-                        Image(systemName: "pin.fill")
-                            .foregroundStyle(.tint)
-                            .imageScale(.small)
+    func navigationLink(for metadata: DemoMetadata) -> some View {
+        HStack {
+            NavigationLink(value: metadata.id) {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Label(metadata.name, systemImage: metadata.systemImage)
+                            .layoutPriority(1)
+                            .truncationMode(.tail)
+                            .lineLimit(1)
+                            .foregroundStyle(metadata.color ?? Color.primary)
+                            .labelStyle(.titleAndIcon)
+                        KeywordsView(keywords: metadata.keywords)
                     }
-                    Label(metadata.name, systemImage: metadata.systemImage)
-                        .layoutPriority(1)
-                        .truncationMode(.tail)
-                        .lineLimit(1)
-                        .foregroundStyle(metadata.color ?? Color.primary)
-                        .labelStyle(.titleAndIcon)
-                    KeywordsView(keywords: metadata.keywords)
-                }
-                if let description = metadata.description {
-                    Text(description)
-                        .lineLimit(nil)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let description = metadata.description {
+                        Text(description)
+                            .lineLimit(nil)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
+            
+            Spacer()
+            
+            #if os(macOS)
+            Button {
+                viewModel.togglePin(for: metadata.id)
+            } label: {
+                Image(systemName: viewModel.isPinned(metadata.id) ? "pin.fill" : "pin")
+                    .foregroundStyle(viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary)
+            }
+            .buttonStyle(.plain)
+            .opacity(hoveredID == metadata.id || viewModel.isPinned(metadata.id) ? 1 : 0)
+            .animation(.easeInOut(duration: 0.15), value: hoveredID)
+            .help(viewModel.isPinned(metadata.id) ? "Unpin demo" : "Pin demo")
+            #else
+            Button {
+                viewModel.togglePin(for: metadata.id)
+            } label: {
+                Image(systemName: viewModel.isPinned(metadata.id) ? "pin.fill" : "pin")
+                    .foregroundStyle(viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary)
+            }
+            .buttonStyle(.plain)
+            .help(viewModel.isPinned(metadata.id) ? "Unpin demo" : "Pin demo")
+            #endif
+        }
+        .onHover { isHovering in
+            #if os(macOS)
+            hoveredID = isHovering ? metadata.id : nil
+            #endif
         }
         .contextMenu {
-            Button(viewModel.isPinned(metadata.id) ? "Unpin" : "Pin") {
+            Button {
                 viewModel.togglePin(for: metadata.id)
+            } label: {
+                Label(viewModel.isPinned(metadata.id) ? "Unpin Demo" : "Pin Demo", 
+                      systemImage: viewModel.isPinned(metadata.id) ? "pin.slash" : "pin")
             }
         }
         .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")")
