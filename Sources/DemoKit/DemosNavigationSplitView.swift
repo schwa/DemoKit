@@ -10,37 +10,45 @@ struct DemosNavigationSplitView: View {
     @State
     private var hoveredID: DemoMetadata.ID?
 
-    var body: some View {
-        let elements = viewModel.demos
+    private var visibleElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
+        viewModel.demos
             .map { (type: $0, metadata: $0.metadata) }
             .filter { !viewModel.isHidden($0.metadata.id) }
-
-        let filteredElements = searchText.isEmpty ? elements : elements.filter { element in
-            let metadata = element.metadata
-            let searchLower = searchText.lowercased()
-
-            if metadata.name.lowercased().contains(searchLower) {
-                return true
-            }
-
-            if let description = metadata.description,
-               description.lowercased().contains(searchLower) {
-                return true
-            }
-
-            if metadata.keywords.contains(where: { $0.lowercased().contains(searchLower) }) {
-                return true
-            }
-
-            return false
-        }
-
-        let pinnedElements = filteredElements.filter { viewModel.isPinned($0.metadata.id) }
-        let unpinnedElements = filteredElements.filter { !viewModel.isPinned($0.metadata.id) }
+    }
+    
+    private var filteredElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
+        guard !searchText.isEmpty else { return visibleElements }
         
-        let grouped = Dictionary(grouping: unpinnedElements) { $0.metadata.group }
-        let sortedGroups = grouped.keys.compactMap(\.self).sorted()
-        let ungroupedElements = grouped[nil] ?? []
+        let searchLower = searchText.lowercased()
+        return visibleElements.filter { element in
+            let metadata = element.metadata
+            return metadata.name.lowercased().contains(searchLower) ||
+                   (metadata.description?.lowercased().contains(searchLower) ?? false) ||
+                   metadata.keywords.contains { $0.lowercased().contains(searchLower) }
+        }
+    }
+    
+    private var pinnedElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
+        filteredElements.filter { viewModel.isPinned($0.metadata.id) }
+    }
+    
+    private var unpinnedElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
+        filteredElements.filter { !viewModel.isPinned($0.metadata.id) }
+    }
+    
+    private var groupedElements: [String?: [(type: any DemoView.Type, metadata: DemoMetadata)]] {
+        Dictionary(grouping: unpinnedElements) { $0.metadata.group }
+    }
+    
+    private var sortedGroups: [String] {
+        groupedElements.keys.compactMap(\.self).sorted()
+    }
+    
+    private var ungroupedElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
+        groupedElements[nil] ?? []
+    }
+    
+    var body: some View {
 
         NavigationSplitView {
             @Bindable
@@ -50,16 +58,8 @@ struct DemosNavigationSplitView: View {
                 if filteredElements.isEmpty, !searchText.isEmpty {
                     ContentUnavailableView.search(text: searchText)
                 }
-                else if elements.isEmpty && !viewModel.hiddenDemoIDs.isEmpty {
-                    ContentUnavailableView {
-                        Label("All Demos Hidden", systemImage: "eye.slash")
-                    } description: {
-                        Text("\(viewModel.hiddenDemoIDs.count) demo\(viewModel.hiddenDemoIDs.count == 1 ? " is" : "s are") hidden")
-                    } actions: {
-                        Button("Unhide All") {
-                            viewModel.unhideAll()
-                        }
-                    }
+                else if visibleElements.isEmpty && !viewModel.hiddenDemoIDs.isEmpty {
+                    allDemosHiddenView
                 }
                 else {
                     if !pinnedElements.isEmpty {
@@ -78,7 +78,7 @@ struct DemosNavigationSplitView: View {
 
                     ForEach(sortedGroups, id: \.self) { group in
                         Section(group) {
-                            ForEach(grouped[group] ?? [], id: \.metadata.id) { element in
+                            ForEach(groupedElements[group] ?? [], id: \.metadata.id) { element in
                                 navigationLink(for: element.metadata)
                             }
                         }
@@ -96,23 +96,40 @@ struct DemosNavigationSplitView: View {
                 }
             }
         } detail: {
-            if let id = viewModel.selection,
-               let element = elements.first(where: { $0.metadata.id == id }) {
-                AnyView(element.type.init()).id(id)
-            }
-            else {
-                Text("Select a demo from the sidebar")
-                    .foregroundStyle(.secondary)
-            }
+            detailView
         }
         .onChange(of: viewModel.selection) { oldValue, newValue in
             guard oldValue != newValue else { return }
             viewModel.selectionDidChange()
         }
-        .applySearchable(searchText: $searchText, shouldShow: elements.count >= 6)
+        .applySearchable(searchText: $searchText, shouldShow: visibleElements.count >= 6)
+    }
+    
+    @ViewBuilder
+    private var allDemosHiddenView: some View {
+        ContentUnavailableView {
+            Label("All Demos Hidden", systemImage: "eye.slash")
+        } description: {
+            Text("\(viewModel.hiddenDemoIDs.count) demo\(viewModel.hiddenDemoIDs.count == 1 ? " is" : "s are") hidden")
+        } actions: {
+            Button("Unhide All") {
+                viewModel.unhideAll()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var detailView: some View {
+        if let id = viewModel.selection,
+           let element = visibleElements.first(where: { $0.metadata.id == id }) {
+            AnyView(element.type.init()).id(id)
+        } else {
+            Text("Select a demo from the sidebar")
+                .foregroundStyle(.secondary)
+        }
     }
 
-    func navigationLink(for metadata: DemoMetadata) -> some View {
+    private func navigationLink(for metadata: DemoMetadata) -> some View {
         HStack {
             NavigationLink(value: metadata.id) {
                 VStack(alignment: .leading) {
