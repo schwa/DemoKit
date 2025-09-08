@@ -1,29 +1,66 @@
 # DemoKit
 
-## Setting Initial Demo Selection
+## Demo Selection
 
-You can override the initial demo selection using an environment variable:
+DemoKit provides three ways to control which demo is displayed:
 
-```bash
-DEMO_SELECTION=<demo_id> /path/to/your/app
-```
+### 1. At Launch via Environment Variable
 
-On macOS, you can also use command-line UserDefaults:
+Set the `DEMOVIEW` environment variable to launch with a specific demo:
 
 ```bash
-/path/to/your/app -DemosNavigationSplitView.selection <demo_id>
+DEMOVIEW=<demo_id> /path/to/your/app
 ```
 
-(TODO: test this works the . might be a problem)
+### 2. At Launch via Command-Line Argument
 
-The selection priority is:
-1. `DEMO_SELECTION` environment variable (if set and valid)
-2. Previously stored selection from UserDefaults (including command-line overrides)
+Pass the demo ID via UserDefaults on the command line:
+
+```bash
+/path/to/your/app -demoview <demo_id>
+```
+
+### 3. At Runtime via URL Scheme (Optional)
+
+You can enable URL scheme support to open specific demos while the app is running.
+
+#### Setup
+
+1. In your app's `Info.plist`, register your custom URL scheme:
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>x-demo</string>
+        </array>
+    </dict>
+</array>
+```
+
+2. In your SwiftUI app, enable the URL handler:
+```swift
+DemoPickerScene(demos: demos)
+    .handleDemoURLScheme("x-demo")
+```
+
+#### Usage
+
+Open demos using either format:
+- Direct: `x-demo://Demo1`
+- Query parameter: `x-demo://?openDemo=Demo1`
+
+### Selection Priority
+
+When multiple selection methods are present, DemoKit uses this priority:
+1. `DEMOVIEW` environment variable (if set and valid)
+2. Previously stored selection from UserDefaults (persisted between launches)
 3. First demo in the list (fallback)
 
-## TODO
+Note: URL scheme selections override the current selection immediately when received.
 
-Add support for changing demo by URL scheme.
+## TODO
 Add support for taking screenshots of demos automatically.
 
 osascript -e 'tell app "System Events" to get the id of every window of (every process whose background only is false)' 

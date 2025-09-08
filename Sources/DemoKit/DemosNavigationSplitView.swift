@@ -1,4 +1,5 @@
 import SwiftUI
+import OSLog
 
 struct DemosNavigationSplitView: View {
     @Bindable var viewModel: DemoPickerViewModel
@@ -31,11 +32,17 @@ struct DemosNavigationSplitView: View {
                 }
             }
         } detail: {
-            if let id = viewModel.selection, let element = elements.first(where: { $0.metadata.id == id }) {
+            if let id = viewModel.selection,
+               let element = elements.first(where: { $0.metadata.id == id }) {
                 AnyView(element.type.init()).id(id)
+            } else {
+                Text("Select a demo from the sidebar")
+                    .foregroundStyle(.secondary)
             }
         }
-        .onChange(of: viewModel.selection) {
+        .onChange(of: viewModel.selection) { oldValue, newValue in
+            guard oldValue != newValue else { return }
+            logger?.debug("Selection changed from '\(oldValue?.rawValue ?? "nil")' to '\(newValue?.rawValue ?? "nil")'")
             viewModel.selectionDidChange()
         }
     }
