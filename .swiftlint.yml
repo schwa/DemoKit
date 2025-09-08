@@ -195,7 +195,7 @@ only_rules:
   - sorted_enum_cases
   - sorted_first_last
   - sorted_imports # 7 violations (fixable)
-  - statement_position
+#  - statement_position
   - static_operator
   - static_over_final_class
   - strict_fileprivate

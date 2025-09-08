@@ -60,7 +60,8 @@ public final class DemoPickerViewModel {
         if elements.contains(where: { $0.id == storedID }) {
             logger?.info("Restoring selection from storage: \(self.storedSelection)")
             selection = storedID
-        } else {
+        }
+        else {
             logger?.warning("Stored selection '\(self.storedSelection)' not found, using first demo")
             selection = elements.first?.id
         }

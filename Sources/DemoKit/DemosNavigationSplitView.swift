@@ -6,7 +6,8 @@ private extension View {
     func applySearchable(searchText: Binding<String>, shouldShow: Bool) -> some View {
         if shouldShow {
             self.searchable(text: searchText, placement: .sidebar, prompt: "Search Demos")
-        } else {
+        }
+        else {
             self
         }
     }
@@ -58,7 +59,8 @@ struct DemosNavigationSplitView: View {
             List(selection: $viewModel.selection) {
                 if filteredElements.isEmpty, !searchText.isEmpty {
                     ContentUnavailableView.search(text: searchText)
-                } else {
+                }
+                else {
                     if !ungroupedElements.isEmpty {
                         ForEach(ungroupedElements, id: \.metadata.id) { element in
                             navigationLink(for: element.metadata)
@@ -79,7 +81,8 @@ struct DemosNavigationSplitView: View {
             if let id = viewModel.selection,
                let element = elements.first(where: { $0.metadata.id == id }) {
                 AnyView(element.type.init()).id(id)
-            } else {
+            }
+            else {
                 Text("Select a demo from the sidebar")
                     .foregroundStyle(.secondary)
             }
