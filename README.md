@@ -2,23 +2,13 @@
 
 SwiftUI library for creating organized, searchable demonstration views with metadata and navigation support.
 
-## Features
-
-- **Organized Demo Navigation**: Automatic navigation split view with sidebar and detail views
-- **Rich Metadata**: Attach names, descriptions, icons, groups, keywords, and colors to demos
-- **Flexible Selection**: Multiple ways to launch specific demos (environment variables, command-line, URL schemes)
-- **Grouping Support**: Organize demos into logical groups in the sidebar
-- **Keyword Tagging**: Add searchable keywords to categorize and find demos
-- **State Persistence**: Remembers the last selected demo between app launches
-- **Cross-Platform**: Supports iOS 18+ and macOS 15+
-
 ## Installation
 
 Add DemoKit to your Swift Package Manager dependencies:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/DemoKit.git", from: "1.0.0")
+    .package(url: "https://github.com/yourusername/DemoKit.git", from: "0.1.0")
 ]
 ```
 
@@ -37,7 +27,7 @@ targets: [
 
 ### Basic Setup
 
-1. Create demo views conforming to the `DemoView` protocol:
+1. Create demo views conforming to the `DemoView` protocol. Most metadata fields are optional.
 
 ```swift
 import SwiftUI
@@ -45,8 +35,8 @@ import DemoKit
 
 struct MyDemoView: DemoView {
     static var metadata = DemoMetadata(
-        id: .init("my-demo"),
-        name: "My Demo",
+        id: .init("my-demo"), // Optional - will default to kebab-case of type name
+        name: "My Demo", // Optional - will default to type name split by camel case
         systemImage: "star.fill",
         description: "Demonstrates a cool feature",
         group: "Features",
