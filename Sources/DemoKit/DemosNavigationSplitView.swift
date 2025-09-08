@@ -131,7 +131,7 @@ struct DemosNavigationSplitView: View {
                 viewModel.togglePin(for: metadata.id)
             } label: {
                 Image(systemName: viewModel.isPinned(metadata.id) ? "pin.fill" : "pin")
-                    .foregroundStyle(viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary)
+                    .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary))
             }
             .buttonStyle(.plain)
             .opacity(hoveredID == metadata.id || viewModel.isPinned(metadata.id) ? 1 : 0)
@@ -142,7 +142,7 @@ struct DemosNavigationSplitView: View {
                 viewModel.togglePin(for: metadata.id)
             } label: {
                 Image(systemName: viewModel.isPinned(metadata.id) ? "pin.fill" : "pin")
-                    .foregroundStyle(viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary)
+                    .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary))
             }
             .buttonStyle(.plain)
             .help(viewModel.isPinned(metadata.id) ? "Unpin demo" : "Pin demo")
