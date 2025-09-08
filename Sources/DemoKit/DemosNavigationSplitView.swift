@@ -133,12 +133,14 @@ struct DemosNavigationSplitView: View {
     
     @ViewBuilder
     private var detailView: some View {
+        
         if let id = viewModel.selection,
            let element = visibleElements.first(where: { $0.metadata.id == id }) {
-            AnyView(element.type.init()).id(id)
+            AnyView(element.type.init())
+                .id(id)
+                .navigationTitle("\(element.metadata.name)")
         } else {
-            Text("Select a demo from the sidebar")
-                .foregroundStyle(.secondary)
+            ContentUnavailableView("Select a Demo", systemImage: "sidebar.left", description: Text("Choose a demo from the sidebar"))
         }
     }
 

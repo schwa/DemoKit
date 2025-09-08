@@ -37,6 +37,14 @@ struct DemoView3: DemoView {
     )
     init() {}
     var body: some View {
-        Text("My Complex Demo View")
+        Text("Demo View 3")
+    }
+}
+
+struct DemoView4: DemoView {
+    static var metadata = DemoMetadata(type: Self.self)
+    init() {}
+    var body: some View {
+        Text("Demo View 4")
     }
 }
