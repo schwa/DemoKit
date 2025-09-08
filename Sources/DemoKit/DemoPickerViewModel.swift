@@ -25,7 +25,7 @@ public final class DemoPickerViewModel {
     }
 
     private func loadInitialSelection() {
-        let elements = demos.map(\.metadata)
+        let elements = demos.map { $0.metadata }
 
         // First check environment variable
         if let envSelection = ProcessInfo.processInfo.environment["DEMOVIEW"],
@@ -47,7 +47,7 @@ public final class DemoPickerViewModel {
     }
 
     private func loadStoredSelection() {
-        let elements = demos.map(\.metadata)
+        let elements = demos.map { $0.metadata }
 
         guard !storedSelection.isEmpty else {
             let firstID = elements.first?.id

@@ -55,66 +55,7 @@ public protocol DemoView: View {
     init()
 }
 
-public extension DemoView {
-    // Helper to create metadata with automatic ID generation from type name
-    static func makeMetadata(
-        id: DemoMetadata.ID? = nil,
-        name: String? = nil,
-        systemImage: String = "puzzlepiece",
-        description: String? = nil,
-        group: String? = nil,
-        keywords: [String] = [],
-        color: Color? = nil,
-        isEnabled: Bool = true,
-        variants: [DemoMetadata] = []
-    ) -> DemoMetadata {
-        let typeName = String(describing: Self.self)
 
-        // Remove "DemoView" suffix if present, otherwise use full type name
-        let cleanedTypeName = typeName.hasSuffix("DemoView")
-            ? String(typeName.dropLast(8))  // Remove "DemoView" (8 characters)
-            : typeName
-
-        // Generate default name from type name: "MyDemoView" -> "My Demo View"
-        let defaultName = name ?? cleanedTypeName
-            .reduce("") { result, char in
-                if char.isUppercase, !result.isEmpty {
-                    return result + " " + String(char)
-                }
-                if char.isNumber, !result.isEmpty, !result.last!.isNumber {
-                    return result + " " + String(char)
-                }
-                return result + String(char)
-            }
-            .trimmingCharacters(in: .whitespaces)
-
-        // Generate default ID from type name in kebab-case
-        let defaultID = id ?? DemoMetadata.ID(
-            cleanedTypeName
-                .reduce("") { result, char in
-                    if char.isUppercase, !result.isEmpty {
-                        return result + "-" + String(char).lowercased()
-                    }
-                    if char.isNumber, !result.isEmpty, !result.last!.isNumber {
-                        return result + "-" + String(char)
-                    }
-                    return result + String(char).lowercased()
-                }
-        )
-
-        return DemoMetadata(
-            id: defaultID,
-            name: defaultName,
-            systemImage: systemImage,
-            description: description,
-            group: group,
-            keywords: keywords,
-            color: color,
-            isEnabled: isEnabled,
-            variants: variants
-        )
-    }
-}
 
 // protocol DemoScene: Scene {
 //    static var metadata: DemoMetadata { get }
