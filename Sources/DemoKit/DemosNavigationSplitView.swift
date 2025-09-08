@@ -112,5 +112,6 @@ struct DemosNavigationSplitView: View {
                 }
             }
         }
+        .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")")
     }
 }

@@ -71,12 +71,17 @@ public extension DemoView {
     ) -> DemoMetadata {
         let typeName = String(describing: Self.self)
         
+        // Remove "DemoView" suffix if present, otherwise use full type name
+        let cleanedTypeName = typeName.hasSuffix("DemoView") 
+            ? String(typeName.dropLast(8))  // Remove "DemoView" (8 characters)
+            : typeName
+        
         // Generate default name from type name: "MyDemoView" -> "My Demo View"
-        let defaultName = name ?? typeName
-            .replacingOccurrences(of: "DemoView", with: "")
-            .replacingOccurrences(of: "Demo", with: "")
+        let defaultName = name ?? cleanedTypeName
             .reduce("") { result, char in
                 if char.isUppercase && !result.isEmpty {
+                    return result + " " + String(char)
+                } else if char.isNumber && !result.isEmpty && !result.last!.isNumber {
                     return result + " " + String(char)
                 }
                 return result + String(char)
@@ -85,12 +90,12 @@ public extension DemoView {
         
         // Generate default ID from type name in kebab-case
         let defaultID = id ?? DemoMetadata.ID(
-            typeName
-                .replacingOccurrences(of: "DemoView", with: "")
-                .replacingOccurrences(of: "Demo", with: "")
+            cleanedTypeName
                 .reduce("") { result, char in
                     if char.isUppercase && !result.isEmpty {
                         return result + "-" + String(char).lowercased()
+                    } else if char.isNumber && !result.isEmpty && !result.last!.isNumber {
+                        return result + "-" + String(char)
                     }
                     return result + String(char).lowercased()
                 }

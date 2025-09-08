@@ -2,7 +2,7 @@ import SwiftUI
 import DemoKit
 
 struct DemoView1: DemoView {
-    static var metadata = DemoMetadata(
+    static var metadata = makeMetadata(
         description: "This is a demo view 1",
         group: "Group A",
         keywords: ["tag 1", "tag 2"]
@@ -14,9 +14,9 @@ struct DemoView1: DemoView {
 }
 
 struct DemoView2: DemoView {
-    static var metadata = DemoMetadata(
+    static var metadata = makeMetadata(
         description: "This is a demo view 2",
-        group: "Group A",
+        group: "Group A"
     )
     init() {}
     var body: some View {
@@ -25,7 +25,7 @@ struct DemoView2: DemoView {
 }
 
 struct DemoView3: DemoView {
-    static var metadata = DemoMetadata(
+    static var metadata = makeMetadata(
         description: "This is a demo view 3",
         group: "Group A",
         keywords: ["a very long tab", "another very long tag"]
