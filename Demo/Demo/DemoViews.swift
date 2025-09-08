@@ -3,7 +3,6 @@ import SwiftUI
 
 struct DemoView1: DemoView {
     static var metadata = DemoMetadata(
-        name: "Demo View 1",
         description: "This is a demo view 1",
         group: "Group A",
         keywords: ["tag 1", "tag 2"],
@@ -28,15 +27,15 @@ struct DemoView2: DemoView {
     }
 }
 
-struct DemoView3: DemoView {
+struct MyComplexDemoView: DemoView {
     static var metadata = DemoMetadata(
-        name: "Demo View 3",
-        description: "This is a demo view 3",
+        id: .init("custom-id"),
+        description: "This demonstrates ID to name conversion",
         group: "Group A",
         keywords: ["a very long tab", "another very long tag"]
     )
     init() {}
     var body: some View {
-        Text("Demo View 3")
+        Text("My Complex Demo View")
     }
 }
