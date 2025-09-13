@@ -3,6 +3,10 @@ import SwiftUI
 
 @main
 struct DemoApp: App {
+    init() {
+        DemoCrashDetector.install()
+    }
+    
     var body: some Scene {
         DemoPickerScene(demos: [
             DemoView1.self,

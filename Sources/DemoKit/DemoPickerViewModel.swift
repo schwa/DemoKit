@@ -65,8 +65,12 @@ public final class DemoPickerViewModel {
         let elements = demos.map { $0.metadata }
 
         guard !storedSelection.isEmpty else {
+            #if os(iOS)
+            selection = nil
+            #else
             let firstID = elements.first?.id
             selection = firstID
+            #endif
             return
         }
 
@@ -75,7 +79,11 @@ public final class DemoPickerViewModel {
             selection = storedID
         }
         else {
+            #if os(iOS)
+            selection = nil
+            #else
             selection = elements.first?.id
+            #endif
         }
     }
 
