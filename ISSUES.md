@@ -37,3 +37,12 @@ WIP - needs design discussion. Grill me on this later.
 
 ---
 
+## 5: Add long descriptions and short descriptions
+status: new
+priority: medium
+kind: feature
+created: 2026-04-02T22:55:43.745406+00:00
+
+
+---
+
