@@ -57,11 +57,12 @@ created: 2026-04-02T22:55:43.745406+00:00
 ---
 
 ## 6: Add common places for demos to put configuration
-status: new
+status: closed
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:45.860260+00:00
-updated: 2026-04-02T23:19:50.385127+00:00
+updated: 2026-04-02T23:31:29.051532+00:00
+closed: 2026-04-02T23:31:29.051532+00:00
 
 Provide a standard configuration view slot for demos.
 
@@ -72,6 +73,8 @@ Key decisions:
 - iOS: popover/sheet
 - Hidden by default, toggled on/off
 - Can implement now on current DemoView system, migrates to ViewableDemo later when #4 lands
+
+- 2026-04-02T23:31:29.055327+00:00: Implemented configuration view slot. Demos use .demoConfiguration { } modifier. macOS: bottom overlay with toolbar toggle. iOS: sheet with presentation detents.
 
 ---
 
