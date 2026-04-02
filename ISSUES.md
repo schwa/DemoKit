@@ -55,3 +55,12 @@ created: 2026-04-02T22:55:45.860260+00:00
 
 ---
 
+## 7: Automatically generate a screenshot from a demo
+status: new
+priority: low
+kind: none
+created: 2026-04-02T23:02:37.990422+00:00
+
+
+---
+
