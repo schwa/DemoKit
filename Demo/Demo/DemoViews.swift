@@ -9,9 +9,23 @@ struct DemoView1: DemoView {
         keywords: ["tag 1", "tag 2"],
         color: .green
     )
+
+    @State private var scale: Double = 1.0
+    @State private var rotation: Double = 0.0
+
     init() {}
     var body: some View {
         Text("Demo View 1")
+            .scaleEffect(scale)
+            .rotationEffect(.degrees(rotation))
+            .demoConfiguration {
+                LabeledContent("Scale") {
+                    Slider(value: $scale, in: 0.5...3.0)
+                }
+                LabeledContent("Rotation") {
+                    Slider(value: $rotation, in: 0...360)
+                }
+            }
     }
 }
 

@@ -1,158 +1,152 @@
 {
-  "version": 4,
-  "project_info": {
-    "workspace": null,
-    "project": "/Users/schwa/Desktop/DemoKit/Demo/Demo.xcodeproj",
-    "package": null,
-    "schemes": [
-      {
+  "version": 1,
+  "timestamp": 1775172100,
+  "xcode_version": null,
+  "graph": {
+    "projects": {
+      "/Users/schwa/Shared/Projects/DemoKit/Package.swift": {
+        "path": "/Users/schwa/Shared/Projects/DemoKit/Package.swift",
+        "kind": "swift_package",
+        "name": "DemoKit",
+        "schemes": [
+          "DemoKit"
+        ],
+        "native_schemes": [
+          "DemoKit"
+        ],
+        "targets": [
+          "DemoKit",
+          "DemoKitTests (test)"
+        ],
+        "configurations": []
+      },
+      "/Users/schwa/Shared/Projects/DemoKit/Demo/Demo.xcodeproj": {
+        "path": "/Users/schwa/Shared/Projects/DemoKit/Demo/Demo.xcodeproj",
+        "kind": "xcode_project",
         "name": "Demo",
-        "supported_platforms": [
-          "mac"
+        "schemes": [
+          "Demo",
+          "DemoKit"
+        ],
+        "native_schemes": [
+          "Demo"
+        ],
+        "targets": [
+          "Demo"
+        ],
+        "configurations": [
+          "Debug",
+          "Release"
         ]
       }
-    ],
-    "targets": [
+    },
+    "dependencies": [
       {
-        "name": "Demo",
-        "platform": null,
-        "target_type": "app"
+        "from": "/Users/schwa/Shared/Projects/DemoKit/Demo/Demo.xcodeproj",
+        "to": "/Users/schwa/Shared/Projects/DemoKit/Package.swift",
+        "kind": "local_package"
       }
     ],
-    "packages": []
+    "root": "/Users/schwa/Shared/Projects/DemoKit"
   },
-  "xcode_installations": [
-    {
-      "path": "/Applications/Xcode-26.0.0-Beta.7.app",
-      "version": "26.0",
-      "build": "17A5305k",
-      "is_current": true
-    },
-    {
-      "path": "/Applications/Xcode-16.4.0.app",
-      "version": "16.4",
-      "build": "16F6",
-      "is_current": false
-    }
-  ],
-  "available_destinations": [
+  "destinations": [
     {
       "platform": "macOS",
       "name": "My Mac",
-      "id": "00006041-000448263480801C",
+      "id": "00006050-000E70491131401C",
       "os": null,
-      "variant": null
-    },
-    {
-      "platform": "iOS",
-      "name": "Jonathan’s iPhone Pro Max 16",
-      "id": "00008140-000651EA0AD2801C",
-      "os": null,
-      "variant": null
-    },
-    {
-      "platform": "iOS",
-      "name": "Any iOS Device",
-      "id": "dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder",
-      "os": null,
-      "variant": null
-    },
-    {
-      "platform": "iOS Simulator",
-      "name": "Any iOS Simulator Device",
-      "id": "dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder",
-      "os": null,
-      "variant": null
-    },
-    {
-      "platform": "macOS",
-      "name": "Any Mac",
-      "id": null,
-      "os": null,
-      "variant": null
+      "arch": "arm64"
     },
     {
       "platform": "visionOS",
-      "name": "Any visionOS Device",
-      "id": "dvtdevice-DVTiOSDevicePlaceholder-xros:placeholder",
+      "name": "Jonathan’s Apple Vision Pro",
+      "id": "00008112-001A08891A78A01E",
       "os": null,
-      "variant": null
+      "arch": "arm64"
     },
     {
       "platform": "visionOS Simulator",
-      "name": "Any visionOS Simulator Device",
-      "id": "dvtdevice-DVTiOSDeviceSimulatorPlaceholder-xrsimulator:placeholder",
-      "os": null,
-      "variant": null
+      "name": "Apple Vision Pro",
+      "id": "021681A2-D945-4FD8-98C9-AB2ABC5D1A4C",
+      "os": "26.4",
+      "arch": "arm64"
     },
     {
       "platform": "iOS Simulator",
-      "name": "iPad mini (6th generation)",
-      "id": "0E0175C3-F672-418E-ADAE-487C885E28FA",
-      "os": "26.0",
-      "variant": null
+      "name": "iPad (A16)",
+      "id": "972341C3-E64E-4776-A521-6F66589DD210",
+      "os": "26.4",
+      "arch": "arm64"
     },
     {
       "platform": "iOS Simulator",
-      "name": "iPhone 16 Pro Max",
-      "id": "14D4A9DE-103A-4BD7-926C-B0079CA759F6",
-      "os": "26.0",
-      "variant": null
-    }
-  ],
-  "discovered_projects": [
-    {
-      "path": ".",
-      "project_type": "SwiftPackage",
-      "depth": 0,
-      "schemes": [
-        {
-          "name": "DemoKit",
-          "supported_platforms": [
-            "mac"
-          ]
-        },
-        {
-          "name": "DemoKitTests",
-          "supported_platforms": [
-            "mac"
-          ]
-        }
-      ],
-      "targets": [
-        {
-          "name": "DemoKit",
-          "platform": null,
-          "target_type": "library"
-        },
-        {
-          "name": "DemoKitTests",
-          "platform": null,
-          "target_type": "library"
-        }
-      ]
+      "name": "iPad Air 11-inch (M4)",
+      "id": "105E9F9C-A97A-4DDE-8CF8-A42F7BEABD8A",
+      "os": "26.4",
+      "arch": "arm64"
     },
     {
-      "path": "./Demo/Demo.xcodeproj",
-      "project_type": "Project",
-      "depth": 2,
-      "schemes": [
-        {
-          "name": "Demo",
-          "supported_platforms": [
-            "mac"
-          ]
-        }
-      ],
-      "targets": [
-        {
-          "name": "Demo",
-          "platform": null,
-          "target_type": "app"
-        }
-      ]
+      "platform": "iOS Simulator",
+      "name": "iPad Air 13-inch (M4)",
+      "id": "A3E232F4-1AC4-4D24-B6D1-DE246E602C35",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPad Pro 11-inch (M5)",
+      "id": "E769C815-0401-4B6D-A859-BEE1D27CD947",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPad Pro 13-inch (M5)",
+      "id": "17EA3CEA-A884-445B-BC1F-1DA4E260CCE5",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPad mini (A17 Pro)",
+      "id": "FAC5A893-5D39-49FD-8A4D-FCD9250EDF4D",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPhone 17",
+      "id": "D8F59215-35E8-44D6-B8DB-BD6514A2FB21",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPhone 17 Pro",
+      "id": "E05B2085-0553-4EE3-A8AE-4C7009A994AA",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPhone 17 Pro Max",
+      "id": "5E8478C0-7242-49E4-9F6B-BB93621A4370",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPhone 17e",
+      "id": "0E94C0D3-89BD-4AA4-87D8-35E75C62C770",
+      "os": "26.4",
+      "arch": "arm64"
+    },
+    {
+      "platform": "iOS Simulator",
+      "name": "iPhone Air",
+      "id": "2F982FB9-316A-4594-97E3-8623837AF1AE",
+      "os": "26.4",
+      "arch": "arm64"
     }
-  ],
-  "default_project": "Demo/Demo.xcodeproj",
-  "timestamp": 1757359388
+  ]
 }
