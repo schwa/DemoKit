@@ -27,3 +27,13 @@ created: 2026-04-02T22:55:38.899907+00:00
 
 ---
 
+## 4: Isolate demos from view
+status: new
+priority: medium
+kind: feature
+created: 2026-04-02T22:55:41.936612+00:00
+
+WIP - needs design discussion. Grill me on this later.
+
+---
+
