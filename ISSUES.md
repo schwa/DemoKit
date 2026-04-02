@@ -46,3 +46,12 @@ created: 2026-04-02T22:55:43.745406+00:00
 
 ---
 
+## 6: Add common places for demos to put configuration
+status: new
+priority: medium
+kind: feature
+created: 2026-04-02T22:55:45.860260+00:00
+
+
+---
+
