@@ -32,8 +32,18 @@ status: new
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:41.936612+00:00
+updated: 2026-04-02T23:15:27.906627+00:00
 
-WIP - needs design discussion. Grill me on this later.
+Separate the concept of a Demo from its View representation.
+
+Key decisions:
+- Demo protocol: metadata + discoverability only, no lifecycle/execution model imposed
+- ViewableDemo protocol: extends Demo, adds ability to produce a View
+- Not all demos need views (headless compute, GPU work, etc.)
+- UI only shows ViewableDemo conformers (for now)
+- Demos registered via explicit array, same as today
+- Demo type semantics (value vs reference) TBD at implementation time
+- Big refactor — break into sub-issues when ready to implement
 
 ---
 
