@@ -61,7 +61,17 @@ status: new
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:45.860260+00:00
+updated: 2026-04-02T23:19:50.385127+00:00
 
+Provide a standard configuration view slot for demos.
+
+Key decisions:
+- ViewBuilder-based: DemoView takes an optional configurationView: closure alongside the main content
+- Single slot — DemoKit decides placement per platform
+- macOS: overlay along the bottom, toggled by a toolbar button
+- iOS: popover/sheet
+- Hidden by default, toggled on/off
+- Can implement now on current DemoView system, migrates to ViewableDemo later when #4 lands
 
 ---
 
