@@ -18,3 +18,12 @@ The MetalSprocketsExamples app has a Demos menu defined in the app target, but D
 
 ---
 
+## 3: Show description over the demo view
+status: new
+priority: medium
+kind: feature
+created: 2026-04-02T22:55:38.899907+00:00
+
+
+---
+
