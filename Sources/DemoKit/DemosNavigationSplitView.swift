@@ -6,7 +6,7 @@ struct DemosNavigationSplitView: View {
 
     @State
     private var searchText: String = ""
-    
+
     @State
     private var hoveredID: DemoMetadata.ID?
 
@@ -15,10 +15,10 @@ struct DemosNavigationSplitView: View {
             .map { (type: $0, metadata: $0.metadata) }
             .filter { !viewModel.isHidden($0.metadata.id) }
     }
-    
+
     private var filteredElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
         guard !searchText.isEmpty else { return visibleElements }
-        
+
         let searchLower = searchText.lowercased()
         return visibleElements.filter { element in
             let metadata = element.metadata
@@ -27,27 +27,27 @@ struct DemosNavigationSplitView: View {
                    metadata.keywords.contains { $0.lowercased().contains(searchLower) }
         }
     }
-    
+
     private var pinnedElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
         filteredElements.filter { viewModel.isPinned($0.metadata.id) }
     }
-    
+
     private var unpinnedElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
         filteredElements.filter { !viewModel.isPinned($0.metadata.id) }
     }
-    
+
     private var groupedElements: [String?: [(type: any DemoView.Type, metadata: DemoMetadata)]] {
         Dictionary(grouping: unpinnedElements) { $0.metadata.group }
     }
-    
+
     private var sortedGroups: [String] {
         groupedElements.keys.compactMap(\.self).sorted()
     }
-    
+
     private var ungroupedElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
         groupedElements[nil] ?? []
     }
-    
+
     var body: some View {
         NavigationSplitView {
             demoList
@@ -60,11 +60,11 @@ struct DemosNavigationSplitView: View {
         }
         .applySearchable(searchText: $searchText, shouldShow: visibleElements.count >= 6)
     }
-    
+
     @ViewBuilder
     private var demoList: some View {
         @Bindable var viewModel = viewModel
-        
+
         List(selection: $viewModel.selection) {
             listContent
         }
@@ -79,20 +79,20 @@ struct DemosNavigationSplitView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private var listContent: some View {
         if filteredElements.isEmpty, !searchText.isEmpty {
             ContentUnavailableView.search(text: searchText)
         }
-        else if visibleElements.isEmpty && !viewModel.hiddenDemoIDs.isEmpty {
+        else if visibleElements.isEmpty, !viewModel.hiddenDemoIDs.isEmpty {
             allDemosHiddenView
         }
         else {
             demosContent
         }
     }
-    
+
     @ViewBuilder
     private var demosContent: some View {
         if !pinnedElements.isEmpty {
@@ -102,7 +102,7 @@ struct DemosNavigationSplitView: View {
                 }
             }
         }
-        
+
         if !ungroupedElements.isEmpty {
             ForEach(ungroupedElements, id: \.metadata.id) { element in
                 navigationLink(for: element.metadata)
@@ -117,7 +117,7 @@ struct DemosNavigationSplitView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private var allDemosHiddenView: some View {
         ContentUnavailableView {
@@ -130,10 +130,9 @@ struct DemosNavigationSplitView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private var detailView: some View {
-        
         if let id = viewModel.selection,
            let element = visibleElements.first(where: { $0.metadata.id == id }) {
             DemoConfigurationContainer(content: AnyView(element.type.init().frame(maxWidth: .infinity, maxHeight: .infinity)))
@@ -165,30 +164,10 @@ struct DemosNavigationSplitView: View {
                     }
                 }
             }
-            
+
             Spacer()
-            
-            #if os(macOS)
-            Button {
-                viewModel.togglePin(for: metadata.id)
-            } label: {
-                Image(systemName: viewModel.isPinned(metadata.id) ? "pin.fill" : "pin")
-                    .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary))
-            }
-            .buttonStyle(.plain)
-            .opacity(hoveredID == metadata.id || viewModel.isPinned(metadata.id) ? 1 : 0)
-            .animation(.easeInOut(duration: 0.15), value: hoveredID)
-            .help(viewModel.isPinned(metadata.id) ? "Unpin demo" : "Pin demo")
-            #else
-            Button {
-                viewModel.togglePin(for: metadata.id)
-            } label: {
-                Image(systemName: viewModel.isPinned(metadata.id) ? "pin.fill" : "pin")
-                    .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary))
-            }
-            .buttonStyle(.plain)
-            .help(viewModel.isPinned(metadata.id) ? "Unpin demo" : "Pin demo")
-            #endif
+
+            pinButton(for: metadata)
         }
         .onHover { isHovering in
             #if os(macOS)
@@ -196,30 +175,67 @@ struct DemosNavigationSplitView: View {
             #endif
         }
         .contextMenu {
-            Button {
-                viewModel.togglePin(for: metadata.id)
-            } label: {
-                Label(viewModel.isPinned(metadata.id) ? "Unpin Demo" : "Pin Demo", 
-                      systemImage: viewModel.isPinned(metadata.id) ? "pin.slash" : "pin")
-            }
-            
-            Divider()
-            
-            Button {
-                viewModel.toggleHidden(for: metadata.id)
-            } label: {
-                Label("Hide Demo", systemImage: "eye.slash")
-            }
-            
-            if !viewModel.hiddenDemoIDs.isEmpty {
-                Button {
-                    viewModel.unhideAll()
-                } label: {
-                    Label("Unhide All Demos (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
-                }
-            }
+            contextMenuContent(for: metadata)
         }
         .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")")
+    }
+
+    @ViewBuilder
+    private func pinButton(for metadata: DemoMetadata) -> some View {
+        let pinImageName = viewModel.isPinned(metadata.id) ? "pin.fill" : "pin"
+        let pinColor = viewModel.selection == metadata.id ? Color.primary : (viewModel.isPinned(metadata.id) ? Color.accentColor : Color.secondary)
+
+        #if os(macOS)
+        Button {
+            viewModel.togglePin(for: metadata.id)
+        } label: {
+            Image(systemName: pinImageName)
+                .accessibilityLabel(viewModel.isPinned(metadata.id) ? "Unpin" : "Pin")
+                .foregroundStyle(pinColor)
+        }
+        .buttonStyle(.plain)
+        .opacity(hoveredID == metadata.id || viewModel.isPinned(metadata.id) ? 1 : 0)
+        .animation(.easeInOut(duration: 0.15), value: hoveredID)
+        .help(viewModel.isPinned(metadata.id) ? "Unpin demo" : "Pin demo")
+        #else
+        Button {
+            viewModel.togglePin(for: metadata.id)
+        } label: {
+            Image(systemName: pinImageName)
+                .accessibilityLabel(viewModel.isPinned(metadata.id) ? "Unpin" : "Pin")
+                .foregroundStyle(pinColor)
+        }
+        .buttonStyle(.plain)
+        .help(viewModel.isPinned(metadata.id) ? "Unpin demo" : "Pin demo")
+        #endif
+    }
+
+    @ViewBuilder
+    private func contextMenuContent(for metadata: DemoMetadata) -> some View {
+        Button {
+            viewModel.togglePin(for: metadata.id)
+        } label: {
+            Label(
+                viewModel.isPinned(metadata.id) ? "Unpin Demo" : "Pin Demo",
+                systemImage: viewModel.isPinned(metadata.id) ? "pin.slash" : "pin"
+            )
+        }
+
+        Divider()
+
+        Button {
+            viewModel.toggleHidden(for: metadata.id)
+        } label: {
+            Label("Hide Demo", systemImage: "eye.slash")
+        }
+
+        if !viewModel.hiddenDemoIDs.isEmpty {
+            Button {
+                viewModel.unhideAll()
+            } label: {
+                Label("Unhide All Demos (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
+            }
+        }
     }
 }
 

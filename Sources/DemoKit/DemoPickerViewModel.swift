@@ -109,7 +109,7 @@ public final class DemoPickerViewModel {
             pinnedDemoIDs = []
             return
         }
-        
+
         let ids = storedPinnedDemos.split(separator: ",").map { DemoMetadata.ID(String($0)) }
         pinnedDemoIDs = Set(ids)
     }
@@ -145,7 +145,7 @@ public final class DemoPickerViewModel {
             hiddenDemoIDs = []
             return
         }
-        
+
         let ids = storedHiddenDemos.split(separator: ",").map { DemoMetadata.ID(String($0)) }
         hiddenDemoIDs = Set(ids)
     }
