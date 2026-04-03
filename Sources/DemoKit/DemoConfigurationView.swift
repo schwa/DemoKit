@@ -23,7 +23,7 @@ struct EquatableAnyView: Equatable {
     }
 
     nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.id == rhs.id
+        false
     }
 }
 
