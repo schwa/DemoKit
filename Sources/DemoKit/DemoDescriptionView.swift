@@ -14,14 +14,14 @@ struct DemoDescriptionContainer<Content: View>: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(metadata.name)
-                                .font(.headline)
+                                .font(.title.bold())
                             if let description = metadata.description {
-                                Text(description)
-                                    .foregroundStyle(.secondary)
+                                Text(LocalizedStringKey(description))
+                                    .font(.title2)
                             }
                             if let longDescription = metadata.longDescription {
-                                Text(longDescription)
-                                    .foregroundStyle(.tertiary)
+                                Text(LocalizedStringKey(longDescription))
+                                    .font(.title3)
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -29,7 +29,7 @@ struct DemoDescriptionContainer<Content: View>: View {
                     }
                     .frame(maxHeight: 300)
                     .fixedSize(horizontal: false, vertical: true)
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+                    .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 10))
                     .padding()
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
