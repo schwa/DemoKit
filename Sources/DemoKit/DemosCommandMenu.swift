@@ -66,17 +66,20 @@ public struct DemosCommandMenu: Commands {
 
     @ViewBuilder
     private func navigationItems(viewModel: DemoPickerViewModel) -> some View {
+        let ids = viewModel.visibleIDs()
+        let currentIndex = viewModel.selection.flatMap { ids.firstIndex(of: $0) }
+
         Button("Previous Demo") {
-            selectAdjacentDemo(viewModel: viewModel, offset: -1)
+            viewModel.selectPreviousDemo()
         }
         .keyboardShortcut("[", modifiers: .command)
-        .disabled(previousDemoID(viewModel: viewModel) == nil)
+        .disabled(currentIndex == nil || currentIndex == ids.startIndex)
 
         Button("Next Demo") {
-            selectAdjacentDemo(viewModel: viewModel, offset: 1)
+            viewModel.selectNextDemo()
         }
         .keyboardShortcut("]", modifiers: .command)
-        .disabled(nextDemoID(viewModel: viewModel) == nil)
+        .disabled(currentIndex == nil || currentIndex == ids.index(before: ids.endIndex))
     }
 
     @ViewBuilder
@@ -116,56 +119,4 @@ public struct DemosCommandMenu: Commands {
         }
     }
 
-    // MARK: - Navigation Helpers
-
-    private func visibleIDs(viewModel: DemoPickerViewModel) -> [DemoMetadata.ID] {
-        let allVisible = viewModel.demos
-            .map { $0.metadata } // swiftlint:disable:this prefer_key_path
-            .filter { !viewModel.isHidden($0.id) }
-
-        let pinned = allVisible.filter { viewModel.isPinned($0.id) }
-        let unpinned = allVisible.filter { !viewModel.isPinned($0.id) }
-        let ungrouped = unpinned.filter { $0.group == nil }
-        let grouped = Dictionary(grouping: unpinned.filter { $0.group != nil }) { $0.group! }
-        let sortedGroups = grouped.keys.sorted()
-
-        var result = pinned.map { $0.id } // swiftlint:disable:this prefer_key_path
-        result += ungrouped.map { $0.id } // swiftlint:disable:this prefer_key_path
-        for group in sortedGroups {
-            result += (grouped[group] ?? []).map { $0.id } // swiftlint:disable:this prefer_key_path
-        }
-        return result
-    }
-
-    private func selectAdjacentDemo(viewModel: DemoPickerViewModel, offset: Int) {
-        let ids = visibleIDs(viewModel: viewModel)
-        guard !ids.isEmpty else {
-            return
-        }
-        guard let current = viewModel.selection, let index = ids.firstIndex(of: current) else {
-            viewModel.selection = ids.first
-            return
-        }
-        let newIndex = index.advanced(by: offset)
-        guard ids.indices.contains(newIndex) else {
-            return
-        }
-        viewModel.selection = ids[newIndex]
-    }
-
-    private func previousDemoID(viewModel: DemoPickerViewModel) -> DemoMetadata.ID? {
-        let ids = visibleIDs(viewModel: viewModel)
-        guard let current = viewModel.selection, let index = ids.firstIndex(of: current), index > 0 else {
-            return nil
-        }
-        return ids[index - 1]
-    }
-
-    private func nextDemoID(viewModel: DemoPickerViewModel) -> DemoMetadata.ID? {
-        let ids = visibleIDs(viewModel: viewModel)
-        guard let current = viewModel.selection, let index = ids.firstIndex(of: current), index < ids.count - 1 else {
-            return nil
-        }
-        return ids[index + 1]
-    }
 }

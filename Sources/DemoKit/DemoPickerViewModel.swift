@@ -154,55 +154,92 @@ public final class DemoPickerViewModel {
         storedHiddenDemos = hiddenDemoIDs.map(\.rawValue).sorted().joined(separator: ",")
     }
 
-    func handleURL(_ url: URL, urlScheme: String?) {
-        guard let urlScheme else {
+    // MARK: - Navigation
+
+    func visibleIDs() -> [DemoMetadata.ID] {
+        let allVisible = demos
+            .map { $0.metadata }
+            .filter { !isHidden($0.id) }
+
+        let pinned = allVisible.filter { isPinned($0.id) }
+        let unpinned = allVisible.filter { !isPinned($0.id) }
+        let ungrouped = unpinned.filter { $0.group == nil }
+        let grouped = Dictionary(grouping: unpinned.filter { $0.group != nil }) { $0.group! }
+        let sortedGroups = grouped.keys.sorted()
+
+        var result = pinned.map { $0.id }
+        result += ungrouped.map { $0.id }
+        for group in sortedGroups {
+            result += (grouped[group] ?? []).map { $0.id }
+        }
+        return result
+    }
+
+    func selectNextDemo() {
+        selectAdjacentDemo(offset: 1)
+    }
+
+    func selectPreviousDemo() {
+        selectAdjacentDemo(offset: -1)
+    }
+
+    private func selectAdjacentDemo(offset: Int) {
+        let ids = visibleIDs()
+        guard !ids.isEmpty else { return }
+        guard let current = selection, let index = ids.firstIndex(of: current) else {
+            selection = ids.first
             return
         }
+        let newIndex = index.advanced(by: offset)
+        guard ids.indices.contains(newIndex) else { return }
+        selection = ids[newIndex]
+    }
 
-        guard url.scheme == urlScheme else {
-            return
-        }
-
-        let demoID = extractDemoID(from: url)
-
-        guard let demoID else {
-            logger?.warning("Could not extract demo ID from URL: \(url.absoluteString)")
-            return
-        }
-
-        logger?.info("Extracted demo ID: \(demoID)")
-
+    func findDemoID(_ demoID: String) -> DemoMetadata.ID? {
         let allMetadata = demos.map { $0.metadata }
-
-        // Try exact ID match, then kebab-cased, then case-insensitive ID, then case-insensitive name
-        let matched: DemoMetadata.ID? =
-            allMetadata.first(where: { $0.id.rawValue == demoID })?.id
+        return allMetadata.first(where: { $0.id.rawValue == demoID })?.id
             ?? allMetadata.first(where: { $0.id.rawValue == DemoMetadata.kebabCase(demoID) })?.id
             ?? allMetadata.first(where: { $0.id.rawValue.lowercased() == demoID.lowercased() })?.id
             ?? allMetadata.first(where: { $0.name.lowercased().replacingOccurrences(of: " ", with: "") == demoID.lowercased().replacingOccurrences(of: " ", with: "") })?.id
+    }
 
-        guard let matched else {
+    // MARK: - URL Handling
+
+    /// URL scheme: `<scheme>://demo/<id>`, `<scheme>://next`, `<scheme>://previous`, `<scheme>://screenshot`, `<scheme>://screenshot/<id>`
+    func handleURL(_ url: URL, urlScheme: String?) {
+        guard let urlScheme else { return }
+        guard url.scheme == urlScheme else { return }
+
+        let host = url.host ?? ""
+        let path = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+
+        switch host {
+        case "demo":
+            if !path.isEmpty {
+                navigateToDemo(path)
+            }
+        case "next":
+            selectNextDemo()
+        case "previous", "prev":
+            selectPreviousDemo()
+        case "screenshot":
+            if !path.isEmpty {
+                navigateToDemo(path)
+            }
+            // Screenshot handling is left to external tooling (e.g. steveo screenshot)
+            let currentID = selection?.rawValue ?? "none"
+            logger?.info("Screenshot requested for current demo: \(currentID)")
+        default:
+            logger?.warning("Unknown URL action: \(host)")
+        }
+    }
+
+    private func navigateToDemo(_ demoID: String) {
+        guard let matched = findDemoID(demoID) else {
             logger?.warning("Demo with ID '\(demoID)' not found in \(self.demos.count) available demos")
             return
         }
         logger?.info("URL navigated to demo: \(matched.rawValue)")
         selection = matched
-    }
-
-    private func extractDemoID(from url: URL) -> String? {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return nil
-        }
-
-        if let openDemoValue = components.queryItems?.first(where: { $0.name == "openDemo" })?.value,
-           !openDemoValue.isEmpty {
-            return openDemoValue
-        }
-
-        if let host = components.host, !host.isEmpty {
-            return host
-        }
-
-        return nil
     }
 }
