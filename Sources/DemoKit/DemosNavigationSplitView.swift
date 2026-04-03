@@ -4,6 +4,9 @@ struct DemosNavigationSplitView: View {
     @Environment(DemoPickerViewModel.self)
     private var viewModel: DemoPickerViewModel
 
+    @Environment(\.demoKitConfiguration)
+    private var configuration: DemoKitConfiguration
+
     @State
     private var searchText: String = ""
 
@@ -160,11 +163,13 @@ struct DemosNavigationSplitView: View {
                             .layoutPriority(1)
                             .truncationMode(.tail)
                             .lineLimit(1)
-                            .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (metadata.color ?? Color.primary))
-                            .labelStyle(.titleAndIcon)
-                        KeywordsView(keywords: metadata.keywords)
+                            .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (configuration.showColors ? (metadata.color ?? Color.primary) : Color.primary))
+                            .applyLabelStyle(showIcons: configuration.showIcons)
+                        if configuration.showKeywordTags {
+                            KeywordsView(keywords: metadata.keywords)
+                        }
                     }
-                    if let description = metadata.description {
+                    if configuration.showDescriptions, let description = metadata.description {
                         Text(description)
                             .lineLimit(nil)
                             .font(.caption)
@@ -175,7 +180,9 @@ struct DemosNavigationSplitView: View {
 
             Spacer()
 
-            pinButton(for: metadata)
+            if configuration.showPinButton {
+                pinButton(for: metadata)
+            }
         }
         .accessibilityIdentifier(metadata.id.rawValue)
         .onHover { isHovering in
@@ -256,6 +263,15 @@ private extension View {
         }
         else {
             self
+        }
+    }
+
+    @ViewBuilder
+    func applyLabelStyle(showIcons: Bool) -> some View {
+        if showIcons {
+            self.labelStyle(.titleAndIcon)
+        } else {
+            self.labelStyle(.titleOnly)
         }
     }
 }

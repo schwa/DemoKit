@@ -192,11 +192,13 @@ closed: 2026-04-03T21:26:33Z
 ---
 
 ## 14: Allow calling app to control sidebar visual options (tags, descriptions, etc.)
-status: new
+status: closed
 priority: low
 kind: feature
 labels: api, sidebar
 created: 2026-04-03T21:36:01Z
+updated: 2026-04-03T21:37:55Z
+closed: 2026-04-03T21:37:55Z
 
 The calling app should be able to control which visual elements appear in the sidebar — e.g. whether keyword tags, descriptions, or icons are shown.
 
@@ -240,6 +242,8 @@ DemoPickerScene(demos: [...])
 
 ## Recommendation
 Option 1 (single config struct via environment) is cleanest. It is a single type, easy to extend, and follows the pattern used by SwiftUI for `NavigationSplitViewStyle`, `ListStyle`, etc.
+
+- `2026-04-03T21:37:55Z`: Implemented DemoKitConfiguration struct with environment propagation. Supports: showKeywordTags, showDescriptions, showIcons, showPinButton, showColors. Applied via .demoKitConfiguration() modifier on View or Scene.
 
 ---
 
