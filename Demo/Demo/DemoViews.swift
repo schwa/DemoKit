@@ -26,6 +26,7 @@ struct DemoView1: DemoView {
                     Slider(value: $rotation, in: 0...360)
                 }
             }
+            .border(Color.red)
     }
 }
 
@@ -39,6 +40,7 @@ struct DemoView2: DemoView {
     init() {}
     var body: some View {
         Text("Demo View 2")
+            .border(Color.red)
     }
 }
 
@@ -52,6 +54,7 @@ struct DemoView3: DemoView {
     init() {}
     var body: some View {
         Text("Demo View 3")
+        .border(Color.red)
     }
 }
 
@@ -60,5 +63,39 @@ struct DemoView4: DemoView {
     init() {}
     var body: some View {
         Text("Demo View 4")
+            .border(Color.red)
+    }
+}
+
+struct StateTestDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        description: "Tests that configuration panel updates when state changes",
+        group: "Group B",
+        keywords: ["state", "bug"]
+    )
+
+    @State private var counter = 0
+    @State private var color: Color = .blue
+
+    init() {}
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Counter: \(counter)")
+                .font(.largeTitle)
+                .foregroundStyle(color)
+            Button("Increment from main view") {
+                counter += 1
+            }
+        }
+        .demoConfiguration {
+            VStack {
+                Text("Counter is: \(counter)")
+                    .font(.headline)
+                Stepper("Counter: \(counter)", value: $counter)
+                ColorPicker("Color", selection: $color)
+            }
+        }
     }
 }

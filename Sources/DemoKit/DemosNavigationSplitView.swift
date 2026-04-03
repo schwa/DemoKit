@@ -136,9 +136,10 @@ struct DemosNavigationSplitView: View {
     private var detailView: some View {
         if let id = viewModel.selection,
            let element = visibleElements.first(where: { $0.metadata.id == id }) {
-            DemoConfigurationContainer(content: AnyView(element.type.init()))
+            let demoView = AnyView(element.type.init())
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.black)
+
+            DemoConfigurationContainer(content: demoView)
                 .id(id)
                 .navigationTitle("\(element.metadata.name)")
         } else {
