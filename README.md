@@ -1,58 +1,55 @@
 # DemoKit
 
-SwiftUI library for creating organized, searchable demonstration views with metadata and navigation support.
+A SwiftUI library for building organized, searchable demo galleries with navigation, metadata, grouping, pinning, and URL scheme support. Ideal for showcasing components, prototypes, or test views in a single app.
+
+## Requirements
+
+- iOS 18.0+ / macOS 15.0+
+- Swift 6.0+
+- Xcode 16.0+
 
 ## Installation
 
-Add DemoKit to your Swift Package Manager dependencies:
+Add DemoKit as a Swift Package Manager dependency:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/DemoKit.git", from: "0.1.0")
+    .package(url: "https://github.com/schwa/DemoKit.git", from: "0.1.0")
 ]
 ```
 
-Then add it to your target:
+## Quick Start
 
-```swift
-targets: [
-    .target(
-        name: "YourApp",
-        dependencies: ["DemoKit"]
-    )
-]
-```
+### 1. Create a Demo
 
-## Usage
-
-### Basic Setup
-
-1. Create demo views conforming to the `DemoView` protocol. Most metadata fields are optional.
+Conform a view to `DemoView` and provide a static `metadata` property. The view must have a no-argument `init()`.
 
 ```swift
 import SwiftUI
 import DemoKit
 
-struct MyDemoView: DemoView {
+struct AnimationDemo: DemoView {
     static var metadata = DemoMetadata(
-        id: .init("my-demo"), // Optional - will default to kebab-case of type name
-        name: "My Demo", // Optional - will default to type name split by camel case
-        systemImage: "star.fill",
-        description: "Demonstrates a cool feature",
-        group: "Features",
-        keywords: ["animation", "gestures"],
-        color: .blue
+        type: Self.self,
+        systemImage: "wand.and.rays",
+        description: "Showcases various SwiftUI animations",
+        group: "Visual Effects",
+        keywords: ["animation", "motion"],
+        color: .purple
     )
-    
+
     init() {}
-    
+
     var body: some View {
-        Text("Your demo content here")
+        Text("Animation Demo")
+            .font(.largeTitle)
     }
 }
 ```
 
-2. Use `DemoPickerScene` in your app:
+### 2. Wire Up Your App
+
+Use `DemoPickerScene` as your app's scene, passing an array of demo types:
 
 ```swift
 import SwiftUI
@@ -62,56 +59,140 @@ import DemoKit
 struct DemoApp: App {
     var body: some Scene {
         DemoPickerScene(demos: [
-            MyDemoView.self,
-            AnotherDemoView.self,
-            ThirdDemoView.self
+            AnimationDemo.self,
+            GestureDemo.self,
+            LayoutDemo.self,
         ])
     }
 }
 ```
 
-### Alternative: Using DemoPickerView
+That's it — you get a sidebar with search, grouping, pinning, and a detail area that displays the selected demo.
 
-For more control, use `DemoPickerView` directly in your views:
+## Creating Demos
+
+### The `DemoView` Protocol
 
 ```swift
-struct ContentView: View {
+public protocol DemoView: View {
+    static var metadata: DemoMetadata { get }
+    @MainActor init()
+}
+```
+
+Every demo view needs a `metadata` property and a parameterless initializer.
+
+### `DemoMetadata`
+
+```swift
+DemoMetadata(
+    id: .init("my-demo"),       // Unique ID — auto-derived if omitted
+    name: "My Demo",            // Display name — auto-derived if omitted
+    systemImage: "star.fill",   // SF Symbol for the sidebar icon
+    description: "Short text",  // Shown below the name in the sidebar
+    longDescription: "Longer text with **Markdown** support",
+    group: "Category",          // Groups demos into sidebar sections
+    keywords: ["tag1", "tag2"], // Searchable tags shown as pills
+    color: .blue,               // Tints the sidebar label
+    isEnabled: true,             // Whether the demo is selectable
+    variants: []                // Sub-demos (nested metadata)
+)
+```
+
+**Auto-derived names and IDs:** You can omit both `name` and `id` if you pass the `type:` parameter. DemoKit strips common suffixes (`DemoView`, `Demo`, `View`) from the type name and converts it to a human-readable name and kebab-case ID:
+
+```swift
+struct MeshGradientDemoView: DemoView {
+    // name → "Mesh Gradient", id → "mesh-gradient"
+    static var metadata = DemoMetadata(type: Self.self, group: "Backgrounds")
+    // ...
+}
+```
+
+You can also provide just `name:` (ID is derived) or just `id:` (name is derived).
+
+### Configuration Panels
+
+Add a configuration panel to any demo with the `.demoConfiguration` modifier. On macOS it appears as a material overlay at the bottom of the detail view; on iOS it opens as a sheet.
+
+```swift
+struct MyDemo: DemoView {
+    @State private var radius: Double = 50
+
     var body: some View {
-        DemoPickerView(demos: [
-            MyDemoView.self,
-            AnotherDemoView.self
-        ])
+        Circle()
+            .frame(width: radius * 2, height: radius * 2)
+            .demoConfiguration {
+                Form {
+                    Slider(value: $radius, in: 10...150)
+                }
+            }
     }
 }
 ```
 
-## Demo Selection
+A gear button appears in the toolbar automatically when `.demoConfiguration` is used.
 
-DemoKit provides three ways to control which demo is displayed:
+### Description Overlays
 
-### 1. At Launch via Environment Variable
+If a demo has a `description` or `longDescription`, an info button appears in the toolbar. Clicking it shows a material overlay with the demo's name, icon, and description text (rendered as Markdown via `LocalizedStringKey`).
 
-Set the `DEMOVIEW` environment variable to launch with a specific demo:
+## Showing a Menu Bar
 
-```bash
-DEMOVIEW=my-demo /path/to/your/app
+Add `DemosCommandMenu` to your app's `.commands` modifier to get a **Demos** menu in the menu bar:
+
+```swift
+@main
+struct DemoApp: App {
+    var body: some Scene {
+        DemoPickerScene(demos: demos)
+            .commands {
+                DemosCommandMenu()
+            }
+    }
+}
 ```
 
-### 2. At Launch via Command-Line Argument
+The menu provides:
 
-Pass the demo ID via UserDefaults on the command line:
+- **Previous Demo** (`⌘[`) and **Next Demo** (`⌘]`) navigation
+- **Show/Hide Configuration** (`⌘K`)
+- **Show/Hide Description** (`⌘I`)
+- A list of all visible demos, grouped by section, with a checkmark on the current selection
 
-```bash
-/path/to/your/app -demoview my-demo
+## Configuring Appearance
+
+Use `DemoKitConfiguration` to control what's shown in the sidebar:
+
+```swift
+DemoPickerScene(demos: demos)
+    .demoKitConfiguration(DemoKitConfiguration(
+        showKeywordTags: false,  // Hide keyword pill tags
+        showDescriptions: true,  // Show description text
+        showIcons: true,         // Show SF Symbol icons
+        showPinButton: true,     // Show pin buttons
+        showColors: true         // Use demo-specified colors
+    ))
 ```
 
-### 3. At Runtime via URL Scheme (Optional)
+### Hiding Tags
 
-Enable URL scheme support to open specific demos while the app is running.
+To hide keyword tags from the sidebar, set `showKeywordTags: false`:
 
-#### Setup
+```swift
+.demoKitConfiguration(DemoKitConfiguration(showKeywordTags: false))
+```
 
-1. In your app's `Info.plist`, register your custom URL scheme:
+Keywords are still searchable even when tags are hidden.
+
+## URL Schemes
+
+DemoKit supports a custom URL scheme for deep-linking into demos from outside the app.
+
+### Setup
+
+1. Register a URL scheme in your `Info.plist`:
+
 ```xml
 <key>CFBundleURLTypes</key>
 <array>
@@ -124,161 +205,146 @@ Enable URL scheme support to open specific demos while the app is running.
 </array>
 ```
 
-2. Enable the URL handler in your app:
+2. Enable the URL handler on your scene:
+
 ```swift
 DemoPickerScene(demos: demos)
     .handleDemoURL(scheme: "x-demo")
 ```
 
-#### Usage
+### URL Formats
 
-Open demos using either format:
-- Direct: `x-demo://my-demo`
-- Query parameter: `x-demo://?openDemo=my-demo`
+| URL | Action |
+|-----|--------|
+| `x-demo://demo/my-demo-id` | Navigate to a specific demo by ID |
+| `x-demo://next` | Select the next demo |
+| `x-demo://previous` | Select the previous demo |
+| `x-demo://screenshot` | Take a screenshot of the current demo |
 
-### Selection Priority
+Demo IDs are matched flexibly — exact match, kebab-case conversion, case-insensitive, and whitespace-stripped name matching are all tried.
 
-When multiple selection methods are present, DemoKit uses this priority:
-1. `DEMOVIEW` environment variable (if set and valid)
-2. Previously stored selection from UserDefaults (persisted between launches)
-3. First demo in the list (fallback)
+### Testing from the Terminal
 
-Note: URL scheme selections override the current selection immediately when received.
+```bash
+open "x-demo://demo/animation-demo"
+open "x-demo://next"
+```
 
-## API Reference
+## Demo Selection at Launch
 
-### DemoMetadata
+DemoKit provides multiple ways to launch directly into a specific demo:
 
-Struct containing metadata for a demo view:
+### Environment Variable
+
+```bash
+DEMOVIEW=my-demo-id ./MyApp
+```
+
+### Command-Line Argument (UserDefaults)
+
+```bash
+./MyApp -demoview my-demo-id
+```
+
+### Priority Order
+
+1. `DEMOVIEW` environment variable (highest)
+2. Stored selection from UserDefaults (persisted between launches)
+3. First demo in the list (fallback; `nil` on iOS)
+
+URL scheme selections override the current selection immediately when received.
+
+## Crash Detection
+
+Install the crash detector to automatically clear the stored demo selection if the app crashes on launch (preventing a crash loop):
 
 ```swift
-public struct DemoMetadata {
-    var id: ID                     // Unique identifier for the demo
-    var name: String               // Display name in the sidebar
-    var systemImage: String        // SF Symbol name for the icon
-    var description: String?       // Optional description shown below the name
-    var group: String?             // Optional group name for organization
-    var keywords: [String]         // Searchable keywords/tags
-    var color: Color?              // Optional color for the demo item
-    var isEnabled: Bool            // Whether the demo is selectable (default: true)
-    var variants: [DemoMetadata]   // Sub-demos or variants
+@main
+struct DemoApp: App {
+    init() {
+        DemoCrashDetector.install()
+    }
+    // ...
 }
 ```
 
-### DemoView Protocol
+## Sidebar Features
 
-Protocol that demo views must conform to:
+- **Search** — Appears automatically when there are 6+ demos. Searches names, descriptions, and keywords.
+- **Grouping** — Demos with a `group` are organized into collapsible sections.
+- **Pinning** — Pin demos to a "Pinned" section at the top. Toggle via the pin button or context menu.
+- **Hiding** — Hide demos via context menu. Unhide all from the list's context menu or the empty-state button.
+
+## Using `DemoPickerView` Directly
+
+For more control over your scene structure, use `DemoPickerView` instead of `DemoPickerScene`:
 
 ```swift
-public protocol DemoView: View {
-    static var metadata: DemoMetadata { get }
-    
-    @MainActor
-    init()
+struct ContentView: View {
+    var body: some View {
+        DemoPickerView(demos: [
+            AnimationDemo.self,
+            GestureDemo.self,
+        ])
+    }
 }
 ```
 
-### DemoPickerScene
-
-Scene wrapper for creating a demo picker window:
-
-```swift
-public struct DemoPickerScene: Scene {
-    init(demos: [any DemoView.Type])
-}
-```
-
-### DemoPickerView
-
-View component for embedding the demo picker in existing views:
-
-```swift
-public struct DemoPickerView: View {
-    init(demos: [any DemoView.Type])
-}
-```
-
-### Environment Extensions
-
-Extensions for handling URL schemes:
-
-```swift
-// For Views
-func handleDemoURL(scheme: String) -> some View
-
-// For Scenes  
-func handleDemoURL(scheme: String) -> some Scene
-```
-
-## Requirements
-
-- iOS 18.0+ / macOS 15.0+
-- Swift 6.0+
-- Xcode 16.0+
-
-## Example
-
-Here's a complete example demonstrating various DemoKit features:
+## Complete Example
 
 ```swift
 import SwiftUI
 import DemoKit
 
-// Define multiple demo views
-struct AnimationDemo: DemoView {
+struct GradientDemo: DemoView {
     static var metadata = DemoMetadata(
-        id: .init("animation-demo"),
-        name: "Animation Demo",
-        systemImage: "wand.and.rays",
-        description: "Showcases various SwiftUI animations",
-        group: "Visual Effects",
-        keywords: ["animation", "motion", "transitions"],
-        color: .purple
+        type: Self.self,
+        systemImage: "paintpalette",
+        description: "A configurable linear gradient",
+        group: "Backgrounds",
+        keywords: ["gradient", "color"],
+        color: .indigo
     )
-    
+
+    @State private var hue: Double = 0.6
+
     init() {}
-    
+
     var body: some View {
-        VStack {
-            Text("Animation Demo")
-                .font(.largeTitle)
-            // Your animation code here
+        LinearGradient(
+            colors: [Color(hue: hue, saturation: 0.8, brightness: 0.9), .black],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .demoConfiguration {
+            Form {
+                LabeledContent("Hue") {
+                    Slider(value: $hue, in: 0...1)
+                }
+            }
         }
     }
 }
 
-struct GestureDemo: DemoView {
-    static var metadata = DemoMetadata(
-        id: .init("gesture-demo"),
-        name: "Gesture Recognition",
-        systemImage: "hand.tap.fill",
-        description: "Demonstrates gesture handling",
-        group: "User Input",
-        keywords: ["gestures", "touch", "interaction"],
-        color: .orange
-    )
-    
-    init() {}
-    
-    var body: some View {
-        Text("Gesture Demo")
-        // Your gesture code here
-    }
-}
-
-// Create the app
 @main
 struct DemoApp: App {
+    init() {
+        DemoCrashDetector.install()
+    }
+
     var body: some Scene {
         DemoPickerScene(demos: [
-            AnimationDemo.self,
-            GestureDemo.self
+            GradientDemo.self,
         ])
         .handleDemoURL(scheme: "x-demo")
+        .commands {
+            DemosCommandMenu()
+        }
     }
 }
 ```
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
