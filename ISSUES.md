@@ -321,7 +321,7 @@ When switching between demos in the sidebar, the previously selected demo should
 status: new
 priority: low
 kind: task
-labels: ios,screenshot
+labels: ios, screenshot
 created: 2026-04-03T22:25:03Z
 
 The `screenshot` URL action saves to `/tmp` on macOS and reveals via `NSWorkspace`. On iOS we need to decide where screenshots go.
@@ -333,6 +333,31 @@ Options:
 - UIPasteboard
 
 Defer until iOS support is actively needed.
+
+---
+
+## 18: Screenshot URL action: configurable width, height, scale, destination, and format
+status: new
+priority: low
+kind: feature
+labels: screenshot,url
+created: 2026-04-03T22:28:33Z
+
+The `x-demo://screenshot` action currently hardcodes 800×600, 2x scale, PNG format, and saves to the temp directory. These should be configurable via query parameters:
+
+```
+x-demo://screenshot?width=1200&height=800&scale=3&format=png
+x-demo://screenshot?width=400&height=300&format=jpg
+```
+
+### Parameters to support
+- `width` — render width in points (default: 800)
+- `height` — render height in points (default: 600)
+- `scale` — rendering scale factor (default: 2.0)
+- `format` — `png` or `jpg` (default: png)
+- `destination` — output path or directory (default: temp directory)
+- `reveal` — whether to reveal in Finder, `true`/`false` (default: true on macOS)
+- `background` — background color, e.g. `white`, `black`, `clear` (default: white)
 
 ---
 
