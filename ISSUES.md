@@ -55,11 +55,14 @@ Key decisions:
 ---
 
 ## 5: Add long descriptions and short descriptions
-status: new
+status: closed
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:43Z
+updated: 2026-04-03T22:13:19Z
+closed: 2026-04-03T22:13:19Z
 
+- `2026-04-03T22:13:19Z`: DemoMetadata supports both description and longDescription. Both rendered in sidebar and description overlay with Markdown support.
 
 ---
 
