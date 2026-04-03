@@ -115,3 +115,12 @@ Tags displayed in the UI should be tappable. Tapping a tag filters the view to s
 
 ---
 
+## 10: demoConfiguration view doesn't update when state changes — replace preference-based approach
+status: new
+priority: medium
+kind: bug
+created: 2026-04-03T02:20:16.684425+00:00
+
+
+---
+
