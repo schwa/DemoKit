@@ -95,6 +95,7 @@ extension DemoMetadata {
             .replacingOccurrences(of: " ", with: "-")
             .replacingOccurrences(of: "_", with: "-")
             .replacingOccurrences(of: "([A-Z])", with: "-$1", options: .regularExpression)
+            .replacingOccurrences(of: "-{2,}", with: "-", options: .regularExpression)
             .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
             .lowercased()
     }
