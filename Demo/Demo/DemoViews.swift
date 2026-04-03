@@ -5,7 +5,7 @@ struct StateTestDemoView: DemoView {
     static var metadata = DemoMetadata(
         type: Self.self,
         description: "Tests that configuration panel updates when state changes",
-        longDescription: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.",
+        longDescription: "Verifies that `@State` changes in the **main view** propagate to the `.demoConfiguration` panel and vice versa. If the counter gets out of sync, there's an *identity bug*.",
         group: "Group B",
         keywords: ["state", "bug"]
     )
@@ -35,6 +35,290 @@ struct StateTestDemoView: DemoView {
     }
 }
 
+// MARK: - Edge Cases
+
+struct EmptyDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "rectangle.dashed",
+        description: "A completely empty demo",
+        longDescription: "Contains **no views at all**. Tests that DemoKit handles an `EmptyView` body gracefully without layout issues.",
+        group: "Edge Cases"
+    )
+
+    init() {}
+    var body: some View {
+        EmptyView()
+    }
+}
+
+// MARK: - State & Configuration Tests
+
+struct LinkedSlidersDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "slider.horizontal.3",
+        description: "Sliders that drive each other and text fields",
+        longDescription: "Three `Slider` controls drive **RGB** values that update a color swatch and a `#hex` label in real time. The config panel shows the *numeric value* of each channel alongside its slider.",
+        group: "State Tests",
+        keywords: ["slider", "binding", "identity"]
+    )
+
+    @State private var red: Double = 0.5
+    @State private var green: Double = 0.3
+    @State private var blue: Double = 0.8
+
+    init() {}
+    var body: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Color(red: red, green: green, blue: blue))
+            .frame(width: 200, height: 200)
+            .overlay {
+                Text(String(format: "#%02X%02X%02X", Int(red * 255), Int(green * 255), Int(blue * 255)))
+                    .font(.system(.title3, design: .monospaced).bold())
+                    .foregroundStyle(.white)
+                    .shadow(radius: 4)
+            }
+            .demoConfiguration {
+                LabeledContent("Red: \(String(format: "%.0f", red * 255))") {
+                    Slider(value: $red, in: 0...1)
+                }
+                LabeledContent("Green: \(String(format: "%.0f", green * 255))") {
+                    Slider(value: $green, in: 0...1)
+                }
+                LabeledContent("Blue: \(String(format: "%.0f", blue * 255))") {
+                    Slider(value: $blue, in: 0...1)
+                }
+                Text("Total brightness: \(String(format: "%.0f%%", (red + green + blue) / 3.0 * 100))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+    }
+}
+
+struct FormMirrorDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "rectangle.portrait.on.rectangle.portrait",
+        description: "Configuration panel mirrors the main view in real time",
+        longDescription: "A `TextField`, `Slider`, `Toggle`, and `ColorPicker` in the config panel all drive the **same** `@State` as the main view. Exercises *two-way binding* across the `PreferenceKey` boundary.",
+        group: "State Tests",
+        keywords: ["form", "mirror", "identity", "binding"]
+    )
+
+    @State private var name: String = "Hello"
+    @State private var fontSize: Double = 24
+    @State private var isBold: Bool = true
+    @State private var isItalic: Bool = false
+    @State private var color: Color = .blue
+
+    init() {}
+    var body: some View {
+        VStack(spacing: 16) {
+            Text(name)
+                .font(.system(size: fontSize, weight: isBold ? .bold : .regular))
+                .italic(isItalic)
+                .foregroundStyle(color)
+            Text("Size: \(String(format: "%.0fpt", fontSize)) • \(isBold ? "Bold" : "Regular") • \(isItalic ? "Italic" : "Upright")")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .demoConfiguration {
+            TextField("Text", text: $name)
+                .textFieldStyle(.roundedBorder)
+            LabeledContent("Font Size: \(String(format: "%.0f", fontSize))pt") {
+                Slider(value: $fontSize, in: 10...72)
+            }
+            Toggle("Bold", isOn: $isBold)
+            Toggle("Italic", isOn: $isItalic)
+            ColorPicker("Color", selection: $color)
+        }
+    }
+}
+
+struct CascadingStatesDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "arrow.triangle.branch",
+        description: "State changes cascade through derived values",
+        longDescription: "A `baseValue` and `multiplier` drive **computed properties** (`computed`, `percentage`, `clamped`) shown in both views. Uses `Stepper` *and* `Slider` bound to the same `@State`.",
+        group: "State Tests",
+        keywords: ["cascade", "derived", "computed"]
+    )
+
+    @State private var baseValue: Double = 50
+    @State private var multiplier: Double = 2
+
+    private var computed: Double { baseValue * multiplier }
+    private var percentage: Double { baseValue / 100.0 }
+    private var clamped: Double { min(max(computed, 0), 200) }
+
+    init() {}
+    var body: some View {
+        VStack(spacing: 12) {
+            Text("Base: \(String(format: "%.1f", baseValue))")
+                .font(.title)
+            Text("× \(String(format: "%.1f", multiplier)) = \(String(format: "%.1f", computed))")
+                .font(.title2)
+            ProgressView(value: percentage)
+                .frame(width: 200)
+            Text("Clamped: \(String(format: "%.1f", clamped))")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .demoConfiguration {
+            LabeledContent("Base: \(String(format: "%.1f", baseValue))") {
+                Slider(value: $baseValue, in: 0...100)
+            }
+            LabeledContent("Multiplier: \(String(format: "%.1f", multiplier))") {
+                Slider(value: $multiplier, in: 0.5...5)
+            }
+            Stepper("Base (stepper): \(String(format: "%.0f", baseValue))", value: $baseValue, in: 0...100, step: 5)
+            Text("Computed: \(String(format: "%.1f", computed))")
+                .font(.headline)
+            Text("Percentage: \(String(format: "%.0f%%", percentage * 100))")
+            Text("Clamped (0–200): \(String(format: "%.1f", clamped))")
+        }
+    }
+}
+
+struct ListEditorDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "list.bullet.rectangle",
+        description: "Add and remove items from a list via the config panel",
+        longDescription: "Uses `ForEach` with dynamic identity (`id: \\.self`). The config panel can **add**, **remove**, and **shuffle** items. Stresses SwiftUI's *diffing engine* across the preference-key boundary.",
+        group: "State Tests",
+        keywords: ["list", "dynamic", "identity"]
+    )
+
+    @State private var items: [String] = ["Apple", "Banana", "Cherry"]
+    @State private var newItem: String = ""
+
+    init() {}
+    var body: some View {
+        VStack(spacing: 8) {
+            if items.isEmpty {
+                Text("No items")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(items, id: \.self) { item in
+                    Text(item)
+                        .font(.title3)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(.quaternary, in: Capsule())
+                }
+            }
+            Text("\(items.count) item\(items.count == 1 ? "" : "s")")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .demoConfiguration {
+            HStack {
+                TextField("New item", text: $newItem)
+                    .textFieldStyle(.roundedBorder)
+                Button("Add") {
+                    guard !newItem.isEmpty else { return }
+                    items.append(newItem)
+                    newItem = ""
+                }
+                .disabled(newItem.isEmpty)
+            }
+            if !items.isEmpty {
+                Button("Remove Last") {
+                    items.removeLast()
+                }
+                Button("Shuffle") {
+                    items.shuffle()
+                }
+                Button("Clear All", role: .destructive) {
+                    items.removeAll()
+                }
+            }
+            Text("Items: \(items.joined(separator: ", "))")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+struct TimerDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "timer",
+        description: "A live timer with controls in the config panel",
+        longDescription: "Updates `@State` every **100ms** via `Timer.scheduledTimer`. Both views show `elapsed` in different formats. Tests that *rapid state mutations* don't cause identity thrashing.",
+        group: "State Tests",
+        keywords: ["timer", "rapid", "updates"],
+        color: .red
+    )
+
+    @State private var elapsed: TimeInterval = 0
+    @State private var isRunning = false
+    @State private var timer: Timer?
+
+    init() {}
+    var body: some View {
+        VStack(spacing: 16) {
+            Text(String(format: "%02d:%02d.%d", Int(elapsed) / 60, Int(elapsed) % 60, Int(elapsed * 10) % 10))
+                .font(.system(size: 64, weight: .thin, design: .monospaced))
+                .foregroundStyle(isRunning ? .primary : .secondary)
+            HStack(spacing: 20) {
+                Button(isRunning ? "Stop" : "Start") {
+                    toggleTimer()
+                }
+                Button("Reset") {
+                    stopTimer()
+                    elapsed = 0
+                }
+                .disabled(elapsed == 0 && !isRunning)
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .demoConfiguration {
+            Text("Elapsed: \(String(format: "%.1f", elapsed))s")
+                .font(.headline)
+            Text("Minutes: \(String(format: "%.2f", elapsed / 60.0))")
+            Text("Status: \(isRunning ? "Running" : "Stopped")")
+                .foregroundStyle(isRunning ? .green : .red)
+            Button(isRunning ? "Stop" : "Start") {
+                toggleTimer()
+            }
+            Button("Reset") {
+                stopTimer()
+                elapsed = 0
+            }
+            Button("+10 seconds") {
+                elapsed += 10
+            }
+        }
+        .onDisappear {
+            stopTimer()
+        }
+    }
+
+    private func toggleTimer() {
+        if isRunning {
+            stopTimer()
+        } else {
+            isRunning = true
+            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                Task { @MainActor in
+                    elapsed += 0.1
+                }
+            }
+        }
+    }
+
+    private func stopTimer() {
+        isRunning = false
+        timer?.invalidate()
+        timer = nil
+    }
+}
+
 // MARK: - Backgrounds
 
 struct GradientBackgroundDemoView: DemoView {
@@ -42,7 +326,7 @@ struct GradientBackgroundDemoView: DemoView {
         type: Self.self,
         systemImage: "rectangle.inset.filled",
         description: "Full-size view with a configurable gradient background",
-        longDescription: "A large view filled with a linear gradient. Adjust the hue, saturation, and angle to explore color spaces.",
+        longDescription: "Uses `Color.clear.background(LinearGradient(...)).frame(maxWidth: .infinity, maxHeight: .infinity)` to fill the entire detail area. Exercises the *full-bleed* layout path.",
         group: "Backgrounds",
         keywords: ["gradient", "background", "color"],
         color: .indigo
@@ -50,33 +334,30 @@ struct GradientBackgroundDemoView: DemoView {
 
     @State private var hue: Double = 0.6
     @State private var angle: Double = 0
+    @State private var saturation: Double = 0.8
 
     init() {}
     var body: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(
+        Color.clear
+            .background(
                 LinearGradient(
                     colors: [
-                        Color(hue: hue, saturation: 0.8, brightness: 0.9),
-                        Color(hue: (hue + 0.3).truncatingRemainder(dividingBy: 1.0), saturation: 0.8, brightness: 0.5),
+                        Color(hue: hue, saturation: saturation, brightness: 0.9),
+                        Color(hue: (hue + 0.3).truncatingRemainder(dividingBy: 1.0), saturation: saturation, brightness: 0.5),
                     ],
                     startPoint: UnitPoint(x: cos(angle * .pi / 180), y: sin(angle * .pi / 180)),
                     endPoint: UnitPoint(x: cos((angle + 180) * .pi / 180), y: sin((angle + 180) * .pi / 180))
                 )
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(40)
-            .overlay {
-                Text("Gradient Background")
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .shadow(radius: 4)
-            }
             .demoConfiguration {
-                LabeledContent("Hue") {
+                LabeledContent("Hue: \(String(format: "%.0f°", hue * 360))") {
                     Slider(value: $hue, in: 0...1)
                 }
-                LabeledContent("Angle") {
+                LabeledContent("Saturation: \(String(format: "%.0f%%", saturation * 100))") {
+                    Slider(value: $saturation, in: 0...1)
+                }
+                LabeledContent("Angle: \(String(format: "%.0f°", angle))") {
                     Slider(value: $angle, in: 0...360)
                 }
             }
@@ -88,31 +369,37 @@ struct MeshGradientDemoView: DemoView {
         type: Self.self,
         systemImage: "circle.grid.3x3.fill",
         description: "A large mesh gradient background",
-        longDescription: "Uses MeshGradient to create a rich multi-point color field. Each corner and edge contributes a different color.",
+        longDescription: "Uses `MeshGradient` with a draggable **center point**. The 3×3 grid fills the entire view via `.frame(maxWidth: .infinity, maxHeight: .infinity)`.",
         group: "Backgrounds",
         keywords: ["mesh", "gradient", "background"]
     )
 
+    @State private var centerX: Float = 0.5
+    @State private var centerY: Float = 0.5
+
     init() {}
     var body: some View {
-        MeshGradient(width: 3, height: 3, points: [
-            [0, 0], [0.5, 0], [1, 0],
-            [0, 0.5], [0.5, 0.5], [1, 0.5],
-            [0, 1], [0.5, 1], [1, 1],
-        ], colors: [
-            .red, .orange, .yellow,
-            .purple, .pink, .mint,
-            .blue, .indigo, .cyan,
-        ])
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(40)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .overlay {
-            Text("Mesh Gradient")
-                .font(.system(size: 42, weight: .heavy, design: .rounded))
-                .foregroundStyle(.white)
-                .shadow(radius: 8)
-        }
+        Color.clear
+            .background(
+                MeshGradient(width: 3, height: 3, points: [
+                    [0, 0], [0.5, 0], [1, 0],
+                    [0, 0.5], [centerX, centerY], [1, 0.5],
+                    [0, 1], [0.5, 1], [1, 1],
+                ], colors: [
+                    .red, .orange, .yellow,
+                    .purple, .pink, .mint,
+                    .blue, .indigo, .cyan,
+                ])
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .demoConfiguration {
+                LabeledContent("Center X: \(String(format: "%.2f", centerX))") {
+                    Slider(value: $centerX, in: 0...1)
+                }
+                LabeledContent("Center Y: \(String(format: "%.2f", centerY))") {
+                    Slider(value: $centerY, in: 0...1)
+                }
+            }
     }
 }
 
@@ -121,7 +408,7 @@ struct NoisePatternDemoView: DemoView {
         type: Self.self,
         systemImage: "square.grid.4x3.fill",
         description: "A tiled pattern background with configurable colors",
-        longDescription: "Creates a checkerboard pattern at large scale using a Canvas view. Adjust the tile size and colors.",
+        longDescription: "Draws a checkerboard using `Canvas` inside `.background { }`. The `Canvas` fills the available space — tile size and colors are driven from `.demoConfiguration`.",
         group: "Backgrounds",
         keywords: ["pattern", "checkerboard", "background"],
         color: .brown
@@ -133,33 +420,28 @@ struct NoisePatternDemoView: DemoView {
 
     init() {}
     var body: some View {
-        Canvas { context, size in
-            let cols = Int(size.width / tileSize) + 1
-            let rows = Int(size.height / tileSize) + 1
-            for row in 0..<rows {
-                for col in 0..<cols {
-                    let isEven = (row + col) % 2 == 0
-                    let rect = CGRect(x: Double(col) * tileSize, y: Double(row) * tileSize, width: tileSize, height: tileSize)
-                    context.fill(Path(rect), with: .color(isEven ? color1 : color2))
+        Color.clear
+            .background {
+                Canvas { context, size in
+                    let cols = Int(size.width / tileSize) + 1
+                    let rows = Int(size.height / tileSize) + 1
+                    for row in 0..<rows {
+                        for col in 0..<cols {
+                            let isEven = (row + col) % 2 == 0
+                            let rect = CGRect(x: Double(col) * tileSize, y: Double(row) * tileSize, width: tileSize, height: tileSize)
+                            context.fill(Path(rect), with: .color(isEven ? color1 : color2))
+                        }
+                    }
                 }
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .padding(40)
-        .overlay {
-            Text("Checkerboard")
-                .font(.system(size: 36, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .shadow(color: .black, radius: 6)
-        }
-        .demoConfiguration {
-            LabeledContent("Tile Size") {
-                Slider(value: $tileSize, in: 10...100)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .demoConfiguration {
+                LabeledContent("Tile Size: \(String(format: "%.0fpx", tileSize))") {
+                    Slider(value: $tileSize, in: 10...100)
+                }
+                ColorPicker("Color 1", selection: $color1)
+                ColorPicker("Color 2", selection: $color2)
             }
-            ColorPicker("Color 1", selection: $color1)
-            ColorPicker("Color 2", selection: $color2)
-        }
     }
 }
 
@@ -170,7 +452,7 @@ struct CirclesDemoView: DemoView {
         type: Self.self,
         systemImage: "circle.hexagongrid",
         description: "Overlapping circles with blend modes",
-        longDescription: "Demonstrates how SwiftUI blend modes interact when layering colored shapes on top of each other.",
+        longDescription: "Three `Circle()` views with `.blendMode(.screen)` overlap to show **additive color mixing**. Adjust the `radius` to change the overlap area.",
         group: "Shapes",
         keywords: ["blend", "circles"],
         color: .purple
@@ -208,7 +490,7 @@ struct RoundedPolygonDemoView: DemoView {
         type: Self.self,
         systemImage: "pentagon",
         description: "A configurable rounded polygon",
-        longDescription: "Experiment with the number of sides, corner radius, and rotation of a polygon shape.",
+        longDescription: "A `RoundedRectangle` with configurable `cornerRadius` and `.rotationEffect`. The config panel provides **three sliders** that all update independently.",
         group: "Shapes",
         keywords: ["polygon", "geometry"]
     )
@@ -249,7 +531,7 @@ struct PulseDemoView: DemoView {
         type: Self.self,
         systemImage: "waveform.circle",
         description: "A pulsing animation effect",
-        longDescription: "Shows a repeating scale and opacity animation on a circle, useful for loading indicators or attention-grabbing UI.",
+        longDescription: "Uses `.animation(.easeInOut.repeatForever(autoreverses: true))` on `scaleEffect` and `opacity`. The animation starts on `.onAppear` — no configuration needed.",
         group: "Animation",
         keywords: ["pulse", "animation"],
         color: .orange
@@ -274,7 +556,7 @@ struct SpinnerDemoView: DemoView {
         type: Self.self,
         systemImage: "arrow.trianglehead.2.counterclockwise",
         description: "A customizable spinning loader",
-        longDescription: "Renders a trimmed circle that rotates continuously. Configure the trim amount and speed.",
+        longDescription: "A `Circle().trim(from:to:)` with `.rotationEffect` animated via `.linear.repeatForever`. The config panel adjusts **trim** and **line width** in real time.",
         group: "Animation",
         keywords: ["spinner", "loading"]
     )
@@ -308,7 +590,7 @@ struct BounceDemoView: DemoView {
         type: Self.self,
         systemImage: "arrow.up.arrow.down",
         description: "A bouncing ball animation",
-        longDescription: "A simple ball that bounces up and down with a spring animation. Demonstrates repeating spring physics.",
+        longDescription: "Uses `.interpolatingSpring(stiffness: 200, damping: 5).repeatForever` to bounce a `Circle` between two `offset` values. Pure *spring physics*, no configuration.",
         group: "Animation",
         keywords: ["bounce", "spring"]
     )
@@ -333,7 +615,7 @@ struct GridDemoView: DemoView {
         type: Self.self,
         systemImage: "square.grid.3x3",
         description: "A color grid layout",
-        longDescription: "Displays a grid of colored squares using LazyVGrid. Configure the number of columns.",
+        longDescription: "A `LazyVGrid` with `GridItem(.flexible())` columns. Changing the **column count** via the slider rebuilds the grid layout, testing identity stability.",
         group: "Layout",
         keywords: ["grid", "colors"],
         color: .cyan
@@ -366,7 +648,7 @@ struct StackDemoView: DemoView {
         type: Self.self,
         systemImage: "square.3.layers.3d",
         description: "Stacked cards with depth effect",
-        longDescription: "Cards stacked with offset and rotation to create a fanned-out deck effect. Adjust the spread and angle.",
+        longDescription: "Five `RoundedRectangle` cards in a `ZStack`, each with computed `offset` and `rotationEffect`. The **spread** and **angle** sliders update all cards simultaneously.",
         group: "Layout",
         keywords: ["stack", "cards"]
     )
@@ -403,7 +685,7 @@ struct TypographyDemoView: DemoView {
         type: Self.self,
         systemImage: "textformat",
         description: "Typography scale showcase",
-        longDescription: "Displays all the built-in SwiftUI font styles from large title down to caption, useful as a quick reference.",
+        longDescription: "Shows every built-in `Font` style from `.largeTitle` to `.caption2`. Useful as a quick **visual reference** for the SwiftUI type scale.",
         group: "Text",
         keywords: ["fonts", "typography"]
     )
@@ -432,7 +714,7 @@ struct GradientTextDemoView: DemoView {
         type: Self.self,
         systemImage: "paintbrush",
         description: "Text with animated gradient fill",
-        longDescription: "A large text label rendered with a moving linear gradient, creating a shimmering rainbow effect.",
+        longDescription: "Applies a `LinearGradient` as `.foregroundStyle` on a `.system(size: 48)` `Text`. The gradient *would* animate with phase offset — currently static rainbow.",
         group: "Text",
         keywords: ["gradient", "rainbow"],
         color: .pink
@@ -464,7 +746,7 @@ struct SymbolsDemoView: DemoView {
         type: Self.self,
         systemImage: "star.square.on.square",
         description: "SF Symbols browser",
-        longDescription: "A small sampling of SF Symbols rendered in a grid. Shows variable rendering and symbol effects.",
+        longDescription: "A `LazyVGrid` of 20 `Image(systemName:)` views with `.foregroundStyle(.tint)`. A quick **sampler** of common SF Symbols.",
         group: "Text",
         keywords: ["symbols", "icons"]
     )

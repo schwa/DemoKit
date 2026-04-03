@@ -9,7 +9,13 @@ struct DemoApp: App {
 
     var body: some Scene {
         DemoPickerScene(demos: [
+            EmptyDemoView.self,
             StateTestDemoView.self,
+            LinkedSlidersDemoView.self,
+            FormMirrorDemoView.self,
+            CascadingStatesDemoView.self,
+            ListEditorDemoView.self,
+            TimerDemoView.self,
             GradientBackgroundDemoView.self,
             MeshGradientDemoView.self,
             NoisePatternDemoView.self,
