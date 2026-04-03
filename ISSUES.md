@@ -340,7 +340,7 @@ Defer until iOS support is actively needed.
 status: new
 priority: low
 kind: feature
-labels: screenshot,url
+labels: screenshot, url
 created: 2026-04-03T22:28:33Z
 
 The `x-demo://screenshot` action currently hardcodes 800×600, 2x scale, PNG format, and saves to the temp directory. These should be configurable via query parameters:
@@ -358,6 +358,33 @@ x-demo://screenshot?width=400&height=300&format=jpg
 - `destination` — output path or directory (default: temp directory)
 - `reveal` — whether to reveal in Finder, `true`/`false` (default: true on macOS)
 - `background` — background color, e.g. `white`, `black`, `clear` (default: white)
+
+---
+
+## 19: URL scheme: demo/<id> navigation doesn't work, next/previous do
+status: new
+priority: high
+kind: bug
+created: 2026-04-03T23:11:20Z
+
+When using `DemoPickerScene` with `.handleDemoURL(scheme:)`, the `next` and `previous` URL actions work correctly (window title changes to the new demo), but `demo/<id>` does nothing — the window stays on the current demo.
+
+Tested with:
+- `open -a "MetalSprockets-Examples" "metalsprockets-examples://demo/grass"` — no effect
+- `open -a "MetalSprockets-Examples" "metalsprockets-examples://demo/Grass"` — no effect  
+- `open -a "MetalSprockets-Examples" "metalsprockets-examples://demo/Grass Sphere"` — not tested but likely same
+- `open -a "MetalSprockets-Examples" "metalsprockets-examples://next"` — works
+- `open -a "MetalSprockets-Examples" "metalsprockets-examples://previous"` — works
+
+The app setup matches the README pattern:
+```swift
+DemoPickerScene(demos: allDemos)
+    .handleDemoURL(scheme: "metalsprockets-examples")
+```
+
+Demo metadata has `name: "Grass Sphere"` (no explicit `id:`), so DemoKit should derive the ID. The README says IDs are matched loosely (exact, kebab-case, case-insensitive, whitespace-stripped). None of the obvious variants work.
+
+Previously the app used `Window` + `DemoPickerView` + `.handleDemoURL` on the view (instead of on `DemoPickerScene`) — that also didn't work for direct navigation.
 
 ---
 
