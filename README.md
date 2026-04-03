@@ -1,6 +1,6 @@
 # DemoKit
 
-A SwiftUI library for building organized, searchable demo galleries with navigation, metadata, grouping, pinning, and URL scheme support. Ideal for showcasing components, prototypes, or test views in a single app.
+A SwiftUI library for putting all your demo views, prototypes, and test screens in one app with a searchable sidebar.
 
 ## Requirements
 
@@ -67,7 +67,7 @@ struct DemoApp: App {
 }
 ```
 
-That's it — you get a sidebar with search, grouping, pinning, and a detail area that displays the selected demo.
+That gives you a sidebar with search, grouping, and pinning, plus a detail area for the selected demo.
 
 ## Creating Demos
 
@@ -113,7 +113,7 @@ You can also provide just `name:` (ID is derived) or just `id:` (name is derived
 
 ### Configuration Panels
 
-Add a configuration panel to any demo with the `.demoConfiguration` modifier. On macOS it appears as a material overlay at the bottom of the detail view; on iOS it opens as a sheet.
+The `.demoConfiguration` modifier adds a configuration panel to a demo. On macOS this is a material overlay at the bottom of the detail view. On iOS it opens as a sheet.
 
 ```swift
 struct MyDemo: DemoView {
@@ -135,11 +135,11 @@ A gear button appears in the toolbar automatically when `.demoConfiguration` is 
 
 ### Description Overlays
 
-If a demo has a `description` or `longDescription`, an info button appears in the toolbar. Clicking it shows a material overlay with the demo's name, icon, and description text (rendered as Markdown via `LocalizedStringKey`).
+If a demo has a `description` or `longDescription`, an info button appears in the toolbar. Clicking it toggles a material overlay with the demo's name, icon, and description. The text is rendered as Markdown through `LocalizedStringKey`.
 
 ## Showing a Menu Bar
 
-Add `DemosCommandMenu` to your app's `.commands` modifier to get a **Demos** menu in the menu bar:
+Add `DemosCommandMenu` to your app's `.commands` modifier to get a Demos menu in the menu bar:
 
 ```swift
 @main
@@ -153,12 +153,12 @@ struct DemoApp: App {
 }
 ```
 
-The menu provides:
+This adds:
 
-- **Previous Demo** (`⌘[`) and **Next Demo** (`⌘]`) navigation
-- **Show/Hide Configuration** (`⌘K`)
-- **Show/Hide Description** (`⌘I`)
-- A list of all visible demos, grouped by section, with a checkmark on the current selection
+- Previous Demo (`⌘[`) / Next Demo (`⌘]`)
+- Show/Hide Configuration (`⌘K`)
+- Show/Hide Description (`⌘I`)
+- A list of all visible demos grouped by section, with a checkmark on the current one
 
 ## Configuring Appearance
 
@@ -221,7 +221,7 @@ DemoPickerScene(demos: demos)
 | `x-demo://previous` | Select the previous demo |
 | `x-demo://screenshot` | Take a screenshot of the current demo |
 
-Demo IDs are matched flexibly — exact match, kebab-case conversion, case-insensitive, and whitespace-stripped name matching are all tried.
+Demo IDs are matched loosely: exact match, kebab-case conversion, case-insensitive, and whitespace-stripped name matching are all tried.
 
 ### Testing from the Terminal
 
@@ -232,7 +232,7 @@ open "x-demo://next"
 
 ## Demo Selection at Launch
 
-DemoKit provides multiple ways to launch directly into a specific demo:
+You can launch directly into a specific demo:
 
 ### Environment Variable
 
@@ -256,7 +256,7 @@ URL scheme selections override the current selection immediately when received.
 
 ## Crash Detection
 
-Install the crash detector to automatically clear the stored demo selection if the app crashes on launch (preventing a crash loop):
+If the app crashes on launch, the stored demo selection can cause a crash loop. The crash detector clears it:
 
 ```swift
 @main
@@ -270,10 +270,10 @@ struct DemoApp: App {
 
 ## Sidebar Features
 
-- **Search** — Appears automatically when there are 6+ demos. Searches names, descriptions, and keywords.
-- **Grouping** — Demos with a `group` are organized into collapsible sections.
-- **Pinning** — Pin demos to a "Pinned" section at the top. Toggle via the pin button or context menu.
-- **Hiding** — Hide demos via context menu. Unhide all from the list's context menu or the empty-state button.
+- Search appears automatically when there are 6+ demos. It searches names, descriptions, and keywords.
+- Demos with a `group` are organized into collapsible sidebar sections.
+- You can pin demos to a "Pinned" section at the top, via the pin button or context menu.
+- Hide demos from the context menu. Unhide all from the list's context menu or the empty-state button.
 
 ## Using `DemoPickerView` Directly
 
@@ -347,4 +347,4 @@ struct DemoApp: App {
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+MIT. See [LICENSE](LICENSE).
