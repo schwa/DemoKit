@@ -88,12 +88,16 @@ created: 2026-04-02T23:02:37.990422+00:00
 ---
 
 ## 8: Persist configuration panel visibility in @AppStorage
-status: new
+status: closed
 priority: medium
 kind: enhancement
 created: 2026-04-03T00:03:52.639431+00:00
+updated: 2026-04-03T00:05:08.497475+00:00
+closed: 2026-04-03T00:05:08.497475+00:00
 
 The show/hide state of the configuration overlay should be saved in @AppStorage so it persists across app launches.
+
+- 2026-04-03T00:05:08.504448+00:00: Implemented in same commit as text label change.
 
 ---
 

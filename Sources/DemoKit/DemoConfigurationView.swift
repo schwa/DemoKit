@@ -41,7 +41,8 @@ struct DemoConfigurationContainer<Content: View>: View {
     let content: Content
 
     @State private var configurationView: EquatableAnyView?
-    @State private var showConfiguration = false
+    @AppStorage("showDemoConfiguration")
+    private var showConfiguration = false
 
     var body: some View {
         content
@@ -54,7 +55,7 @@ struct DemoConfigurationContainer<Content: View>: View {
                         Button {
                             showConfiguration.toggle()
                         } label: {
-                            Label("Configuration", systemImage: showConfiguration ? "slider.horizontal.2.square.on.square" : "slider.horizontal.2.square")
+                            Text("Configuration")
                         }
                         .help("Toggle configuration panel")
                     }
