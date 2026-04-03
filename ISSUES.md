@@ -272,11 +272,13 @@ Needs:
 ---
 
 ## 16: Ensure demos are properly torn down when navigating away
-status: new
+status: closed
 priority: medium
 kind: task
-labels: lifecycle,reliability
+labels: lifecycle, reliability
 created: 2026-04-03T21:38:19Z
+updated: 2026-04-03T21:38:55Z
+closed: 2026-04-03T21:38:55Z
 
 When switching between demos in the sidebar, the previously selected demo should be fully torn down. Currently demos that use timers, animations, or other ongoing resources may continue running in the background after navigating away.
 
@@ -292,6 +294,8 @@ When switching between demos in the sidebar, the previously selected demo should
 - Check if `.onDisappear` is reliably called
 - Consider whether demos need an explicit lifecycle protocol (e.g. `func tearDown()`) or if SwiftUI view lifecycle is sufficient
 - Test with Instruments to confirm no leaked timers or orphaned views
+
+- `2026-04-03T21:38:55Z`: Already handled: detail view uses .id(id) forcing SwiftUI to destroy/recreate on selection change. TimerDemoView has .onDisappear { stopTimer() }. Basic lifecycle is sufficient.
 
 ---
 
