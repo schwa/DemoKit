@@ -35,6 +35,134 @@ struct StateTestDemoView: DemoView {
     }
 }
 
+// MARK: - Backgrounds
+
+struct GradientBackgroundDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "rectangle.inset.filled",
+        description: "Full-size view with a configurable gradient background",
+        longDescription: "A large view filled with a linear gradient. Adjust the hue, saturation, and angle to explore color spaces.",
+        group: "Backgrounds",
+        keywords: ["gradient", "background", "color"],
+        color: .indigo
+    )
+
+    @State private var hue: Double = 0.6
+    @State private var angle: Double = 0
+
+    init() {}
+    var body: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color(hue: hue, saturation: 0.8, brightness: 0.9),
+                        Color(hue: (hue + 0.3).truncatingRemainder(dividingBy: 1.0), saturation: 0.8, brightness: 0.5),
+                    ],
+                    startPoint: UnitPoint(x: cos(angle * .pi / 180), y: sin(angle * .pi / 180)),
+                    endPoint: UnitPoint(x: cos((angle + 180) * .pi / 180), y: sin((angle + 180) * .pi / 180))
+                )
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(40)
+            .overlay {
+                Text("Gradient Background")
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .shadow(radius: 4)
+            }
+            .demoConfiguration {
+                LabeledContent("Hue") {
+                    Slider(value: $hue, in: 0...1)
+                }
+                LabeledContent("Angle") {
+                    Slider(value: $angle, in: 0...360)
+                }
+            }
+    }
+}
+
+struct MeshGradientDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "circle.grid.3x3.fill",
+        description: "A large mesh gradient background",
+        longDescription: "Uses MeshGradient to create a rich multi-point color field. Each corner and edge contributes a different color.",
+        group: "Backgrounds",
+        keywords: ["mesh", "gradient", "background"]
+    )
+
+    init() {}
+    var body: some View {
+        MeshGradient(width: 3, height: 3, points: [
+            [0, 0], [0.5, 0], [1, 0],
+            [0, 0.5], [0.5, 0.5], [1, 0.5],
+            [0, 1], [0.5, 1], [1, 1],
+        ], colors: [
+            .red, .orange, .yellow,
+            .purple, .pink, .mint,
+            .blue, .indigo, .cyan,
+        ])
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(40)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay {
+            Text("Mesh Gradient")
+                .font(.system(size: 42, weight: .heavy, design: .rounded))
+                .foregroundStyle(.white)
+                .shadow(radius: 8)
+        }
+    }
+}
+
+struct NoisePatternDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "square.grid.4x3.fill",
+        description: "A tiled pattern background with configurable colors",
+        longDescription: "Creates a checkerboard pattern at large scale using a Canvas view. Adjust the tile size and colors.",
+        group: "Backgrounds",
+        keywords: ["pattern", "checkerboard", "background"],
+        color: .brown
+    )
+
+    @State private var tileSize: Double = 40
+    @State private var color1: Color = .blue
+    @State private var color2: Color = .cyan
+
+    init() {}
+    var body: some View {
+        Canvas { context, size in
+            let cols = Int(size.width / tileSize) + 1
+            let rows = Int(size.height / tileSize) + 1
+            for row in 0..<rows {
+                for col in 0..<cols {
+                    let isEven = (row + col) % 2 == 0
+                    let rect = CGRect(x: Double(col) * tileSize, y: Double(row) * tileSize, width: tileSize, height: tileSize)
+                    context.fill(Path(rect), with: .color(isEven ? color1 : color2))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .padding(40)
+        .overlay {
+            Text("Checkerboard")
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .shadow(color: .black, radius: 6)
+        }
+        .demoConfiguration {
+            LabeledContent("Tile Size") {
+                Slider(value: $tileSize, in: 10...100)
+            }
+            ColorPicker("Color 1", selection: $color1)
+            ColorPicker("Color 2", selection: $color2)
+        }
+    }
+}
+
 // MARK: - Shapes
 
 struct CirclesDemoView: DemoView {

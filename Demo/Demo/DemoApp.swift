@@ -10,6 +10,9 @@ struct DemoApp: App {
     var body: some Scene {
         DemoPickerScene(demos: [
             StateTestDemoView.self,
+            GradientBackgroundDemoView.self,
+            MeshGradientDemoView.self,
+            NoisePatternDemoView.self,
             CirclesDemoView.self,
             RoundedPolygonDemoView.self,
             PulseDemoView.self,
