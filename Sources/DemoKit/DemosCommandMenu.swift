@@ -16,9 +16,23 @@ extension FocusedValues {
 
 // MARK: - Command Menu
 
+// Retains last non-nil focused viewModel so menus work even when the window isn't key.
+@MainActor
+enum FocusedViewModelRetainer {
+    static var viewModel: DemoPickerViewModel?
+}
+
 public struct DemosCommandMenu: Commands {
     @FocusedValue(\.demoPickerViewModel)
-    private var viewModel
+    private var focusedViewModel
+
+    private var viewModel: DemoPickerViewModel? {
+        if let focusedViewModel {
+            FocusedViewModelRetainer.viewModel = focusedViewModel
+            return focusedViewModel
+        }
+        return FocusedViewModelRetainer.viewModel
+    }
 
     @AppStorage("showDemoConfiguration")
     private var showConfiguration = false
