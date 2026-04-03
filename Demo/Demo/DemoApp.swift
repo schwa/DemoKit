@@ -10,6 +10,7 @@ struct DemoApp: App {
     var body: some Scene {
         DemoPickerScene(demos: [
             EmptyDemoView.self,
+            LinksDemoView.self,
             StateTestDemoView.self,
             LinkedSlidersDemoView.self,
             FormMirrorDemoView.self,

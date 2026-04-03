@@ -54,6 +54,23 @@ struct EmptyDemoView: DemoView {
     }
 }
 
+struct LinksDemoView: DemoView {
+    static var metadata = DemoMetadata(
+        type: Self.self,
+        systemImage: "link",
+        description: "Description with a [clickable link](https://developer.apple.com)",
+        longDescription: "Tests that **Markdown links** work in both the sidebar and the description overlay. See the [Apple HIG](https://developer.apple.com/design/human-interface-guidelines) and [SwiftUI docs](https://developer.apple.com/documentation/swiftui) for reference.",
+        group: "Edge Cases",
+        keywords: ["links", "markdown"]
+    )
+
+    init() {}
+    var body: some View {
+        Text("Check the sidebar description and the info overlay for clickable links.")
+            .font(.title3)
+    }
+}
+
 // MARK: - State & Configuration Tests
 
 struct LinkedSlidersDemoView: DemoView {

@@ -170,7 +170,7 @@ struct DemosNavigationSplitView: View {
                         }
                     }
                     if configuration.showDescriptions, let description = metadata.description {
-                        Text(description)
+                        Text(LocalizedStringKey(description))
                             .lineLimit(nil)
                             .font(.caption)
                             .foregroundStyle(.secondary)

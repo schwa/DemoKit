@@ -248,11 +248,13 @@ Option 1 (single config struct via environment) is cleanest. It is a single type
 ---
 
 ## 15: Support clickable links in demo descriptions
-status: new
+status: closed
 priority: low
 kind: feature
 labels: ui
 created: 2026-04-03T21:36:50Z
+updated: 2026-04-03T21:39:34Z
+closed: 2026-04-03T21:39:34Z
 
 Demo descriptions and long descriptions already use `LocalizedStringKey` (which supports Markdown), but links in the description overlay and sidebar are not interactive.
 
@@ -268,6 +270,8 @@ Needs:
 - Verify `Text(LocalizedStringKey(...))` is used for description rendering (it already is in `DemoDescriptionView`)
 - Check sidebar description text uses `LocalizedStringKey` too
 - Ensure `.tint()` or link styling makes links visually distinct
+
+- `2026-04-03T21:39:34Z`: Sidebar description now uses LocalizedStringKey for Markdown link support. DemoDescriptionView already did. Added LinksDemoView to test.
 
 ---
 
