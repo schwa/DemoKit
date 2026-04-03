@@ -154,20 +154,26 @@ struct DemosNavigationSplitView: View {
         }
     }
 
+    private func demoLabel(for metadata: DemoMetadata) -> some View {
+        Label(metadata.name, systemImage: metadata.systemImage)
+            .truncationMode(.tail)
+            .lineLimit(1)
+            .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (configuration.showColors ? (metadata.color ?? Color.primary) : Color.primary))
+            .applyLabelStyle(showIcons: configuration.showIcons)
+    }
+
     private func navigationLink(for metadata: DemoMetadata) -> some View {
         HStack {
             NavigationLink(value: metadata.id) {
                 VStack(alignment: .leading) {
-                    HStack {
-                        Label(metadata.name, systemImage: metadata.systemImage)
-                            .layoutPriority(1)
-                            .truncationMode(.tail)
-                            .lineLimit(1)
-                            .foregroundStyle(viewModel.selection == metadata.id ? Color.primary : (configuration.showColors ? (metadata.color ?? Color.primary) : Color.primary))
-                            .applyLabelStyle(showIcons: configuration.showIcons)
-                        if configuration.showKeywordTags {
-                            KeywordsView(keywords: metadata.keywords)
+                    ViewThatFits(in: .horizontal) {
+                        HStack {
+                            demoLabel(for: metadata)
+                            if configuration.showKeywordTags {
+                                KeywordsView(keywords: metadata.keywords)
+                            }
                         }
+                        demoLabel(for: metadata)
                     }
                     if configuration.showDescriptions, let description = metadata.description {
                         Text(LocalizedStringKey(description))
