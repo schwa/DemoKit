@@ -195,7 +195,7 @@ closed: 2026-04-03T21:26:33Z
 status: new
 priority: low
 kind: feature
-labels: api,sidebar
+labels: api, sidebar
 created: 2026-04-03T21:36:01Z
 
 The calling app should be able to control which visual elements appear in the sidebar — e.g. whether keyword tags, descriptions, or icons are shown.
@@ -240,6 +240,30 @@ DemoPickerScene(demos: [...])
 
 ## Recommendation
 Option 1 (single config struct via environment) is cleanest. It is a single type, easy to extend, and follows the pattern used by SwiftUI for `NavigationSplitViewStyle`, `ListStyle`, etc.
+
+---
+
+## 15: Support clickable links in demo descriptions
+status: new
+priority: low
+kind: feature
+labels: ui
+created: 2026-04-03T21:36:50Z
+
+Demo descriptions and long descriptions already use `LocalizedStringKey` (which supports Markdown), but links in the description overlay and sidebar are not interactive.
+
+The description text in `DemoDescriptionView` and sidebar rows should support tappable/clickable Markdown links, e.g.:
+
+```swift
+static var metadata = DemoMetadata(
+    description: "See [Apple docs](https://developer.apple.com) for details"
+)
+```
+
+Needs:
+- Verify `Text(LocalizedStringKey(...))` is used for description rendering (it already is in `DemoDescriptionView`)
+- Check sidebar description text uses `LocalizedStringKey` too
+- Ensure `.tint()` or link styling makes links visually distinct
 
 ---
 
