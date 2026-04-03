@@ -66,7 +66,6 @@ struct DemoConfigurationContainer<Content: View>: View {
                 if showConfiguration, let configurationView {
                     configurationView.content
                         .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
                         .padding()
                         .transition(.move(edge: .bottom).combined(with: .opacity))
