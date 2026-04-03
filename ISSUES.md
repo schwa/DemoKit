@@ -105,3 +105,13 @@ The show/hide state of the configuration overlay should be saved in @AppStorage 
 
 ---
 
+## 9: Tags should be tappable to filter the view
+status: new
+priority: medium
+kind: none
+created: 2026-04-03T00:50:04.057614+00:00
+
+Tags displayed in the UI should be tappable. Tapping a tag filters the view to show only items with that tag. Need a clear/reset filter mechanism (e.g. a clear button or tapping the active tag again to deselect).
+
+---
+
