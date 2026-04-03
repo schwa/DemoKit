@@ -21,6 +21,7 @@ private struct DemoConfigurationModifier<Configuration: View>: ViewModifier {
         content
             .preference(key: HasDemoConfigurationPreferenceKey.self, value: true)
             #if os(macOS)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .bottom) {
                 if showConfiguration {
                     configuration()

@@ -143,6 +143,7 @@ struct DemosNavigationSplitView: View {
                                             DemoConfigurationContainer(content: demoView)
                 )
             }
+
             .id(id)
             .navigationTitle("\(element.metadata.name)")
         } else {

@@ -13,7 +13,17 @@ struct DemoApp: App {
             DemoView2.self,
             DemoView3.self,
             DemoView4.self,
-            StateTestDemoView.self
+            StateTestDemoView.self,
+            CirclesDemoView.self,
+            RoundedPolygonDemoView.self,
+            PulseDemoView.self,
+            SpinnerDemoView.self,
+            BounceDemoView.self,
+            GridDemoView.self,
+            StackDemoView.self,
+            TypographyDemoView.self,
+            GradientTextDemoView.self,
+            SymbolsDemoView.self,
         ])
         .handleDemoURL(scheme: "x-demo")
         .commands {
