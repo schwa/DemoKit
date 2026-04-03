@@ -55,7 +55,7 @@ struct DemoConfigurationContainer<Content: View>: View {
                         Button {
                             showConfiguration.toggle()
                         } label: {
-                            Text("Configuration")
+                            Label("Configuration", systemImage: "gear")
                         }
                         .help("Toggle configuration panel")
                     }

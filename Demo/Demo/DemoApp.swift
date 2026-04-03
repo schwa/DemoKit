@@ -15,5 +15,8 @@ struct DemoApp: App {
             DemoView4.self
         ])
         .handleDemoURL(scheme: "x-demo")
+        .commands {
+            DemosCommandMenu()
+        }
     }
 }

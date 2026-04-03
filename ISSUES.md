@@ -9,12 +9,16 @@ NavigationSplitView in DemosNavigationSplitView doesn't expose a View > Hide/Sho
 ---
 
 ## 2: Add Demos menu for navigating between demos
-status: new
+status: closed
 priority: low
 kind: none
 created: 2026-04-02T21:10:31.446371+00:00
+updated: 2026-04-03T00:24:23.117666+00:00
+closed: 2026-04-03T00:24:23.117665+00:00
 
 The MetalSprocketsExamples app has a Demos menu defined in the app target, but DemoKit itself should provide this as a built-in feature. DemoPickerView/DemoPickerScene should automatically populate a Demos menu with all registered demos, enabling keyboard/menu-driven navigation and automation.
+
+- 2026-04-03T00:24:23.121057+00:00: Implemented DemosCommandMenu with demo list, next/previous navigation, and configuration toggle.
 
 ---
 

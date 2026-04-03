@@ -11,6 +11,7 @@ public struct DemoPickerView: View {
     public var body: some View {
         DemosNavigationSplitView()
             .environment(viewModel)
+            .focusedSceneValue(\.demoPickerViewModel, viewModel)
             .onOpenURL { url in
                 viewModel.handleURL(url, urlScheme: urlScheme)
             }
