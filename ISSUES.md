@@ -317,3 +317,22 @@ When switching between demos in the sidebar, the previously selected demo should
 
 ---
 
+## 17: Decide iOS screenshot destination
+status: new
+priority: low
+kind: task
+labels: ios,screenshot
+created: 2026-04-03T22:25:03Z
+
+The `screenshot` URL action saves to `/tmp` on macOS and reveals via `NSWorkspace`. On iOS we need to decide where screenshots go.
+
+Options:
+- Save to photo library (needs permission)
+- Save to app documents directory
+- Share sheet
+- UIPasteboard
+
+Defer until iOS support is actively needed.
+
+---
+
