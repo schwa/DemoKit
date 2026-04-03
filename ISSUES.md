@@ -126,3 +126,13 @@ closed: 2026-04-03T03:29:10.242892+00:00
 
 ---
 
+## 11: URL scheme navigation not working
+status: new
+priority: medium
+kind: bug
+created: 2026-04-03T06:10:32.050275+00:00
+
+Opening URLs like `metalsprockets-examples://GameOfLife` or `metalsprockets-examples://demo/Game%20of%20Life` does not navigate to the demo. The `handleURL` method in `DemoPickerViewModel` parses the URL correctly but the demo selection doesn't change. May be related to the URL scheme only being set via environment on the Scene, or a mismatch between URL host and demo IDs (which are kebab-cased). Needs investigation.
+
+---
+
