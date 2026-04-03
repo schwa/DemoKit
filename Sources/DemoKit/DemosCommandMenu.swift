@@ -23,6 +23,9 @@ public struct DemosCommandMenu: Commands {
     @AppStorage("showDemoConfiguration")
     private var showConfiguration = false
 
+    @AppStorage("showDemoDescription")
+    private var showDescription = false
+
     public init() {}
 
     public var body: some Commands {
@@ -34,6 +37,10 @@ public struct DemosCommandMenu: Commands {
                     showConfiguration.toggle()
                 }
                 .keyboardShortcut("k", modifiers: .command)
+                Button(showDescription ? "Hide Description" : "Show Description") {
+                    showDescription.toggle()
+                }
+                .keyboardShortcut("i", modifiers: .command)
                 Divider()
                 demoListItems(viewModel: viewModel)
             } else {

@@ -139,7 +139,9 @@ struct DemosNavigationSplitView: View {
             let demoView = AnyView(element.type.init())
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            DemoConfigurationContainer(content: demoView)
+            DemoDescriptionContainer(metadata: element.metadata, content:
+                DemoConfigurationContainer(content: demoView)
+            )
                 .id(id)
                 .navigationTitle("\(element.metadata.name)")
         } else {

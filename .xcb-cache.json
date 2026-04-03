@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "timestamp": 1775186309,
+  "timestamp": 1775192246,
   "xcode_version": null,
   "graph": {
     "projects": {
@@ -54,13 +54,6 @@
       "platform": "macOS",
       "name": "My Mac",
       "id": "00006050-000E70491131401C",
-      "os": null,
-      "arch": "arm64"
-    },
-    {
-      "platform": "visionOS",
-      "name": "Jonathan’s Apple Vision Pro",
-      "id": "00008112-001A08891A78A01E",
       "os": null,
       "arch": "arm64"
     },
