@@ -14,8 +14,9 @@ struct DemoDescriptionContainer<Content: View>: View {
                 if showDescription, hasDescription {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(metadata.name)
+                            Label(metadata.name, systemImage: metadata.systemImage)
                                 .font(.title.bold())
+                                .foregroundStyle(metadata.color ?? .primary)
                             if let description = metadata.description {
                                 Text(LocalizedStringKey(description))
                                     .font(.title2)
