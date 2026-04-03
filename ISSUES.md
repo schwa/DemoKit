@@ -136,3 +136,13 @@ Opening URLs like `metalsprockets-examples://GameOfLife` or `metalsprockets-exam
 
 ---
 
+## 12: kebabCase produces double hyphens for names with spaces and capitals
+status: new
+priority: medium
+kind: bug
+created: 2026-04-03T06:19:06.296728+00:00
+
+The `kebabCase` function replaces spaces with hyphens first, then inserts hyphens before uppercase letters, producing double hyphens. For example `"Game of Life"` becomes `"game-of--life"` instead of `"game-of-life"`. The fix should deduplicate consecutive hyphens after all replacements.
+
+---
+
