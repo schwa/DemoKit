@@ -6,6 +6,7 @@ import SwiftUI
 public final class DemoPickerViewModel {
     public let demos: [any DemoView.Type]
     public var selection: DemoMetadata.ID?
+    public var screenshotRequested = false
     public var pinnedDemoIDs: Set<DemoMetadata.ID> = []
     public var hiddenDemoIDs: Set<DemoMetadata.ID> = []
 
@@ -223,12 +224,7 @@ public final class DemoPickerViewModel {
         case "previous", "prev":
             selectPreviousDemo()
         case "screenshot":
-            if !path.isEmpty {
-                navigateToDemo(path)
-            }
-            // Screenshot handling is left to external tooling (e.g. steveo screenshot)
-            let currentID = selection?.rawValue ?? "none"
-            logger?.info("Screenshot requested for current demo: \(currentID)")
+            screenshotRequested = true
         default:
             logger?.warning("Unknown URL action: \(host)")
         }

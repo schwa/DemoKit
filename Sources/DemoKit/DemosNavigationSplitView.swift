@@ -140,18 +140,51 @@ struct DemosNavigationSplitView: View {
         if let id = viewModel.selection,
            let element = visibleElements.first(where: { $0.metadata.id == id }) {
             let demoView = AnyView(element.type.init())
-            ZStack {
+            let detailContent = ZStack {
                 Color.clear
                 DemoDescriptionContainer(metadata: element.metadata, content:
                                             DemoConfigurationContainer(content: demoView)
                 )
             }
             .clipped()
-            .id(id)
-            .navigationTitle("\(element.metadata.name)")
+
+            detailContent
+                .id(id)
+                .navigationTitle("\(element.metadata.name)")
+                .onChange(of: viewModel.screenshotRequested) { _, requested in
+                    guard requested else { return }
+                    viewModel.screenshotRequested = false
+                    takeScreenshot(of: detailContent, demoID: element.metadata.id.rawValue)
+                }
         } else {
             ContentUnavailableView("Select a Demo", systemImage: "sidebar.left", description: Text("Choose a demo from the sidebar"))
         }
+    }
+
+    private func takeScreenshot<V: View>(of view: V, demoID: String) {
+        let renderer = ImageRenderer(content: view.frame(width: 800, height: 600))
+        renderer.scale = 2.0
+        #if os(macOS)
+        guard let image = renderer.nsImage else {
+            logger?.warning("Failed to render screenshot for \(demoID)")
+            return
+        }
+        guard let tiffData = image.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiffData),
+              let pngData = bitmap.representation(using: .png, properties: [:]) else {
+            logger?.warning("Failed to encode screenshot for \(demoID)")
+            return
+        }
+        let filename = "DemoKit-\(demoID).png"
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+        do {
+            try pngData.write(to: url)
+            logger?.info("Screenshot saved to \(url.path)")
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+        } catch {
+            logger?.warning("Failed to write screenshot: \(error.localizedDescription)")
+        }
+        #endif
     }
 
     private func demoLabel(for metadata: DemoMetadata) -> some View {
