@@ -24,6 +24,7 @@ struct DemosNavigationSplitView: View {
             let metadata = element.metadata
             return metadata.name.lowercased().contains(searchLower) ||
                    (metadata.description?.lowercased().contains(searchLower) ?? false) ||
+                   (metadata.longDescription?.lowercased().contains(searchLower) ?? false) ||
                    metadata.keywords.contains { $0.lowercased().contains(searchLower) }
         }
     }
@@ -179,7 +180,7 @@ struct DemosNavigationSplitView: View {
         .contextMenu {
             contextMenuContent(for: metadata)
         }
-        .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")")
+        .help("Name: \(metadata.name)\nID: \(metadata.id.rawValue)\(metadata.description.map { "\nDescription: \($0)" } ?? "")\(metadata.longDescription.map { "\n\($0)" } ?? "")")
     }
 
     @ViewBuilder

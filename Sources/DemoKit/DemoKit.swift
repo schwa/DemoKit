@@ -6,6 +6,7 @@ public struct DemoMetadata: Identifiable, Sendable {
     public var name: String
     public var systemImage: String
     public var description: String?
+    public var longDescription: String?
     public var group: String?
     public var keywords: [String]
     public var color: Color?
@@ -20,7 +21,7 @@ public struct DemoMetadata: Identifiable, Sendable {
         }
     }
 
-    public init(id: ID? = nil, name: String? = nil, systemImage: String = "puzzlepiece", description: String? = nil, group: String? = nil, keywords: [String] = [], color: Color? = nil, isEnabled: Bool = true, variants: [Self] = []) {
+    public init(id: ID? = nil, name: String? = nil, systemImage: String = "puzzlepiece", description: String? = nil, longDescription: String? = nil, group: String? = nil, keywords: [String] = [], color: Color? = nil, isEnabled: Bool = true, variants: [Self] = []) {
         if let id {
             self.id = id
             self.name = name ?? Self.humanReadable(from: id.rawValue)
@@ -32,6 +33,7 @@ public struct DemoMetadata: Identifiable, Sendable {
         }
         self.systemImage = systemImage
         self.description = description
+        self.longDescription = longDescription
         self.group = group
         self.keywords = keywords
         self.color = color
@@ -39,12 +41,13 @@ public struct DemoMetadata: Identifiable, Sendable {
         self.variants = variants
     }
 
-    public init<T: DemoView>(type: T.Type, id: ID? = nil, name: String? = nil, systemImage: String = "puzzlepiece", description: String? = nil, group: String? = nil, keywords: [String] = [], color: Color? = nil, isEnabled: Bool = true, variants: [Self] = []) {
+    public init<T: DemoView>(type: T.Type, id: ID? = nil, name: String? = nil, systemImage: String = "puzzlepiece", description: String? = nil, longDescription: String? = nil, group: String? = nil, keywords: [String] = [], color: Color? = nil, isEnabled: Bool = true, variants: [Self] = []) {
         let (finalName, finalID) = Self.computeNameAndID(type: type, name: name, id: id?.rawValue)
         self.id = ID(finalID)
         self.name = finalName
         self.systemImage = systemImage
         self.description = description
+        self.longDescription = longDescription
         self.group = group
         self.keywords = keywords
         self.color = color
