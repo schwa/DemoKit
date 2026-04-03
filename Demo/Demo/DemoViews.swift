@@ -31,6 +31,7 @@ struct StateTestDemoView: DemoView {
                     .font(.headline)
                 Stepper("Counter: \(counter)", value: $counter)
                     .accessibilityLabel("Counter")
+                    .accessibilityIdentifier("counter")
                 ColorPicker("Color", selection: $color)
             }
         }
@@ -103,14 +104,17 @@ struct LinkedSlidersDemoView: DemoView {
                     LabeledContent("Red: \(String(format: "%.0f", red * 255))") {
                         Slider(value: $red, in: 0...1)
                             .accessibilityLabel("Red")
+                            .accessibilityIdentifier("red")
                     }
                     LabeledContent("Green: \(String(format: "%.0f", green * 255))") {
                         Slider(value: $green, in: 0...1)
                             .accessibilityLabel("Green")
+                            .accessibilityIdentifier("green")
                     }
                     LabeledContent("Blue: \(String(format: "%.0f", blue * 255))") {
                         Slider(value: $blue, in: 0...1)
                             .accessibilityLabel("Blue")
+                            .accessibilityIdentifier("blue")
                     }
                     Text("Total brightness: \(String(format: "%.0f%%", (red + green + blue) / 3.0 * 100))")
                         .font(.caption)
@@ -153,6 +157,7 @@ struct FormMirrorDemoView: DemoView {
                 LabeledContent("Font Size: \(String(format: "%.0f", fontSize))pt") {
                     Slider(value: $fontSize, in: 10...72)
                         .accessibilityLabel("Font Size")
+                        .accessibilityIdentifier("font-size")
                 }
                 Toggle("Bold", isOn: $isBold)
                 Toggle("Italic", isOn: $isItalic)
@@ -197,10 +202,12 @@ struct CascadingStatesDemoView: DemoView {
                 LabeledContent("Base: \(String(format: "%.1f", baseValue))") {
                     Slider(value: $baseValue, in: 0...100)
                         .accessibilityLabel("Base")
+                        .accessibilityIdentifier("base")
                 }
                 LabeledContent("Multiplier: \(String(format: "%.1f", multiplier))") {
                     Slider(value: $multiplier, in: 0.5...5)
                         .accessibilityLabel("Multiplier")
+                        .accessibilityIdentifier("multiplier")
                 }
                 Stepper("Base (stepper): \(String(format: "%.0f", baseValue))", value: $baseValue, in: 0...100, step: 5)
                 Text("Computed: \(String(format: "%.1f", computed))")
@@ -388,14 +395,17 @@ struct GradientBackgroundDemoView: DemoView {
                     LabeledContent("Hue: \(String(format: "%.0f°", hue * 360))") {
                         Slider(value: $hue, in: 0...1)
                             .accessibilityLabel("Hue")
+                            .accessibilityIdentifier("hue")
                     }
                     LabeledContent("Saturation: \(String(format: "%.0f%%", saturation * 100))") {
                         Slider(value: $saturation, in: 0...1)
                             .accessibilityLabel("Saturation")
+                            .accessibilityIdentifier("saturation")
                     }
                     LabeledContent("Angle: \(String(format: "%.0f°", angle))") {
                         Slider(value: $angle, in: 0...360)
                             .accessibilityLabel("Angle")
+                            .accessibilityIdentifier("angle")
                     }
                 }
             }
@@ -435,10 +445,12 @@ struct MeshGradientDemoView: DemoView {
                     LabeledContent("Center X: \(String(format: "%.2f", centerX))") {
                         Slider(value: $centerX, in: 0...1)
                             .accessibilityLabel("Center X")
+                            .accessibilityIdentifier("center-x")
                     }
                     LabeledContent("Center Y: \(String(format: "%.2f", centerY))") {
                         Slider(value: $centerY, in: 0...1)
                             .accessibilityLabel("Center Y")
+                            .accessibilityIdentifier("center-y")
                     }
                 }
             }
@@ -482,6 +494,7 @@ struct NoisePatternDemoView: DemoView {
                     LabeledContent("Tile Size: \(String(format: "%.0fpx", tileSize))") {
                         Slider(value: $tileSize, in: 10...100)
                             .accessibilityLabel("Tile Size")
+                            .accessibilityIdentifier("tile-size")
                     }
                     ColorPicker("Color 1", selection: $color1)
                     ColorPicker("Color 2", selection: $color2)
@@ -527,6 +540,7 @@ struct CirclesDemoView: DemoView {
                 LabeledContent("Radius") {
                     Slider(value: $radius, in: 20...150)
                         .accessibilityLabel("Radius")
+                        .accessibilityIdentifier("radius")
                 }
             }
         }
@@ -563,14 +577,17 @@ struct RoundedPolygonDemoView: DemoView {
                     LabeledContent("Sides") {
                         Slider(value: $sides, in: 3...12, step: 1)
                             .accessibilityLabel("Sides")
+                            .accessibilityIdentifier("sides")
                     }
                     LabeledContent("Corner Radius") {
                         Slider(value: $cornerRadius, in: 0...50)
                             .accessibilityLabel("Corner Radius")
+                            .accessibilityIdentifier("corner-radius")
                     }
                     LabeledContent("Rotation") {
                         Slider(value: $rotation, in: 0...360)
                             .accessibilityLabel("Rotation")
+                            .accessibilityIdentifier("rotation")
                     }
                 }
             }
@@ -632,10 +649,12 @@ struct SpinnerDemoView: DemoView {
                     LabeledContent("Trim") {
                         Slider(value: $trim, in: 0.1...0.9)
                             .accessibilityLabel("Trim")
+                            .accessibilityIdentifier("trim")
                     }
                     LabeledContent("Line Width") {
                         Slider(value: $lineWidth, in: 2...20)
                             .accessibilityLabel("Line Width")
+                            .accessibilityIdentifier("line-width")
                     }
                 }
             }
@@ -697,6 +716,7 @@ struct GridDemoView: DemoView {
                 LabeledContent("Columns") {
                     Slider(value: $columns, in: 2...6, step: 1)
                         .accessibilityLabel("Columns")
+                        .accessibilityIdentifier("columns")
                 }
             }
         }
@@ -732,10 +752,12 @@ struct StackDemoView: DemoView {
                 LabeledContent("Spread") {
                     Slider(value: $spread, in: 0...40)
                         .accessibilityLabel("Spread")
+                        .accessibilityIdentifier("spread")
                 }
                 LabeledContent("Angle") {
                     Slider(value: $angle, in: 0...15)
                         .accessibilityLabel("Angle")
+                        .accessibilityIdentifier("angle")
                 }
             }
         }
