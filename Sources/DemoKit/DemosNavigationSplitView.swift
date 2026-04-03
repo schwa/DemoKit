@@ -140,29 +140,27 @@ struct DemosNavigationSplitView: View {
         if let id = viewModel.selection,
            let element = visibleElements.first(where: { $0.metadata.id == id }) {
             let demoView = AnyView(element.type.init())
-            let detailContent = ZStack {
+            ZStack {
                 Color.clear
                 DemoDescriptionContainer(metadata: element.metadata, content:
                                             DemoConfigurationContainer(content: demoView)
                 )
             }
             .clipped()
-
-            detailContent
-                .id(id)
-                .navigationTitle("\(element.metadata.name)")
-                .onChange(of: viewModel.screenshotRequested) { _, requested in
-                    guard requested else { return }
-                    viewModel.screenshotRequested = false
-                    takeScreenshot(of: detailContent, demoID: element.metadata.id.rawValue)
-                }
+            .id(id)
+            .navigationTitle("\(element.metadata.name)")
+            .onChange(of: viewModel.screenshotRequested) { _, requested in
+                guard requested else { return }
+                viewModel.screenshotRequested = false
+                takeScreenshot(of: demoView, demoID: element.metadata.id.rawValue)
+            }
         } else {
             ContentUnavailableView("Select a Demo", systemImage: "sidebar.left", description: Text("Choose a demo from the sidebar"))
         }
     }
 
     private func takeScreenshot<V: View>(of view: V, demoID: String) {
-        let renderer = ImageRenderer(content: view.frame(width: 800, height: 600))
+        let renderer = ImageRenderer(content: view.frame(width: 800, height: 600).background(Color.white))
         renderer.scale = 2.0
         #if os(macOS)
         guard let image = renderer.nsImage else {
