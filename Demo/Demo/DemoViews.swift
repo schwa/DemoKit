@@ -25,7 +25,7 @@ struct StateTestDemoView: DemoView {
             }
         }
         .demoConfiguration {
-            VStack {
+            Form {
                 Text("Counter is: \(counter)")
                     .font(.headline)
                 Stepper("Counter: \(counter)", value: $counter)
@@ -80,18 +80,20 @@ struct LinkedSlidersDemoView: DemoView {
                     .shadow(radius: 4)
             }
             .demoConfiguration {
-                LabeledContent("Red: \(String(format: "%.0f", red * 255))") {
-                    Slider(value: $red, in: 0...1)
+                Form {
+                    LabeledContent("Red: \(String(format: "%.0f", red * 255))") {
+                        Slider(value: $red, in: 0...1)
+                    }
+                    LabeledContent("Green: \(String(format: "%.0f", green * 255))") {
+                        Slider(value: $green, in: 0...1)
+                    }
+                    LabeledContent("Blue: \(String(format: "%.0f", blue * 255))") {
+                        Slider(value: $blue, in: 0...1)
+                    }
+                    Text("Total brightness: \(String(format: "%.0f%%", (red + green + blue) / 3.0 * 100))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                LabeledContent("Green: \(String(format: "%.0f", green * 255))") {
-                    Slider(value: $green, in: 0...1)
-                }
-                LabeledContent("Blue: \(String(format: "%.0f", blue * 255))") {
-                    Slider(value: $blue, in: 0...1)
-                }
-                Text("Total brightness: \(String(format: "%.0f%%", (red + green + blue) / 3.0 * 100))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
     }
 }
@@ -124,14 +126,15 @@ struct FormMirrorDemoView: DemoView {
                 .foregroundStyle(.secondary)
         }
         .demoConfiguration {
-            TextField("Text", text: $name)
-                .textFieldStyle(.roundedBorder)
-            LabeledContent("Font Size: \(String(format: "%.0f", fontSize))pt") {
-                Slider(value: $fontSize, in: 10...72)
+            Form {
+                TextField("Text", text: $name)
+                LabeledContent("Font Size: \(String(format: "%.0f", fontSize))pt") {
+                    Slider(value: $fontSize, in: 10...72)
+                }
+                Toggle("Bold", isOn: $isBold)
+                Toggle("Italic", isOn: $isItalic)
+                ColorPicker("Color", selection: $color)
             }
-            Toggle("Bold", isOn: $isBold)
-            Toggle("Italic", isOn: $isItalic)
-            ColorPicker("Color", selection: $color)
         }
     }
 }
@@ -167,17 +170,19 @@ struct CascadingStatesDemoView: DemoView {
                 .foregroundStyle(.secondary)
         }
         .demoConfiguration {
-            LabeledContent("Base: \(String(format: "%.1f", baseValue))") {
-                Slider(value: $baseValue, in: 0...100)
+            Form {
+                LabeledContent("Base: \(String(format: "%.1f", baseValue))") {
+                    Slider(value: $baseValue, in: 0...100)
+                }
+                LabeledContent("Multiplier: \(String(format: "%.1f", multiplier))") {
+                    Slider(value: $multiplier, in: 0.5...5)
+                }
+                Stepper("Base (stepper): \(String(format: "%.0f", baseValue))", value: $baseValue, in: 0...100, step: 5)
+                Text("Computed: \(String(format: "%.1f", computed))")
+                    .font(.headline)
+                Text("Percentage: \(String(format: "%.0f%%", percentage * 100))")
+                Text("Clamped (0–200): \(String(format: "%.1f", clamped))")
             }
-            LabeledContent("Multiplier: \(String(format: "%.1f", multiplier))") {
-                Slider(value: $multiplier, in: 0.5...5)
-            }
-            Stepper("Base (stepper): \(String(format: "%.0f", baseValue))", value: $baseValue, in: 0...100, step: 5)
-            Text("Computed: \(String(format: "%.1f", computed))")
-                .font(.headline)
-            Text("Percentage: \(String(format: "%.0f%%", percentage * 100))")
-            Text("Clamped (0–200): \(String(format: "%.1f", clamped))")
         }
     }
 }
@@ -216,30 +221,31 @@ struct ListEditorDemoView: DemoView {
                 .foregroundStyle(.secondary)
         }
         .demoConfiguration {
-            HStack {
-                TextField("New item", text: $newItem)
-                    .textFieldStyle(.roundedBorder)
-                Button("Add") {
-                    guard !newItem.isEmpty else { return }
-                    items.append(newItem)
-                    newItem = ""
+            Form {
+                HStack {
+                    TextField("New item", text: $newItem)
+                    Button("Add") {
+                        guard !newItem.isEmpty else { return }
+                        items.append(newItem)
+                        newItem = ""
+                    }
+                    .disabled(newItem.isEmpty)
                 }
-                .disabled(newItem.isEmpty)
+                if !items.isEmpty {
+                    Button("Remove Last") {
+                        items.removeLast()
+                    }
+                    Button("Shuffle") {
+                        items.shuffle()
+                    }
+                    Button("Clear All", role: .destructive) {
+                        items.removeAll()
+                    }
+                }
+                Text("Items: \(items.joined(separator: ", "))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            if !items.isEmpty {
-                Button("Remove Last") {
-                    items.removeLast()
-                }
-                Button("Shuffle") {
-                    items.shuffle()
-                }
-                Button("Clear All", role: .destructive) {
-                    items.removeAll()
-                }
-            }
-            Text("Items: \(items.joined(separator: ", "))")
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
     }
 }
@@ -278,20 +284,22 @@ struct TimerDemoView: DemoView {
             .buttonStyle(.borderedProminent)
         }
         .demoConfiguration {
-            Text("Elapsed: \(String(format: "%.1f", elapsed))s")
-                .font(.headline)
-            Text("Minutes: \(String(format: "%.2f", elapsed / 60.0))")
-            Text("Status: \(isRunning ? "Running" : "Stopped")")
-                .foregroundStyle(isRunning ? .green : .red)
-            Button(isRunning ? "Stop" : "Start") {
-                toggleTimer()
-            }
-            Button("Reset") {
-                stopTimer()
-                elapsed = 0
-            }
-            Button("+10 seconds") {
-                elapsed += 10
+            Form {
+                Text("Elapsed: \(String(format: "%.1f", elapsed))s")
+                    .font(.headline)
+                Text("Minutes: \(String(format: "%.2f", elapsed / 60.0))")
+                Text("Status: \(isRunning ? "Running" : "Stopped")")
+                    .foregroundStyle(isRunning ? .green : .red)
+                Button(isRunning ? "Stop" : "Start") {
+                    toggleTimer()
+                }
+                Button("Reset") {
+                    stopTimer()
+                    elapsed = 0
+                }
+                Button("+10 seconds") {
+                    elapsed += 10
+                }
             }
         }
         .onDisappear {
@@ -351,14 +359,16 @@ struct GradientBackgroundDemoView: DemoView {
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .demoConfiguration {
-                LabeledContent("Hue: \(String(format: "%.0f°", hue * 360))") {
-                    Slider(value: $hue, in: 0...1)
-                }
-                LabeledContent("Saturation: \(String(format: "%.0f%%", saturation * 100))") {
-                    Slider(value: $saturation, in: 0...1)
-                }
-                LabeledContent("Angle: \(String(format: "%.0f°", angle))") {
-                    Slider(value: $angle, in: 0...360)
+                Form {
+                    LabeledContent("Hue: \(String(format: "%.0f°", hue * 360))") {
+                        Slider(value: $hue, in: 0...1)
+                    }
+                    LabeledContent("Saturation: \(String(format: "%.0f%%", saturation * 100))") {
+                        Slider(value: $saturation, in: 0...1)
+                    }
+                    LabeledContent("Angle: \(String(format: "%.0f°", angle))") {
+                        Slider(value: $angle, in: 0...360)
+                    }
                 }
             }
     }
@@ -393,11 +403,13 @@ struct MeshGradientDemoView: DemoView {
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .demoConfiguration {
-                LabeledContent("Center X: \(String(format: "%.2f", centerX))") {
-                    Slider(value: $centerX, in: 0...1)
-                }
-                LabeledContent("Center Y: \(String(format: "%.2f", centerY))") {
-                    Slider(value: $centerY, in: 0...1)
+                Form {
+                    LabeledContent("Center X: \(String(format: "%.2f", centerX))") {
+                        Slider(value: $centerX, in: 0...1)
+                    }
+                    LabeledContent("Center Y: \(String(format: "%.2f", centerY))") {
+                        Slider(value: $centerY, in: 0...1)
+                    }
                 }
             }
     }
@@ -436,11 +448,13 @@ struct NoisePatternDemoView: DemoView {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .demoConfiguration {
-                LabeledContent("Tile Size: \(String(format: "%.0fpx", tileSize))") {
-                    Slider(value: $tileSize, in: 10...100)
+                Form {
+                    LabeledContent("Tile Size: \(String(format: "%.0fpx", tileSize))") {
+                        Slider(value: $tileSize, in: 10...100)
+                    }
+                    ColorPicker("Color 1", selection: $color1)
+                    ColorPicker("Color 2", selection: $color2)
                 }
-                ColorPicker("Color 1", selection: $color1)
-                ColorPicker("Color 2", selection: $color2)
             }
     }
 }
@@ -478,8 +492,10 @@ struct CirclesDemoView: DemoView {
         }
         .blendMode(.screen)
         .demoConfiguration {
-            LabeledContent("Radius") {
-                Slider(value: $radius, in: 20...150)
+            Form {
+                LabeledContent("Radius") {
+                    Slider(value: $radius, in: 20...150)
+                }
             }
         }
     }
@@ -511,14 +527,16 @@ struct RoundedPolygonDemoView: DemoView {
                     .foregroundStyle(.white)
             }
             .demoConfiguration {
-                LabeledContent("Sides") {
-                    Slider(value: $sides, in: 3...12, step: 1)
-                }
-                LabeledContent("Corner Radius") {
-                    Slider(value: $cornerRadius, in: 0...50)
-                }
-                LabeledContent("Rotation") {
-                    Slider(value: $rotation, in: 0...360)
+                Form {
+                    LabeledContent("Sides") {
+                        Slider(value: $sides, in: 3...12, step: 1)
+                    }
+                    LabeledContent("Corner Radius") {
+                        Slider(value: $cornerRadius, in: 0...50)
+                    }
+                    LabeledContent("Rotation") {
+                        Slider(value: $rotation, in: 0...360)
+                    }
                 }
             }
     }
@@ -575,11 +593,13 @@ struct SpinnerDemoView: DemoView {
             .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: isSpinning)
             .onAppear { isSpinning = true }
             .demoConfiguration {
-                LabeledContent("Trim") {
-                    Slider(value: $trim, in: 0.1...0.9)
-                }
-                LabeledContent("Line Width") {
-                    Slider(value: $lineWidth, in: 2...20)
+                Form {
+                    LabeledContent("Trim") {
+                        Slider(value: $trim, in: 0.1...0.9)
+                    }
+                    LabeledContent("Line Width") {
+                        Slider(value: $lineWidth, in: 2...20)
+                    }
                 }
             }
     }
@@ -636,8 +656,10 @@ struct GridDemoView: DemoView {
         .padding()
         .frame(maxWidth: 400)
         .demoConfiguration {
-            LabeledContent("Columns") {
-                Slider(value: $columns, in: 2...6, step: 1)
+            Form {
+                LabeledContent("Columns") {
+                    Slider(value: $columns, in: 2...6, step: 1)
+                }
             }
         }
     }
@@ -668,11 +690,13 @@ struct StackDemoView: DemoView {
             }
         }
         .demoConfiguration {
-            LabeledContent("Spread") {
-                Slider(value: $spread, in: 0...40)
-            }
-            LabeledContent("Angle") {
-                Slider(value: $angle, in: 0...15)
+            Form {
+                LabeledContent("Spread") {
+                    Slider(value: $spread, in: 0...40)
+                }
+                LabeledContent("Angle") {
+                    Slider(value: $angle, in: 0...15)
+                }
             }
         }
     }
