@@ -137,13 +137,14 @@ struct DemosNavigationSplitView: View {
         if let id = viewModel.selection,
            let element = visibleElements.first(where: { $0.metadata.id == id }) {
             let demoView = AnyView(element.type.init())
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            DemoDescriptionContainer(metadata: element.metadata, content:
-                DemoConfigurationContainer(content: demoView)
-            )
-                .id(id)
-                .navigationTitle("\(element.metadata.name)")
+            ZStack {
+                Color.clear
+                DemoDescriptionContainer(metadata: element.metadata, content:
+                                            DemoConfigurationContainer(content: demoView)
+                )
+            }
+            .id(id)
+            .navigationTitle("\(element.metadata.name)")
         } else {
             ContentUnavailableView("Select a Demo", systemImage: "sidebar.left", description: Text("Choose a demo from the sidebar"))
         }
