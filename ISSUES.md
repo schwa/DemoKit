@@ -147,11 +147,13 @@ The `kebabCase` function replaces spaces with hyphens first, then inserts hyphen
 ---
 
 ## 13: Accessibility audit: Main window
-status: new
+status: closed
 priority: medium
 kind: task
 labels: accessibility
 created: 2026-04-03T21:02:29Z
+updated: 2026-04-03T21:26:33Z
+closed: 2026-04-03T21:26:33Z
 
 ## Accessibility Issues — Main Window
 
@@ -184,6 +186,8 @@ created: 2026-04-03T21:02:29Z
 
 ### Reference
 - [Apple HIG — Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
+
+- `2026-04-03T21:26:33Z`: All actionable items addressed: (1) Stepper accessibility label, (2) increment button identifier, (3) toolbar button identifiers, (4) sidebar navigation link identifiers, (5) keyword tags hidden from accessibility. Item 6 N/A — DemoView1 was removed. Slider accessibility labels added in earlier commit.
 
 ---
 

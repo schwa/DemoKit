@@ -23,12 +23,14 @@ struct StateTestDemoView: DemoView {
             Button("Increment from main view") {
                 counter += 1
             }
+            .accessibilityIdentifier("increment-button")
         }
         .demoConfiguration {
             Form {
                 Text("Counter is: \(counter)")
                     .font(.headline)
                 Stepper("Counter: \(counter)", value: $counter)
+                    .accessibilityLabel("Counter")
                 ColorPicker("Color", selection: $color)
             }
         }

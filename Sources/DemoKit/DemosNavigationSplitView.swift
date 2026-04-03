@@ -177,6 +177,7 @@ struct DemosNavigationSplitView: View {
 
             pinButton(for: metadata)
         }
+        .accessibilityIdentifier(metadata.id.rawValue)
         .onHover { isHovering in
             #if os(macOS)
             hoveredID = isHovering ? metadata.id : nil

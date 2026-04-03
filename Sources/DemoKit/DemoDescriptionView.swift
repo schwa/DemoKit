@@ -45,6 +45,7 @@ struct DemoDescriptionContainer<Content: View>: View {
                             Label("Description", systemImage: "info.circle")
                         }
                         .help("Toggle description overlay")
+                        .accessibilityIdentifier("toggle-description")
                     }
                 }
             }

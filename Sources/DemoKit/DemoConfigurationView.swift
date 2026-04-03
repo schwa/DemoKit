@@ -82,6 +82,7 @@ struct DemoConfigurationContainer<Content: View>: View {
                             Label("Configuration", systemImage: "gear")
                         }
                         .help("Toggle configuration panel")
+                        .accessibilityIdentifier("toggle-configuration")
                     }
                 }
             }

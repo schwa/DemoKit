@@ -9,5 +9,6 @@ struct KeywordsView: View {
                 TagView(text: keyword)
             }
         }
+        .accessibilityHidden(true)
     }
 }
