@@ -2,7 +2,7 @@
 status: new
 priority: low
 kind: none
-created: 2026-04-02T21:10:22.883386+00:00
+created: 2026-04-02T21:10:22Z
 
 NavigationSplitView in DemosNavigationSplitView doesn't expose a View > Hide/Show Sidebar menu item. The toolbar button exists but there's no menu equivalent, making it inaccessible to automation tools like steveo.
 
@@ -12,13 +12,13 @@ NavigationSplitView in DemosNavigationSplitView doesn't expose a View > Hide/Sho
 status: closed
 priority: low
 kind: none
-created: 2026-04-02T21:10:31.446371+00:00
-updated: 2026-04-03T00:24:23.117666+00:00
-closed: 2026-04-03T00:24:23.117665+00:00
+created: 2026-04-02T21:10:31Z
+updated: 2026-04-03T00:24:23Z
+closed: 2026-04-03T00:24:23Z
 
 The MetalSprocketsExamples app has a Demos menu defined in the app target, but DemoKit itself should provide this as a built-in feature. DemoPickerView/DemoPickerScene should automatically populate a Demos menu with all registered demos, enabling keyboard/menu-driven navigation and automation.
 
-- 2026-04-03T00:24:23.121057+00:00: Implemented DemosCommandMenu with demo list, next/previous navigation, and configuration toggle.
+- `2026-04-03T00:24:23Z`: Implemented DemosCommandMenu with demo list, next/previous navigation, and configuration toggle.
 
 ---
 
@@ -26,7 +26,7 @@ The MetalSprocketsExamples app has a Demos menu defined in the app target, but D
 status: new
 priority: medium
 kind: feature
-created: 2026-04-02T22:55:38.899907+00:00
+created: 2026-04-02T22:55:38Z
 
 
 ---
@@ -35,8 +35,8 @@ created: 2026-04-02T22:55:38.899907+00:00
 status: new
 priority: medium
 kind: feature
-created: 2026-04-02T22:55:41.936612+00:00
-updated: 2026-04-02T23:15:27.906627+00:00
+created: 2026-04-02T22:55:41Z
+updated: 2026-04-02T23:15:27Z
 
 Separate the concept of a Demo from its View representation.
 
@@ -55,7 +55,7 @@ Key decisions:
 status: new
 priority: medium
 kind: feature
-created: 2026-04-02T22:55:43.745406+00:00
+created: 2026-04-02T22:55:43Z
 
 
 ---
@@ -64,9 +64,9 @@ created: 2026-04-02T22:55:43.745406+00:00
 status: closed
 priority: medium
 kind: feature
-created: 2026-04-02T22:55:45.860260+00:00
-updated: 2026-04-02T23:31:29.051532+00:00
-closed: 2026-04-02T23:31:29.051532+00:00
+created: 2026-04-02T22:55:45Z
+updated: 2026-04-02T23:31:29Z
+closed: 2026-04-02T23:31:29Z
 
 Provide a standard configuration view slot for demos.
 
@@ -78,7 +78,7 @@ Key decisions:
 - Hidden by default, toggled on/off
 - Can implement now on current DemoView system, migrates to ViewableDemo later when #4 lands
 
-- 2026-04-02T23:31:29.055327+00:00: Implemented configuration view slot. Demos use .demoConfiguration { } modifier. macOS: bottom overlay with toolbar toggle. iOS: sheet with presentation detents.
+- `2026-04-02T23:31:29Z`: Implemented configuration view slot. Demos use .demoConfiguration { } modifier. macOS: bottom overlay with toolbar toggle. iOS: sheet with presentation detents.
 
 ---
 
@@ -86,7 +86,7 @@ Key decisions:
 status: new
 priority: low
 kind: none
-created: 2026-04-02T23:02:37.990422+00:00
+created: 2026-04-02T23:02:37Z
 
 
 ---
@@ -95,13 +95,13 @@ created: 2026-04-02T23:02:37.990422+00:00
 status: closed
 priority: medium
 kind: enhancement
-created: 2026-04-03T00:03:52.639431+00:00
-updated: 2026-04-03T00:05:08.497475+00:00
-closed: 2026-04-03T00:05:08.497475+00:00
+created: 2026-04-03T00:03:52Z
+updated: 2026-04-03T00:05:08Z
+closed: 2026-04-03T00:05:08Z
 
 The show/hide state of the configuration overlay should be saved in @AppStorage so it persists across app launches.
 
-- 2026-04-03T00:05:08.504448+00:00: Implemented in same commit as text label change.
+- `2026-04-03T00:05:08Z`: Implemented in same commit as text label change.
 
 ---
 
@@ -109,7 +109,7 @@ The show/hide state of the configuration overlay should be saved in @AppStorage 
 status: new
 priority: medium
 kind: none
-created: 2026-04-03T00:50:04.057614+00:00
+created: 2026-04-03T00:50:04Z
 
 Tags displayed in the UI should be tappable. Tapping a tag filters the view to show only items with that tag. Need a clear/reset filter mechanism (e.g. a clear button or tapping the active tag again to deselect).
 
@@ -119,9 +119,9 @@ Tags displayed in the UI should be tappable. Tapping a tag filters the view to s
 status: closed
 priority: critical
 kind: bug
-created: 2026-04-03T02:20:16.684425+00:00
-updated: 2026-04-03T03:29:10.242892+00:00
-closed: 2026-04-03T03:29:10.242892+00:00
+created: 2026-04-03T02:20:16Z
+updated: 2026-04-03T03:29:10Z
+closed: 2026-04-03T03:29:10Z
 
 
 ---
@@ -130,7 +130,7 @@ closed: 2026-04-03T03:29:10.242892+00:00
 status: new
 priority: medium
 kind: bug
-created: 2026-04-03T06:10:32.050275+00:00
+created: 2026-04-03T06:10:32Z
 
 Opening URLs like `metalsprockets-examples://GameOfLife` or `metalsprockets-examples://demo/Game%20of%20Life` does not navigate to the demo. The `handleURL` method in `DemoPickerViewModel` parses the URL correctly but the demo selection doesn't change. May be related to the URL scheme only being set via environment on the Scene, or a mismatch between URL host and demo IDs (which are kebab-cased). Needs investigation.
 
@@ -140,9 +140,50 @@ Opening URLs like `metalsprockets-examples://GameOfLife` or `metalsprockets-exam
 status: new
 priority: medium
 kind: bug
-created: 2026-04-03T06:19:06.296728+00:00
+created: 2026-04-03T06:19:06Z
 
 The `kebabCase` function replaces spaces with hyphens first, then inserts hyphens before uppercase letters, producing double hyphens. For example `"Game of Life"` becomes `"game-of--life"` instead of `"game-of-life"`. The fix should deduplicate consecutive hyphens after all replacements.
+
+---
+
+## 13: Accessibility audit: Main window
+status: new
+priority: medium
+kind: task
+labels: accessibility
+created: 2026-04-03T21:02:29Z
+
+## Accessibility Issues — Main Window
+
+### Errors (screen reader blockers)
+
+1. **Stepper missing label** — The Stepper in `StateTestDemoView` (`Demo/Demo/DemoViews.swift:87`) has an `AXIncrementor` and two `AXButton` sub-elements with no accessible title or description. Screen readers cannot announce what this control does.
+   - **Fix:** Add `.accessibilityLabel("Counter")` to the Stepper.
+
+### Warnings (testing & usability)
+
+2. **"Increment from main view" button missing identifier** — `Demo/Demo/DemoViews.swift:83`. Has a title but no accessibility identifier for UI testing.
+   - **Fix:** Add `.accessibilityIdentifier("increment-button")`.
+
+3. **Toolbar buttons missing identifiers** — Configuration gear button (`Sources/DemoKit/DemoConfigurationView.swift:72`) and Description info button (`Sources/DemoKit/DemoDescriptionView.swift:41`) lack accessibility identifiers.
+   - **Fix:** Add `.accessibilityIdentifier("toggle-configuration")` and `.accessibilityIdentifier("toggle-description")`.
+
+4. **Sidebar navigation links missing identifiers** — Each demo row in `Sources/DemoKit/DemosNavigationSplitView.swift` `navigationLink(for:)` has no accessibility identifier.
+   - **Fix:** Add `.accessibilityIdentifier(metadata.id.rawValue)` to each navigation link.
+
+5. **Keyword tags not accessible** — `TagView` / `KeywordsView` (`Sources/DemoKit/TagView.swift`, `KeywordsView.swift`) are visual-only with no accessibility grouping.
+   - **Fix:** Either mark tags `.accessibilityHidden(true)` (decorative) or include keyword text in the parent row's accessibility label.
+
+6. **Slider controls missing identifiers** — Scale and Rotation sliders in `DemoView1` (`Demo/Demo/DemoViews.swift:23-26`) lack `.accessibilityIdentifier()`.
+   - **Fix:** Add `.accessibilityIdentifier("scale-slider")` and `.accessibilityIdentifier("rotation-slider")`.
+
+### Not actionable (system/framework)
+
+- ~60 AXMenuItem violations from macOS system menus (separators, Services, etc.)
+- Window control buttons (close/minimize/zoom) missing labels — standard macOS controls
+
+### Reference
+- [Apple HIG — Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
 
 ---
 
