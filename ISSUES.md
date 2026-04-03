@@ -23,11 +23,14 @@ The MetalSprocketsExamples app has a Demos menu defined in the app target, but D
 ---
 
 ## 3: Show description over the demo view
-status: new
+status: closed
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:38Z
+updated: 2026-04-03T22:13:19Z
+closed: 2026-04-03T22:13:19Z
 
+- `2026-04-03T22:13:19Z`: Description overlay implemented in DemoDescriptionContainer with toggle via toolbar button and Cmd+I.
 
 ---
 
