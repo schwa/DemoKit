@@ -171,13 +171,22 @@ public final class DemoPickerViewModel {
         }
 
         logger?.info("Extracted demo ID: \(demoID)")
-        let id = DemoMetadata.ID(demoID)
 
-        guard demos.contains(where: { $0.metadata.id == id }) else {
+        let allMetadata = demos.map { $0.metadata }
+
+        // Try exact ID match, then kebab-cased, then case-insensitive ID, then case-insensitive name
+        let matched: DemoMetadata.ID? =
+            allMetadata.first(where: { $0.id.rawValue == demoID })?.id
+            ?? allMetadata.first(where: { $0.id.rawValue == DemoMetadata.kebabCase(demoID) })?.id
+            ?? allMetadata.first(where: { $0.id.rawValue.lowercased() == demoID.lowercased() })?.id
+            ?? allMetadata.first(where: { $0.name.lowercased().replacingOccurrences(of: " ", with: "") == demoID.lowercased().replacingOccurrences(of: " ", with: "") })?.id
+
+        guard let matched else {
             logger?.warning("Demo with ID '\(demoID)' not found in \(self.demos.count) available demos")
             return
         }
-        selection = id
+        logger?.info("URL navigated to demo: \(matched.rawValue)")
+        selection = matched
     }
 
     private func extractDemoID(from url: URL) -> String? {

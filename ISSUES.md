@@ -127,12 +127,16 @@ closed: 2026-04-03T03:29:10Z
 ---
 
 ## 11: URL scheme navigation not working
-status: new
+status: closed
 priority: medium
 kind: bug
 created: 2026-04-03T06:10:32Z
+updated: 2026-04-03T22:09:36Z
+closed: 2026-04-03T22:09:36Z
 
 Opening URLs like `metalsprockets-examples://GameOfLife` or `metalsprockets-examples://demo/Game%20of%20Life` does not navigate to the demo. The `handleURL` method in `DemoPickerViewModel` parses the URL correctly but the demo selection doesn't change. May be related to the URL scheme only being set via environment on the Scene, or a mismatch between URL host and demo IDs (which are kebab-cased). Needs investigation.
+
+- `2026-04-03T22:09:36Z`: Fixed Scene environment not propagating to View. DemoPickerScene now bridges the urlScheme environment value. Also added fuzzy ID matching: exact, kebab-cased, case-insensitive, and name-based fallback.
 
 ---
 
