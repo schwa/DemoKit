@@ -198,10 +198,10 @@ public final class DemoPickerViewModel {
 
     func findDemoID(_ demoID: String) -> DemoMetadata.ID? {
         let allMetadata = demos.map { $0.metadata }
-        return allMetadata.first(where: { $0.id.rawValue == demoID })?.id
-            ?? allMetadata.first(where: { $0.id.rawValue == DemoMetadata.kebabCase(demoID) })?.id
-            ?? allMetadata.first(where: { $0.id.rawValue.lowercased() == demoID.lowercased() })?.id
-            ?? allMetadata.first(where: { $0.name.lowercased().replacingOccurrences(of: " ", with: "") == demoID.lowercased().replacingOccurrences(of: " ", with: "") })?.id
+        return allMetadata.first { $0.id.rawValue == demoID }?.id
+            ?? allMetadata.first { $0.id.rawValue == DemoMetadata.kebabCase(demoID) }?.id
+            ?? allMetadata.first { $0.id.rawValue.lowercased() == demoID.lowercased() }?.id
+            ?? allMetadata.first { $0.name.lowercased().replacingOccurrences(of: " ", with: "") == demoID.lowercased().replacingOccurrences(of: " ", with: "") }?.id
     }
 
     // MARK: - URL Handling
@@ -219,12 +219,16 @@ public final class DemoPickerViewModel {
             if !path.isEmpty {
                 navigateToDemo(path)
             }
+
         case "next":
             selectNextDemo()
+
         case "previous", "prev":
             selectPreviousDemo()
+
         case "screenshot":
             screenshotRequested = true
+
         default:
             logger?.warning("Unknown URL action: \(host)")
         }

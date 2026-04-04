@@ -142,7 +142,7 @@ only_rules:
 #  - one_declaration_per_file # 5 violations
   - opening_brace
   - operator_usage_whitespace
-  - operator_whitespace
+  - function_name_whitespace
   - optional_data_string_conversion
   - optional_enum_case_matching
   - orphaned_doc_comment
@@ -151,7 +151,7 @@ only_rules:
   - pattern_matching_keywords
   - period_spacing
   - prefer_condition_list # 7 violations (fixable)
-  - prefer_key_path # 3 violations (fixable)
+#  - prefer_key_path # disabled: triggers compiler crashes with Xcode 26
   - prefer_nimble
   - prefer_self_in_static_references # 2 violations (fixable)
   - prefer_self_type_over_type_of_self
@@ -176,7 +176,7 @@ only_rules:
   - redundant_discardable_let
   - redundant_nil_coalescing
   - redundant_objc_attribute
-  - redundant_self_in_closure
+  - redundant_self
   - redundant_sendable
   - redundant_set_access_control
   - redundant_string_enum_value

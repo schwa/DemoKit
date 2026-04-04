@@ -29,7 +29,7 @@ struct DemoApp: App {
             StackDemoView.self,
             TypographyDemoView.self,
             GradientTextDemoView.self,
-            SymbolsDemoView.self,
+            SymbolsDemoView.self
         ])
         .handleDemoURL(scheme: "x-demo")
         .commands {

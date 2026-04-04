@@ -85,7 +85,7 @@ public struct DemosCommandMenu: Commands {
     @ViewBuilder
     private func demoListItems(viewModel: DemoPickerViewModel) -> some View {
         let visibleDemos = viewModel.demos
-            .map { $0.metadata } // swiftlint:disable:this prefer_key_path
+            .map { $0.metadata }
             .filter { !viewModel.isHidden($0.id) }
 
         let grouped = Dictionary(grouping: visibleDemos) { $0.group }
@@ -118,5 +118,4 @@ public struct DemosCommandMenu: Commands {
             }
         }
     }
-
 }

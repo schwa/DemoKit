@@ -32,8 +32,9 @@ public struct DemoKitConfiguration: Sendable {
     }
 }
 
+// swiftlint:disable:next extension_access_modifier
 extension EnvironmentValues {
-    @Entry public var demoKitConfiguration: DemoKitConfiguration = DemoKitConfiguration()
+    @Entry public var demoKitConfiguration = DemoKitConfiguration()
 }
 
 public extension View {

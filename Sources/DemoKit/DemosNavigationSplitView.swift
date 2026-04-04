@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct DemosNavigationSplitView: View {
+struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_length
     @Environment(DemoPickerViewModel.self)
     private var viewModel: DemoPickerViewModel
 
@@ -142,8 +142,9 @@ struct DemosNavigationSplitView: View {
             let demoView = AnyView(element.type.init())
             ZStack {
                 Color.clear
-                DemoDescriptionContainer(metadata: element.metadata, content:
-                                            DemoConfigurationContainer(content: demoView)
+                DemoDescriptionContainer(
+                    metadata: element.metadata,
+                    content: DemoConfigurationContainer(content: demoView)
                 )
             }
             .clipped()

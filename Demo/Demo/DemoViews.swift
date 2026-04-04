@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import DemoKit
 import SwiftUI
 
@@ -383,7 +384,7 @@ struct GradientBackgroundDemoView: DemoView {
                 LinearGradient(
                     colors: [
                         Color(hue: hue, saturation: saturation, brightness: 0.9),
-                        Color(hue: (hue + 0.3).truncatingRemainder(dividingBy: 1.0), saturation: saturation, brightness: 0.5),
+                        Color(hue: (hue + 0.3).truncatingRemainder(dividingBy: 1.0), saturation: saturation, brightness: 0.5)
                     ],
                     startPoint: UnitPoint(x: cos(angle * .pi / 180), y: sin(angle * .pi / 180)),
                     endPoint: UnitPoint(x: cos((angle + 180) * .pi / 180), y: sin((angle + 180) * .pi / 180))
@@ -429,15 +430,20 @@ struct MeshGradientDemoView: DemoView {
     var body: some View {
         Color.clear
             .background(
-                MeshGradient(width: 3, height: 3, points: [
-                    [0, 0], [0.5, 0], [1, 0],
-                    [0, 0.5], [centerX, centerY], [1, 0.5],
-                    [0, 1], [0.5, 1], [1, 1],
-                ], colors: [
-                    .red, .orange, .yellow,
-                    .purple, .pink, .mint,
-                    .blue, .indigo, .cyan,
-                ])
+                MeshGradient(
+                    width: 3,
+                    height: 3,
+                    points: [
+                        [0, 0], [0.5, 0], [1, 0],
+                        [0, 0.5], [centerX, centerY], [1, 0.5],
+                        [0, 1], [0.5, 1], [1, 1]
+                    ],
+                    colors: [
+                        .red, .orange, .yellow,
+                        .purple, .pink, .mint,
+                        .blue, .indigo, .cyan
+                    ]
+                )
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .demoConfiguration {
@@ -481,7 +487,7 @@ struct NoisePatternDemoView: DemoView {
                     let rows = Int(size.height / tileSize) + 1
                     for row in 0..<rows {
                         for col in 0..<cols {
-                            let isEven = (row + col) % 2 == 0
+                            let isEven = (row + col).isMultiple(of: 2)
                             let rect = CGRect(x: Double(col) * tileSize, y: Double(row) * tileSize, width: tileSize, height: tileSize)
                             context.fill(Path(rect), with: .color(isEven ? color1 : color2))
                         }
@@ -837,10 +843,12 @@ struct SymbolsDemoView: DemoView {
         keywords: ["symbols", "icons"]
     )
 
-    private let symbols = ["star.fill", "heart.fill", "bolt.fill", "leaf.fill", "flame.fill",
-                           "drop.fill", "cloud.fill", "moon.fill", "sun.max.fill", "snowflake",
-                           "wind", "sparkles", "camera.fill", "mic.fill", "bell.fill",
-                           "tag.fill", "flag.fill", "pin.fill", "mappin", "globe"]
+    private let symbols = [
+        "star.fill", "heart.fill", "bolt.fill", "leaf.fill", "flame.fill",
+        "drop.fill", "cloud.fill", "moon.fill", "sun.max.fill", "snowflake",
+        "wind", "sparkles", "camera.fill", "mic.fill", "bell.fill",
+        "tag.fill", "flag.fill", "pin.fill", "mappin", "globe"
+    ]
 
     init() {}
     var body: some View {
