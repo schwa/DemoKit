@@ -14,42 +14,79 @@ struct HasDemoConfigurationPreferenceKey: PreferenceKey {
 
 private struct DemoConfigurationModifier<Configuration: View>: ViewModifier {
     @ViewBuilder let configuration: () -> Configuration
+
+    @Environment(\.demoKitConfiguration)
+    private var demoKitConfiguration: DemoKitConfiguration
+
     @AppStorage("showDemoConfiguration")
     private var showConfiguration = false
+
+    private var effectiveUseInspector: Bool {
+        #if os(visionOS)
+        return false
+        #else
+        return demoKitConfiguration.useInspector
+        #endif
+    }
 
     func body(content: Content) -> some View {
         content
             .preference(key: HasDemoConfigurationPreferenceKey.self, value: true)
-            #if os(macOS)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay(alignment: .bottom) {
-                if showConfiguration {
-                    configuration()
-                        .padding()
-                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
-                        .padding()
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+            .modifier(ConfigurationPresentation(showConfiguration: $showConfiguration, useInspector: effectiveUseInspector, configuration: configuration))
+    }
+}
+
+private struct ConfigurationPresentation<Configuration: View>: ViewModifier {
+    @Binding var showConfiguration: Bool
+    let useInspector: Bool
+    @ViewBuilder let configuration: () -> Configuration
+
+    func body(content: Content) -> some View {
+        if useInspector {
+            #if !os(visionOS)
+            content
+                .inspector(isPresented: $showConfiguration) {
+                    ScrollView {
+                        configuration()
+                            .padding()
+                    }
+                    .inspectorColumnWidth(min: 200, ideal: 300, max: 400)
                 }
-            }
-            .animation(.default, value: showConfiguration)
+            #endif
+        } else {
+            #if os(macOS)
+            content
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .bottom) {
+                    if showConfiguration {
+                        configuration()
+                            .padding()
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+                            .padding()
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                }
+                .animation(.default, value: showConfiguration)
             #else
-            .sheet(isPresented: $showConfiguration) {
-                NavigationStack {
-                    configuration()
-                        .padding()
-                        .navigationTitle("Configuration")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Done") {
-                                    showConfiguration = false
+            content
+                .sheet(isPresented: $showConfiguration) {
+                    NavigationStack {
+                        configuration()
+                            .padding()
+                            .navigationTitle("Configuration")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Done") {
+                                        showConfiguration = false
+                                    }
                                 }
                             }
-                        }
+                    }
+                    .presentationDetents([.medium, .large])
                 }
-                .presentationDetents([.medium, .large])
-            }
             #endif
+        }
     }
 }
 

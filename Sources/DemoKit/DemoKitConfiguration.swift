@@ -17,18 +17,24 @@ public struct DemoKitConfiguration: Sendable {
     /// Whether to use demo-specified colors for sidebar labels.
     public var showColors: Bool
 
+    /// Whether to use `.inspector` for configuration and description panels
+    /// instead of overlays. Has no effect on visionOS where inspector is unavailable.
+    public var useInspector: Bool
+
     public init(
         showKeywordTags: Bool = true,
         showDescriptions: Bool = true,
         showIcons: Bool = true,
         showPinButton: Bool = true,
-        showColors: Bool = true
+        showColors: Bool = true,
+        useInspector: Bool = true
     ) {
         self.showKeywordTags = showKeywordTags
         self.showDescriptions = showDescriptions
         self.showIcons = showIcons
         self.showPinButton = showPinButton
         self.showColors = showColors
+        self.useInspector = useInspector
     }
 }
 
