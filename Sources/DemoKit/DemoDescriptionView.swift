@@ -26,10 +26,9 @@ struct DemoDescriptionContainer<Content: View>: View {
                                     .font(.title3)
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
+                            .padding()
                     }
-                    .frame(maxHeight: 300)
+                    .frame(maxWidth: 600, maxHeight: 300)
                     .fixedSize(horizontal: false, vertical: true)
                     .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 10))
                     .padding()
