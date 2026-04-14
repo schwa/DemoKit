@@ -52,12 +52,34 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
         groupedElements[nil] ?? []
     }
 
+    @State
+    private var configurationStore = DemoConfigurationStore()
+
+    @State
+    private var hasConfiguration = false
+
+    @AppStorage("showDemoConfiguration")
+    private var showConfiguration = false
+
+    private var effectiveUseInspector: Bool {
+        #if os(visionOS)
+        return false
+        #else
+        return configuration.useInspector
+        #endif
+    }
+
     var body: some View {
         NavigationSplitView {
             demoList
         } detail: {
             detailView
         }
+        .modifier(InspectorAttachment(
+            showConfiguration: $showConfiguration,
+            useInspector: effectiveUseInspector && hasConfiguration,
+            store: configurationStore
+        ))
         .onChange(of: viewModel.selection) { oldValue, newValue in
             guard oldValue != newValue else { return }
             viewModel.selectionDidChange()
@@ -144,10 +166,31 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
                 Color.clear
                 DemoDescriptionContainer(
                     metadata: element.metadata,
-                    content: DemoConfigurationContainer(content: demoView)
+                    content: demoView
                 )
             }
             .clipped()
+            .environment(configurationStore)
+            .onPreferenceChange(HasDemoConfigurationPreferenceKey.self) { value in
+                hasConfiguration = value
+                if !value {
+                    showConfiguration = false
+                    configurationStore.content = nil
+                }
+            }
+            .toolbar {
+                if hasConfiguration {
+                    ToolbarItem(placement: .automatic) {
+                        Button {
+                            showConfiguration.toggle()
+                        } label: {
+                            Label("Configuration", systemImage: "gear")
+                        }
+                        .help("Toggle configuration panel")
+                        .accessibilityIdentifier("toggle-configuration")
+                    }
+                }
+            }
             .id(id)
             .navigationTitle("\(element.metadata.name)")
             .onChange(of: viewModel.screenshotRequested) { _, requested in
@@ -289,6 +332,33 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
             } label: {
                 Label("Unhide All Demos (\(viewModel.hiddenDemoIDs.count))", systemImage: "eye")
             }
+        }
+    }
+}
+
+private struct InspectorAttachment: ViewModifier {
+    @Binding var showConfiguration: Bool
+    let useInspector: Bool
+    let store: DemoConfigurationStore
+
+    func body(content: Content) -> some View {
+        if useInspector {
+            #if !os(visionOS)
+            content
+                .inspector(isPresented: $showConfiguration) {
+                    Form {
+                        if let configContent = store.content {
+                            configContent
+                        }
+                    }
+                    .formStyle(.grouped)
+                    .inspectorColumnWidth(min: 200, ideal: 300, max: 400)
+                }
+            #else
+            content
+            #endif
+        } else {
+            content
         }
     }
 }
