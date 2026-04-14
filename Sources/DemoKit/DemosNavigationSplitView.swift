@@ -351,7 +351,7 @@ private struct InspectorAttachment: ViewModifier {
                             configContent
                         }
                     }
-                    .inspectorColumnWidth(min: 200, ideal: 300, max: 400)
+                    .inspectorColumnWidth(min: 200, ideal: 300, max: 1_200)
                 }
             #else
             content
