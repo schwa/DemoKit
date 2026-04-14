@@ -64,7 +64,6 @@ private struct ConfigurationOverlayPresentation<Configuration: View>: ViewModifi
     func body(content: Content) -> some View {
         #if os(macOS)
         content
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .bottom) {
                 if showConfiguration {
                     configuration()

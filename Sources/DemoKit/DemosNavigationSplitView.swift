@@ -346,12 +346,11 @@ private struct InspectorAttachment: ViewModifier {
             #if !os(visionOS)
             content
                 .inspector(isPresented: $showConfiguration) {
-                    Form {
+                    Group {
                         if let configContent = store.content {
                             configContent
                         }
                     }
-                    .formStyle(.grouped)
                     .inspectorColumnWidth(min: 200, ideal: 300, max: 400)
                 }
             #else
