@@ -206,7 +206,13 @@ public final class DemoPickerViewModel {
 
     // MARK: - URL Handling
 
-    /// URL scheme: `<scheme>://demo/<id>`, `<scheme>://next`, `<scheme>://previous`, `<scheme>://screenshot`, `<scheme>://screenshot/<id>`
+    /// URL scheme:
+    /// - `<scheme>://demo/<id>`
+    /// - `<scheme>://next`
+    /// - `<scheme>://previous`
+    /// - `<scheme>://screenshot` or `<scheme>://screenshot/<id>`
+    /// - `<scheme>://configuration/show|hide|toggle`
+    /// - `<scheme>://description/show|hide|toggle`
     func handleURL(_ url: URL, urlScheme: String?) {
         guard let urlScheme else { return }
         guard url.scheme == urlScheme else { return }
@@ -229,8 +235,28 @@ public final class DemoPickerViewModel {
         case "screenshot":
             screenshotRequested = true
 
+        case "configuration", "config":
+            setVisibility(key: "showDemoConfiguration", action: path)
+
+        case "description":
+            setVisibility(key: "showDemoDescription", action: path)
+
         default:
             logger?.warning("Unknown URL action: \(host)")
+        }
+    }
+
+    private func setVisibility(key: String, action: String) {
+        let defaults = UserDefaults.standard
+        switch action {
+        case "show":
+            defaults.set(true, forKey: key)
+        case "hide":
+            defaults.set(false, forKey: key)
+        case "toggle", "":
+            defaults.set(!defaults.bool(forKey: key), forKey: key)
+        default:
+            logger?.warning("Unknown visibility action: \(action) for \(key)")
         }
     }
 
