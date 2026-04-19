@@ -251,10 +251,13 @@ public final class DemoPickerViewModel {
         switch action {
         case "show":
             defaults.set(true, forKey: key)
+
         case "hide":
             defaults.set(false, forKey: key)
+
         case "toggle", "":
             defaults.set(!defaults.bool(forKey: key), forKey: key)
+
         default:
             logger?.warning("Unknown visibility action: \(action) for \(key)")
         }
