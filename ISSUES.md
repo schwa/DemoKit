@@ -1,20 +1,30 @@
+# ISSUES.md
+
+---
+
 ## 1: No View menu item to toggle sidebar
+
++++
 status: new
 priority: low
 kind: none
 created: 2026-04-02T21:10:22Z
++++
 
 NavigationSplitView in DemosNavigationSplitView doesn't expose a View > Hide/Show Sidebar menu item. The toolbar button exists but there's no menu equivalent, making it inaccessible to automation tools like steveo.
 
 ---
 
 ## 2: Add Demos menu for navigating between demos
+
++++
 status: closed
 priority: low
 kind: none
 created: 2026-04-02T21:10:31Z
 updated: 2026-04-03T00:24:23Z
 closed: 2026-04-03T00:24:23Z
++++
 
 The MetalSprocketsExamples app has a Demos menu defined in the app target, but DemoKit itself should provide this as a built-in feature. DemoPickerView/DemoPickerScene should automatically populate a Demos menu with all registered demos, enabling keyboard/menu-driven navigation and automation.
 
@@ -23,23 +33,29 @@ The MetalSprocketsExamples app has a Demos menu defined in the app target, but D
 ---
 
 ## 3: Show description over the demo view
+
++++
 status: closed
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:38Z
 updated: 2026-04-03T22:13:19Z
 closed: 2026-04-03T22:13:19Z
++++
 
 - `2026-04-03T22:13:19Z`: Description overlay implemented in DemoDescriptionContainer with toggle via toolbar button and Cmd+I.
 
 ---
 
 ## 4: Isolate demos from view
+
++++
 status: new
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:41Z
 updated: 2026-04-02T23:15:27Z
++++
 
 Separate the concept of a Demo from its View representation.
 
@@ -55,24 +71,30 @@ Key decisions:
 ---
 
 ## 5: Add long descriptions and short descriptions
+
++++
 status: closed
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:43Z
 updated: 2026-04-03T22:13:19Z
 closed: 2026-04-03T22:13:19Z
++++
 
 - `2026-04-03T22:13:19Z`: DemoMetadata supports both description and longDescription. Both rendered in sidebar and description overlay with Markdown support.
 
 ---
 
 ## 6: Add common places for demos to put configuration
+
++++
 status: closed
 priority: medium
 kind: feature
 created: 2026-04-02T22:55:45Z
 updated: 2026-04-02T23:31:29Z
 closed: 2026-04-02T23:31:29Z
++++
 
 Provide a standard configuration view slot for demos.
 
@@ -89,21 +111,26 @@ Key decisions:
 ---
 
 ## 7: Automatically generate a screenshot from a demo
+
++++
 status: new
 priority: low
 kind: none
 created: 2026-04-02T23:02:37Z
-
++++
 
 ---
 
 ## 8: Persist configuration panel visibility in @AppStorage
+
++++
 status: closed
 priority: medium
 kind: enhancement
 created: 2026-04-03T00:03:52Z
 updated: 2026-04-03T00:05:08Z
 closed: 2026-04-03T00:05:08Z
++++
 
 The show/hide state of the configuration overlay should be saved in @AppStorage so it persists across app launches.
 
@@ -112,33 +139,41 @@ The show/hide state of the configuration overlay should be saved in @AppStorage 
 ---
 
 ## 9: Tags should be tappable to filter the view
+
++++
 status: new
 priority: medium
 kind: none
 created: 2026-04-03T00:50:04Z
++++
 
 Tags displayed in the UI should be tappable. Tapping a tag filters the view to show only items with that tag. Need a clear/reset filter mechanism (e.g. a clear button or tapping the active tag again to deselect).
 
 ---
 
 ## 10: demoConfiguration view doesn't update when state changes — replace preference-based approach
+
++++
 status: closed
 priority: critical
 kind: bug
 created: 2026-04-03T02:20:16Z
 updated: 2026-04-03T03:29:10Z
 closed: 2026-04-03T03:29:10Z
-
++++
 
 ---
 
 ## 11: URL scheme navigation not working
+
++++
 status: closed
 priority: medium
 kind: bug
 created: 2026-04-03T06:10:32Z
 updated: 2026-04-03T22:09:36Z
 closed: 2026-04-03T22:09:36Z
++++
 
 Opening URLs like `metalsprockets-examples://GameOfLife` or `metalsprockets-examples://demo/Game%20of%20Life` does not navigate to the demo. The `handleURL` method in `DemoPickerViewModel` parses the URL correctly but the demo selection doesn't change. May be related to the URL scheme only being set via environment on the Scene, or a mismatch between URL host and demo IDs (which are kebab-cased). Needs investigation.
 
@@ -147,12 +182,15 @@ Opening URLs like `metalsprockets-examples://GameOfLife` or `metalsprockets-exam
 ---
 
 ## 12: kebabCase produces double hyphens for names with spaces and capitals
+
++++
 status: closed
 priority: medium
 kind: bug
 created: 2026-04-03T06:19:06Z
 updated: 2026-04-03T21:59:15Z
 closed: 2026-04-03T21:59:15Z
++++
 
 The `kebabCase` function replaces spaces with hyphens first, then inserts hyphens before uppercase letters, producing double hyphens. For example `"Game of Life"` becomes `"game-of--life"` instead of `"game-of-life"`. The fix should deduplicate consecutive hyphens after all replacements.
 
@@ -161,6 +199,8 @@ The `kebabCase` function replaces spaces with hyphens first, then inserts hyphen
 ---
 
 ## 13: Accessibility audit: Main window
+
++++
 status: closed
 priority: medium
 kind: task
@@ -168,6 +208,7 @@ labels: accessibility
 created: 2026-04-03T21:02:29Z
 updated: 2026-04-03T21:26:33Z
 closed: 2026-04-03T21:26:33Z
++++
 
 ## Accessibility Issues — Main Window
 
@@ -206,6 +247,8 @@ closed: 2026-04-03T21:26:33Z
 ---
 
 ## 14: Allow calling app to control sidebar visual options (tags, descriptions, etc.)
+
++++
 status: closed
 priority: low
 kind: feature
@@ -213,6 +256,7 @@ labels: api, sidebar
 created: 2026-04-03T21:36:01Z
 updated: 2026-04-03T21:37:55Z
 closed: 2026-04-03T21:37:55Z
++++
 
 The calling app should be able to control which visual elements appear in the sidebar — e.g. whether keyword tags, descriptions, or icons are shown.
 
@@ -262,6 +306,8 @@ Option 1 (single config struct via environment) is cleanest. It is a single type
 ---
 
 ## 15: Support clickable links in demo descriptions
+
++++
 status: closed
 priority: low
 kind: feature
@@ -269,6 +315,7 @@ labels: ui
 created: 2026-04-03T21:36:50Z
 updated: 2026-04-03T21:39:34Z
 closed: 2026-04-03T21:39:34Z
++++
 
 Demo descriptions and long descriptions already use `LocalizedStringKey` (which supports Markdown), but links in the description overlay and sidebar are not interactive.
 
@@ -290,6 +337,8 @@ Needs:
 ---
 
 ## 16: Ensure demos are properly torn down when navigating away
+
++++
 status: closed
 priority: medium
 kind: task
@@ -297,6 +346,7 @@ labels: lifecycle, reliability
 created: 2026-04-03T21:38:19Z
 updated: 2026-04-03T21:38:55Z
 closed: 2026-04-03T21:38:55Z
++++
 
 When switching between demos in the sidebar, the previously selected demo should be fully torn down. Currently demos that use timers, animations, or other ongoing resources may continue running in the background after navigating away.
 
@@ -318,11 +368,14 @@ When switching between demos in the sidebar, the previously selected demo should
 ---
 
 ## 17: Decide iOS screenshot destination
+
++++
 status: new
 priority: low
 kind: task
 labels: ios, screenshot
 created: 2026-04-03T22:25:03Z
++++
 
 The `screenshot` URL action saves to `/tmp` on macOS and reveals via `NSWorkspace`. On iOS we need to decide where screenshots go.
 
@@ -337,11 +390,14 @@ Defer until iOS support is actively needed.
 ---
 
 ## 18: Screenshot URL action: configurable width, height, scale, destination, and format
+
++++
 status: new
 priority: low
 kind: feature
 labels: screenshot, url
 created: 2026-04-03T22:28:33Z
++++
 
 The `x-demo://screenshot` action currently hardcodes 800×600, 2x scale, PNG format, and saves to the temp directory. These should be configurable via query parameters:
 
@@ -362,10 +418,13 @@ x-demo://screenshot?width=400&height=300&format=jpg
 ---
 
 ## 19: URL scheme: demo/<id> navigation doesn't work, next/previous do
+
++++
 status: new
 priority: high
 kind: bug
 created: 2026-04-03T23:11:20Z
++++
 
 When using `DemoPickerScene` with `.handleDemoURL(scheme:)`, the `next` and `previous` URL actions work correctly (window title changes to the new demo), but `demo/<id>` does nothing — the window stays on the current demo.
 
@@ -388,3 +447,39 @@ Previously the app used `Window` + `DemoPickerView` + `.handleDemoURL` on the vi
 
 ---
 
+## 20: Configuration panel is a dead snapshot: every demo's controls are frozen in inspector mode
+
++++
+status: new
+priority: critical
+kind: bug
+labels: effort:m
+created: 2026-08-09T18:13:28Z
+updated: 2026-08-09T18:13:33Z
++++
+
+Every interactive control in every demo's configuration panel is non-functional in inspector mode. Sliders spring back, labels never update, toggles will not reflect their state. This is the whole point of the panel, and it is broken for all consumers.
+
+Cause, DemoConfigurationView.swift:44-49:
+
+    content
+        .preference(key: HasDemoConfigurationPreferenceKey.self, value: true)
+        .onAppear {
+            store?.content = AnyView(configuration())   // captured once, never refreshed
+        }
+
+The configuration content is snapshotted into an AnyView exactly once, in onAppear, and the inspector renders that dead value forever. Nothing reassigns store.content afterwards, so the panel never re-evaluates. Consequences:
+
+- Text("Voxel Size: \(voxelSize.width)") is baked into the snapshot as a literal string. It reads 32 forever while the real state is 512.
+- A Slider bound with $state writes through fine, but its thumb never redraws, so it appears to snap back to its starting position.
+- Worse, and much harder to diagnose: any computed Binding in a demo captures self into that escaping snapshot. Writes go through the @State box while reads come from a frozen by-value copy. In MetalSprocketsExamples#389 an instrumented build showed the setter's own read-back going 32 -> 256 -> 512 while 620 consecutive getter calls returned 32. That is a silent, split-brain state bug, and DemoKit is what turns an otherwise ordinary SwiftUI pattern into one.
+
+Verified against a running MetalSprockets-Examples build with steveo: drag a slider, screenshot-diff the window. The 3D viewport changes; the panel region is pixel-identical. Reproduced on both the Voxel demo and Particle Effects, so it is not demo-specific.
+
+Overlay/sheet mode (ConfigurationOverlayPresentation) is fine — it calls configuration() inline, which re-evaluates normally. Only the inspector path snapshots.
+
+Fix direction: the panel content has to be re-evaluated on every body pass rather than captured once. Carrying the view through a PreferenceKey (values are recomputed each pass) rather than assigning to an @Observable store from onAppear is the idiomatic option; storing a closure and calling it at render time is not enough on its own, because the closure still captures a single generation of the demo view.
+
+Whatever the fix, it is worth a regression test: a demo with a @State-backed slider, driven programmatically, asserting the rendered panel reflects the new value.
+
+---
