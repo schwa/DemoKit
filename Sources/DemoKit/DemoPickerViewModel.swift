@@ -198,10 +198,35 @@ public final class DemoPickerViewModel {
 
     func findDemoID(_ demoID: String) -> DemoMetadata.ID? {
         let allMetadata = demos.map { $0.metadata }
-        return allMetadata.first { $0.id.rawValue == demoID }?.id
-            ?? allMetadata.first { $0.id.rawValue == DemoMetadata.kebabCase(demoID) }?.id
-            ?? allMetadata.first { $0.id.rawValue.lowercased() == demoID.lowercased() }?.id
-            ?? allMetadata.first { $0.name.lowercased().replacingOccurrences(of: " ", with: "") == demoID.lowercased().replacingOccurrences(of: " ", with: "") }?.id
+        if let exact = allMetadata.first(where: { $0.id.rawValue == demoID })?.id
+            ?? allMetadata.first(where: { $0.id.rawValue == DemoMetadata.kebabCase(demoID) })?.id
+            ?? allMetadata.first(where: { $0.id.rawValue.lowercased() == demoID.lowercased() })?.id
+            ?? allMetadata.first(where: { Self.squashed($0.name) == Self.squashed(demoID) })?.id {
+            return exact
+        }
+        return uniquePartialMatch(for: demoID, in: allMetadata)
+    }
+
+    /// Matches a partial ID such as `grass` against `grass-sphere`, but only when exactly one demo matches.
+    private func uniquePartialMatch(for demoID: String, in allMetadata: [DemoMetadata]) -> DemoMetadata.ID? {
+        let needle = Self.squashed(demoID)
+        guard !needle.isEmpty else { return nil }
+
+        let matches = allMetadata.filter { metadata in
+            Self.squashed(metadata.id.rawValue).contains(needle) || Self.squashed(metadata.name).contains(needle)
+        }
+        guard let match = matches.first, matches.count == 1 else {
+            if matches.count > 1 {
+                let names = matches.map(\.id.rawValue).joined(separator: ", ")
+                logger?.warning("Demo ID '\(demoID)' is ambiguous, matches: \(names)")
+            }
+            return nil
+        }
+        return match.id
+    }
+
+    private static func squashed(_ string: String) -> String {
+        string.lowercased().filter { $0.isLetter || $0.isNumber }
     }
 
     // MARK: - URL Handling
@@ -265,7 +290,9 @@ public final class DemoPickerViewModel {
 
     private func navigateToDemo(_ demoID: String) {
         guard let matched = findDemoID(demoID) else {
-            logger?.warning("Demo with ID '\(demoID)' not found in \(self.demos.count) available demos")
+            // swiftlint:disable:next prefer_key_path
+            let known = demos.map { $0.metadata.id.rawValue }.joined(separator: ", ")
+            logger?.warning("Demo with ID '\(demoID)' not found. Known demo IDs: \(known)")
             return
         }
         logger?.info("URL navigated to demo: \(matched.rawValue)")

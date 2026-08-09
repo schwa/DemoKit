@@ -435,12 +435,13 @@ x-demo://screenshot?width=400&height=300&format=jpg
 ## 19: URL scheme: demo/<id> navigation doesn't work, next/previous do
 
 +++
-status: open
+status: closed
 priority: high
 kind: bug
 labels: url, effort:m
 created: 2026-04-03T23:11:20Z
-updated: 2026-08-09T18:15:16Z
+updated: 2026-08-09T18:36:54Z
+closed: 2026-08-09T18:36:54Z
 +++
 
 When using `DemoPickerScene` with `.handleDemoURL(scheme:)`, the `next` and `previous` URL actions work correctly (window title changes to the new demo), but `demo/<id>` does nothing — the window stays on the current demo.
@@ -461,6 +462,8 @@ DemoPickerScene(demos: allDemos)
 Demo metadata has `name: "Grass Sphere"` (no explicit `id:`), so DemoKit should derive the ID. The README says IDs are matched loosely (exact, kebab-case, case-insensitive, whitespace-stripped). None of the obvious variants work.
 
 Previously the app used `Window` + `DemoPickerView` + `.handleDemoURL` on the view (instead of on `DemoPickerScene`) — that also didn't work for direct navigation.
+
+- `2026-08-09T18:36:54Z`: Could not reproduce as a hard failure: demo/<id> navigation works end-to-end (verified with the Demo app, x-demo://demo/pulse and x-demo://demo/symbols both switch demos). The reported URLs failed because 'grass' does not match the derived id 'grass-sphere' — the loose matcher only handled exact/kebab/case/whitespace variants. Added a unique partial-match fallback (a substring that matches exactly one demo now resolves, ambiguous ones are ignored and logged), and the not-found warning now lists all known demo IDs.
 
 ---
 
