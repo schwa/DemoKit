@@ -221,7 +221,28 @@ DemoPickerScene(demos: demos)
 | `x-demo://previous` | Select the previous demo |
 | `x-demo://screenshot` | Take a screenshot of the current demo |
 
-Demo IDs are matched loosely: exact match, kebab-case conversion, case-insensitive, and whitespace-stripped name matching are all tried.
+Demo IDs are matched loosely: exact match, kebab-case conversion, case-insensitive, and whitespace-stripped name matching are all tried. If none of those hit, a substring match is used when it identifies exactly one demo (`grass` finds `grass-sphere`); ambiguous matches are ignored.
+
+#### Screenshot Parameters
+
+`x-demo://screenshot` accepts query parameters:
+
+| Parameter | Default | Notes |
+|-----------|---------|-------|
+| `width` | `800` | Render width in points |
+| `height` | `600` | Render height in points |
+| `scale` | `2` | Rendering scale factor |
+| `format` | `png` | `png` or `jpg` (`jpeg` accepted) |
+| `destination` | temp directory | A file path, or a directory to write a generated filename into |
+| `reveal` | `true` | Reveal the file in Finder (macOS) |
+| `background` | `white` | A named colour (`black`, `clear`, …) or a hex value such as `%23FF8000` |
+
+```bash
+open "x-demo://screenshot?width=1200&height=800&scale=3&format=jpg"
+open "x-demo://screenshot?destination=~/Desktop&reveal=false&background=clear"
+```
+
+Sandboxed apps can only write where their entitlements allow; failures are logged.
 
 ### Testing from the Terminal
 

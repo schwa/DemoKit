@@ -410,12 +410,13 @@ Defer until iOS support is actively needed.
 ## 18: Screenshot URL action: configurable width, height, scale, destination, and format
 
 +++
-status: open
+status: closed
 priority: low
 kind: feature
 labels: screenshot, url, effort:m
 created: 2026-04-03T22:28:33Z
-updated: 2026-08-09T18:15:21Z
+updated: 2026-08-09T18:50:23Z
+closed: 2026-08-09T18:50:23Z
 +++
 
 The `x-demo://screenshot` action currently hardcodes 800×600, 2x scale, PNG format, and saves to the temp directory. These should be configurable via query parameters:
@@ -435,6 +436,7 @@ x-demo://screenshot?width=400&height=300&format=jpg
 - `background` — background color, e.g. `white`, `black`, `clear` (default: white)
 
 - `2026-08-09T18:15:21Z`: Related: #7 (automatic screenshot generation), #17 (iOS destination).
+- `2026-08-09T18:50:23Z`: Implemented: screenshot URL action now takes width, height, scale, format (png/jpg), destination (file or directory, ~ expanded), reveal, and background (named colours or hex). Parsing lives in ScreenshotOptions with unit tests; verified end-to-end with the Demo app (400x300 scale-1 JPEG on black, reveal disabled). Note: sandboxed apps can only write where entitlements allow — out-of-container destinations fail and are logged. README updated.
 
 ---
 

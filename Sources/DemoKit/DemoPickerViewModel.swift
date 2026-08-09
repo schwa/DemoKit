@@ -6,7 +6,7 @@ import SwiftUI
 public final class DemoPickerViewModel {
     public let demos: [any DemoView.Type]
     public var selection: DemoMetadata.ID?
-    public var screenshotRequested = false
+    public var screenshotRequest: ScreenshotOptions?
     public var pinnedDemoIDs: Set<DemoMetadata.ID> = []
     public var hiddenDemoIDs: Set<DemoMetadata.ID> = []
 
@@ -235,7 +235,8 @@ public final class DemoPickerViewModel {
     /// - `<scheme>://demo/<id>`
     /// - `<scheme>://next`
     /// - `<scheme>://previous`
-    /// - `<scheme>://screenshot` or `<scheme>://screenshot/<id>`
+    /// - `<scheme>://screenshot` or `<scheme>://screenshot?width=1200&height=800&scale=3&format=jpg`
+    ///   (also `destination`, `reveal`, `background`)
     /// - `<scheme>://configuration/show|hide|toggle`
     /// - `<scheme>://description/show|hide|toggle`
     func handleURL(_ url: URL, urlScheme: String?) {
@@ -258,7 +259,7 @@ public final class DemoPickerViewModel {
             selectPreviousDemo()
 
         case "screenshot":
-            screenshotRequested = true
+            screenshotRequest = ScreenshotOptions.parse(from: url)
 
         case "configuration", "config":
             setVisibility(key: "showDemoConfiguration", action: path)
