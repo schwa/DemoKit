@@ -5,10 +5,12 @@
 ## 1: No View menu item to toggle sidebar
 
 +++
-status: new
+status: open
 priority: low
-kind: none
+kind: enhancement
+labels: effort:xs
 created: 2026-04-02T21:10:22Z
+updated: 2026-08-09T18:15:16Z
 +++
 
 NavigationSplitView in DemosNavigationSplitView doesn't expose a View > Hide/Show Sidebar menu item. The toolbar button exists but there's no menu equivalent, making it inaccessible to automation tools like steveo.
@@ -50,11 +52,12 @@ closed: 2026-04-03T22:13:19Z
 ## 4: Isolate demos from view
 
 +++
-status: new
+status: open
 priority: medium
 kind: feature
+labels: effort:xl
 created: 2026-04-02T22:55:41Z
-updated: 2026-04-02T23:15:27Z
+updated: 2026-08-09T18:15:16Z
 +++
 
 Separate the concept of a Demo from its View representation.
@@ -115,9 +118,13 @@ Key decisions:
 +++
 status: new
 priority: low
-kind: none
+kind: feature
+labels: effort:m, needs-info
 created: 2026-04-02T23:02:37Z
+updated: 2026-08-09T18:15:21Z
 +++
+
+- `2026-08-09T18:15:21Z`: Related: #18 (screenshot URL action options) and #17 (iOS destination). Needs info: unclear whether this means automatic capture at build/CI time, or just a UI action.
 
 ---
 
@@ -141,10 +148,12 @@ The show/hide state of the configuration overlay should be saved in @AppStorage 
 ## 9: Tags should be tappable to filter the view
 
 +++
-status: new
+status: open
 priority: medium
-kind: none
+kind: enhancement
+labels: effort:m
 created: 2026-04-03T00:50:04Z
+updated: 2026-08-09T18:15:16Z
 +++
 
 Tags displayed in the UI should be tappable. Tapping a tag filters the view to show only items with that tag. Need a clear/reset filter mechanism (e.g. a clear button or tapping the active tag again to deselect).
@@ -370,11 +379,12 @@ When switching between demos in the sidebar, the previously selected demo should
 ## 17: Decide iOS screenshot destination
 
 +++
-status: new
+status: open
 priority: low
 kind: task
-labels: ios, screenshot
+labels: ios, screenshot, effort:s
 created: 2026-04-03T22:25:03Z
+updated: 2026-08-09T18:15:21Z
 +++
 
 The `screenshot` URL action saves to `/tmp` on macOS and reveals via `NSWorkspace`. On iOS we need to decide where screenshots go.
@@ -387,16 +397,19 @@ Options:
 
 Defer until iOS support is actively needed.
 
+- `2026-08-09T18:15:21Z`: Related: #18 (screenshot URL parameters incl. destination).
+
 ---
 
 ## 18: Screenshot URL action: configurable width, height, scale, destination, and format
 
 +++
-status: new
+status: open
 priority: low
 kind: feature
-labels: screenshot, url
+labels: screenshot, url, effort:m
 created: 2026-04-03T22:28:33Z
+updated: 2026-08-09T18:15:21Z
 +++
 
 The `x-demo://screenshot` action currently hardcodes 800×600, 2x scale, PNG format, and saves to the temp directory. These should be configurable via query parameters:
@@ -415,15 +428,19 @@ x-demo://screenshot?width=400&height=300&format=jpg
 - `reveal` — whether to reveal in Finder, `true`/`false` (default: true on macOS)
 - `background` — background color, e.g. `white`, `black`, `clear` (default: white)
 
+- `2026-08-09T18:15:21Z`: Related: #7 (automatic screenshot generation), #17 (iOS destination).
+
 ---
 
 ## 19: URL scheme: demo/<id> navigation doesn't work, next/previous do
 
 +++
-status: new
+status: open
 priority: high
 kind: bug
+labels: url, effort:m
 created: 2026-04-03T23:11:20Z
+updated: 2026-08-09T18:15:16Z
 +++
 
 When using `DemoPickerScene` with `.handleDemoURL(scheme:)`, the `next` and `previous` URL actions work correctly (window title changes to the new demo), but `demo/<id>` does nothing — the window stays on the current demo.
@@ -450,12 +467,12 @@ Previously the app used `Window` + `DemoPickerView` + `.handleDemoURL` on the vi
 ## 20: Configuration panel is a dead snapshot: every demo's controls are frozen in inspector mode
 
 +++
-status: new
+status: open
 priority: critical
 kind: bug
 labels: effort:m
 created: 2026-08-09T18:13:28Z
-updated: 2026-08-09T18:13:33Z
+updated: 2026-08-09T18:15:16Z
 +++
 
 Every interactive control in every demo's configuration panel is non-functional in inspector mode. Sliders spring back, labels never update, toggles will not reflect their state. This is the whole point of the panel, and it is broken for all consumers.
