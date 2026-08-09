@@ -467,12 +467,13 @@ Previously the app used `Window` + `DemoPickerView` + `.handleDemoURL` on the vi
 ## 20: Configuration panel is a dead snapshot: every demo's controls are frozen in inspector mode
 
 +++
-status: open
+status: closed
 priority: critical
 kind: bug
 labels: effort:m
 created: 2026-08-09T18:13:28Z
-updated: 2026-08-09T18:15:16Z
+updated: 2026-08-09T18:27:35Z
+closed: 2026-08-09T18:27:35Z
 +++
 
 Every interactive control in every demo's configuration panel is non-functional in inspector mode. Sliders spring back, labels never update, toggles will not reflect their state. This is the whole point of the panel, and it is broken for all consumers.
@@ -498,5 +499,7 @@ Overlay/sheet mode (ConfigurationOverlayPresentation) is fine — it calls confi
 Fix direction: the panel content has to be re-evaluated on every body pass rather than captured once. Carrying the view through a PreferenceKey (values are recomputed each pass) rather than assigning to an @Observable store from onAppear is the idiomatic option; storing a closure and calling it at render time is not enough on its own, because the closure still captures a single generation of the demo view.
 
 Whatever the fix, it is worth a regression test: a demo with a @State-backed slider, driven programmatically, asserting the rendered panel reflects the new value.
+
+- `2026-08-09T18:27:35Z`: Fixed by presenting the inspector inline via a new ConfigurationInspectorPresentation modifier; DemoConfigurationStore removed. No unit test: the failure is only observable in rendered SwiftUI inspector output and is not reachable from a unit test. Verified manually with steveo against the Demo app (State Test demo): incrementing the counter in the main view now updates the inspector panel live (was frozen before).
 
 ---

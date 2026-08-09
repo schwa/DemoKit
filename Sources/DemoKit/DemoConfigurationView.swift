@@ -10,14 +10,6 @@ struct HasDemoConfigurationPreferenceKey: PreferenceKey {
     }
 }
 
-// MARK: - Observable store for passing configuration content up the view tree
-
-@Observable
-@MainActor
-final class DemoConfigurationStore {
-    var content: AnyView?
-}
-
 // MARK: - View Modifier (applied by demos via .demoConfiguration { ... })
 
 private struct DemoConfigurationModifier<Configuration: View>: ViewModifier {
@@ -25,9 +17,6 @@ private struct DemoConfigurationModifier<Configuration: View>: ViewModifier {
 
     @Environment(\.demoKitConfiguration)
     private var demoKitConfiguration: DemoKitConfiguration
-
-    @Environment(DemoConfigurationStore.self)
-    private var store: DemoConfigurationStore?
 
     @AppStorage("showDemoConfiguration")
     private var showConfiguration = false
@@ -43,15 +32,35 @@ private struct DemoConfigurationModifier<Configuration: View>: ViewModifier {
     func body(content: Content) -> some View {
         if effectiveUseInspector {
             content
+                .modifier(ConfigurationInspectorPresentation(showConfiguration: $showConfiguration, configuration: configuration))
                 .preference(key: HasDemoConfigurationPreferenceKey.self, value: true)
-                .onAppear {
-                    store?.content = AnyView(configuration())
-                }
         } else {
             content
                 .preference(key: HasDemoConfigurationPreferenceKey.self, value: true)
                 .modifier(ConfigurationOverlayPresentation(showConfiguration: $showConfiguration, configuration: configuration))
         }
+    }
+}
+
+// MARK: - Inspector presentation (inspector mode)
+
+// The inspector content is built inline so that it re-evaluates on every body
+// pass along with the demo it belongs to. Handing the content to the enclosing
+// split view (via a stored `AnyView`) instead freezes it at capture time.
+private struct ConfigurationInspectorPresentation<Configuration: View>: ViewModifier {
+    @Binding var showConfiguration: Bool
+    @ViewBuilder let configuration: () -> Configuration
+
+    func body(content: Content) -> some View {
+        #if os(visionOS)
+        content
+        #else
+        content
+            .inspector(isPresented: $showConfiguration) {
+                configuration()
+                    .inspectorColumnWidth(min: 200, ideal: 300, max: 1_200)
+            }
+        #endif
     }
 }
 
