@@ -390,7 +390,7 @@ priority: low
 kind: task
 labels: ios, screenshot, effort:s
 created: 2026-04-03T22:25:03Z
-updated: 2026-08-09T18:15:21Z
+updated: 2026-08-09T18:50:34Z
 +++
 
 The `screenshot` URL action saves to `/tmp` on macOS and reveals via `NSWorkspace`. On iOS we need to decide where screenshots go.
@@ -404,6 +404,7 @@ Options:
 Defer until iOS support is actively needed.
 
 - `2026-08-09T18:15:21Z`: Related: #18 (screenshot URL parameters incl. destination).
+- `2026-08-09T18:50:34Z`: Punting: this is a product decision (photo library vs documents dir vs share sheet vs pasteboard), not something the code can resolve, and the issue itself says to defer until iOS support is needed. Note that #18 has since landed a 'destination' parameter, so an iOS default just needs picking — tell me which of the four you want and it's a small change.
 
 ---
 
