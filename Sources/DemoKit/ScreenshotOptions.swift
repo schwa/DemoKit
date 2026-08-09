@@ -116,7 +116,7 @@ public struct ScreenshotOptions: Sendable, Equatable {
 
     private static func expandingTilde(_ path: String) -> String {
         guard path == "~" || path.hasPrefix("~/") else { return path }
-        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let home = NSHomeDirectory()
         return home + path.dropFirst(1)
     }
 
