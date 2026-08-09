@@ -13,6 +13,9 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
     @State
     private var hoveredID: DemoMetadata.ID?
 
+    @State
+    private var selectedKeyword: String?
+
     private var visibleElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
         viewModel.demos
             .map { (type: $0, metadata: $0.metadata) }
@@ -20,15 +23,19 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
     }
 
     private var filteredElements: [(type: any DemoView.Type, metadata: DemoMetadata)] {
-        guard !searchText.isEmpty else { return visibleElements }
+        guard !searchText.isEmpty || selectedKeyword != nil else { return visibleElements }
 
-        let searchLower = searchText.lowercased()
         return visibleElements.filter { element in
-            let metadata = element.metadata
-            return metadata.name.lowercased().contains(searchLower) ||
-                   (metadata.description?.lowercased().contains(searchLower) ?? false) ||
-                   (metadata.longDescription?.lowercased().contains(searchLower) ?? false) ||
-                   metadata.keywords.contains { $0.lowercased().contains(searchLower) }
+            DemoFilter.matches(element.metadata, searchText: searchText, keyword: selectedKeyword)
+        }
+    }
+
+    private func toggleKeywordFilter(_ keyword: String) {
+        if selectedKeyword?.caseInsensitiveCompare(keyword) == .orderedSame {
+            selectedKeyword = nil
+        }
+        else {
+            selectedKeyword = keyword
         }
     }
 
@@ -76,6 +83,9 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
         @Bindable var viewModel = viewModel
 
         List(selection: $viewModel.selection) {
+            if let selectedKeyword {
+                keywordFilterBanner(for: selectedKeyword)
+            }
             listContent
         }
         .id(searchText)
@@ -90,9 +100,37 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
         }
     }
 
+    private func keywordFilterBanner(for keyword: String) -> some View {
+        HStack {
+            Label("Filtered by \(keyword)", systemImage: "line.3.horizontal.decrease.circle")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Button("Clear") {
+                selectedKeyword = nil
+            }
+            .font(.caption)
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.accentColor)
+            .accessibilityIdentifier("clear-keyword-filter")
+        }
+        .selectionDisabled()
+    }
+
     @ViewBuilder
     private var listContent: some View {
-        if filteredElements.isEmpty, !searchText.isEmpty {
+        if filteredElements.isEmpty, selectedKeyword != nil {
+            ContentUnavailableView {
+                Label("No Matching Demos", systemImage: "line.3.horizontal.decrease.circle")
+            } description: {
+                Text("No demos match the current filter")
+            } actions: {
+                Button("Clear Filter") {
+                    selectedKeyword = nil
+                }
+            }
+        }
+        else if filteredElements.isEmpty, !searchText.isEmpty {
             ContentUnavailableView.search(text: searchText)
         }
         else if visibleElements.isEmpty, !viewModel.hiddenDemoIDs.isEmpty {
@@ -219,27 +257,33 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
             .applyLabelStyle(showIcons: configuration.showIcons)
     }
 
+    // Rows are plain content tagged for List selection rather than NavigationLinks: a link label
+    // swallows clicks, so keyword tags nested inside one could never be tapped.
     private func navigationLink(for metadata: DemoMetadata) -> some View {
         HStack {
-            NavigationLink(value: metadata.id) {
-                VStack(alignment: .leading) {
-                    ViewThatFits(in: .horizontal) {
-                        HStack {
-                            demoLabel(for: metadata)
-                            if configuration.showKeywordTags {
-                                KeywordsView(keywords: metadata.keywords)
+            VStack(alignment: .leading) {
+                ViewThatFits(in: .horizontal) {
+                    HStack {
+                        demoLabel(for: metadata)
+                        if configuration.showKeywordTags {
+                            KeywordsView(
+                                keywords: metadata.keywords,
+                                selectedKeyword: selectedKeyword
+                            ) { keyword in
+                                toggleKeywordFilter(keyword)
                             }
                         }
-                        demoLabel(for: metadata)
                     }
-                    if configuration.showDescriptions, let description = metadata.description {
-                        Text(LocalizedStringKey(description))
-                            .lineLimit(nil)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    demoLabel(for: metadata)
+                }
+                if configuration.showDescriptions, let description = metadata.description {
+                    Text(LocalizedStringKey(description))
+                        .lineLimit(nil)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
+            .contentShape(.rect)
 
             Spacer()
 
@@ -247,6 +291,7 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
                 pinButton(for: metadata)
             }
         }
+        .tag(metadata.id)
         .accessibilityIdentifier(metadata.id.rawValue)
         .onHover { isHovering in
             #if os(macOS)

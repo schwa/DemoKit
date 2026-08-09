@@ -148,15 +148,18 @@ The show/hide state of the configuration overlay should be saved in @AppStorage 
 ## 9: Tags should be tappable to filter the view
 
 +++
-status: open
+status: closed
 priority: medium
 kind: enhancement
 labels: effort:m
 created: 2026-04-03T00:50:04Z
-updated: 2026-08-09T18:15:16Z
+updated: 2026-08-09T18:43:33Z
+closed: 2026-08-09T18:43:33Z
 +++
 
 Tags displayed in the UI should be tappable. Tapping a tag filters the view to show only items with that tag. Need a clear/reset filter mechanism (e.g. a clear button or tapping the active tag again to deselect).
+
+- `2026-08-09T18:43:33Z`: Implemented: keyword tags in the sidebar are now buttons that filter the list to that keyword; tapping the active tag or the 'Clear' button in the filter banner resets it. Sidebar rows are now plain List rows tagged for selection instead of NavigationLinks, because a NavigationLink label swallows clicks and the tags could never be tapped inside one. Filtering logic extracted to DemoFilter and unit tested; the tap/selection behaviour verified manually with steveo.
 
 ---
 
