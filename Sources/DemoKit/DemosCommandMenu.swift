@@ -43,6 +43,11 @@ public struct DemosCommandMenu: Commands {
     public init() {}
 
     public var body: some Commands {
+        #if os(macOS)
+        // Adds View > Hide/Show Sidebar, which NavigationSplitView does not provide on its own.
+        SidebarCommands()
+        #endif
+
         CommandMenu("Demos") {
             if let viewModel {
                 navigationItems(viewModel: viewModel)

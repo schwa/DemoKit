@@ -5,15 +5,18 @@
 ## 1: No View menu item to toggle sidebar
 
 +++
-status: open
+status: closed
 priority: low
 kind: enhancement
 labels: effort:xs
 created: 2026-04-02T21:10:22Z
-updated: 2026-08-09T18:15:16Z
+updated: 2026-08-09T18:46:25Z
+closed: 2026-08-09T18:46:25Z
 +++
 
 NavigationSplitView in DemosNavigationSplitView doesn't expose a View > Hide/Show Sidebar menu item. The toolbar button exists but there's no menu equivalent, making it inaccessible to automation tools like steveo.
+
+- `2026-08-09T18:46:25Z`: Added SidebarCommands() to DemosCommandMenu, which supplies View > Show/Hide Sidebar on macOS. No unit test: this is menu-command wiring with no testable unit. Verified with steveo/System Events that the item exists and hides the sidebar.
 
 ---
 
