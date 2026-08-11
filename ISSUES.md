@@ -515,3 +515,20 @@ Whatever the fix, it is worth a regression test: a demo with a @State-backed sli
 - `2026-08-09T18:27:35Z`: Fixed by presenting the inspector inline via a new ConfigurationInspectorPresentation modifier; DemoConfigurationStore removed. No unit test: the failure is only observable in rendered SwiftUI inspector output and is not reachable from a unit test. Verified manually with steveo against the Demo app (State Test demo): incrementing the counter in the main view now updates the inspector panel live (was frozen before).
 
 ---
+
+## 21: Configuration inspector content underlaps the window toolbar
+
++++
+status: new
+priority: medium
+kind: bug
+created: 2026-08-11T18:46:47Z
++++
+
+In inspector mode (the macOS default), the panel presented by .demoConfiguration clips its first rows under the window's unified toolbar: the inspector's scroll content starts at the top edge of the window instead of below the toolbar, so the top of the form is hidden while empty space remains at the bottom.
+
+Reproduce: open any demo with a configuration panel in MetalSprockets-Examples (e.g. Open Sea, Mesh Dissolve), toggle the gear. The first form rows are cut off behind the toolbar.
+
+Likely cause: the detail view's content extends edge-to-edge beneath the toolbar, and the inspector content (ConfigurationInspectorPresentation in DemoConfigurationView.swift) inherits the missing top safe-area inset.
+
+---
