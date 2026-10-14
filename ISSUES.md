@@ -523,6 +523,7 @@ status: new
 priority: medium
 kind: bug
 created: 2026-08-11T18:46:47Z
+updated: 2026-10-14T17:06:35Z
 +++
 
 In inspector mode (the macOS default), the panel presented by .demoConfiguration clips its first rows under the window's unified toolbar: the inspector's scroll content starts at the top edge of the window instead of below the toolbar, so the top of the form is hidden while empty space remains at the bottom.
@@ -530,5 +531,33 @@ In inspector mode (the macOS default), the panel presented by .demoConfiguration
 Reproduce: open any demo with a configuration panel in MetalSprockets-Examples (e.g. Open Sea, Mesh Dissolve), toggle the gear. The first form rows are cut off behind the toolbar.
 
 Likely cause: the detail view's content extends edge-to-edge beneath the toolbar, and the inspector content (ConfigurationInspectorPresentation in DemoConfigurationView.swift) inherits the missing top safe-area inset.
+
+- `2026-10-14T17:06:35Z`: Confirmed from MetalSprocketsSceneGraph's demo app and MetalSprockets-Examples (macOS 26). The view hierarchy shows every NavigationSplitView column, including the detail and the inspector hosting view, at full window height (1031 pt) from y=0, with the toolbar covering the top 52 pt; that part is normal. But the inspector's Form gets no top safe-area inset, so its first rows are hidden. The same happens to the demo content (#22). ScrollViews that are not in the inspector (the description overlay) are inset correctly. Suspect: the detail wrapper in DemosNavigationSplitView.detailView, ZStack { Color.clear; DemoDescriptionContainer(...) }.clipped(), with .inspector applied inside it (ConfigurationInspectorPresentation). Putting the demo directly in the split view's detail column, as MetalSprocketsSceneGraph's old ContentView did, did not show the problem.
+
+---
+
+## 22: Demo content underlaps the window toolbar
+
++++
+status: new
+priority: medium
+kind: bug
+created: 2026-10-14T17:06:35Z
++++
+
+Non-scrolling demo content starts at the top of the window, under the unified toolbar, instead of below it. Overlays aligned to the top (for example a frame-timing overlay with .overlay(alignment: .topTrailing) { ... .padding() }) are partly hidden. Metal views (MTKView via NSViewRepresentable) also start under the toolbar.
+
+Reproduce: MetalSprockets-Examples or the MetalSprocketsSceneGraph demo app on macOS 26: any demo with a top-aligned overlay.
+
+Findings (view hierarchy, MetalSprocketsSceneGraph demo app):
+- All split items are 1031 pt tall from y=0; the visible rect starts 52 pt down (toolbar). Normal on macOS 26.
+- The MTKView platform host frame is 1031 pt from y=0, so SwiftUI gives the detail content no top safe-area inset.
+- No ignoresSafeArea in the demo code, MetalSprocketsUI or Interaction3D.
+- DemoKit's description overlay (a ScrollView) is inset correctly.
+- With the old setup (demo view directly in the NavigationSplitView detail, with its own .inspector) the content was below the toolbar.
+
+Suspect: DemosNavigationSplitView.detailView wraps the demo in ZStack { Color.clear; DemoDescriptionContainer(...) }.clipped(). Try removing the ZStack/Color.clear/.clipped, or applying .safeAreaPadding / .ignoresSafeArea only to the background.
+
+Related: #21 (same cause in the configuration inspector).
 
 ---
