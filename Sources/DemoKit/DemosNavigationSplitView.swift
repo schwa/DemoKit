@@ -216,44 +216,11 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
             .onChange(of: viewModel.screenshotRequest) { _, request in
                 guard let request else { return }
                 viewModel.screenshotRequest = nil
-                takeScreenshot(of: demoView, demoID: element.metadata.id.rawValue, options: request)
+                ScreenshotCapture.capture(demoView, demoID: element.metadata.id.rawValue, options: request)
             }
         } else {
             ContentUnavailableView("Select a Demo", systemImage: "sidebar.left", description: Text("Choose a demo from the sidebar"))
         }
-    }
-
-    private func takeScreenshot<V: View>(of view: V, demoID: String, options: ScreenshotOptions) {
-        let renderer = ImageRenderer(
-            content: view
-                .frame(width: options.width, height: options.height)
-                .background(options.background)
-        )
-        renderer.scale = options.scale
-        #if os(macOS)
-        guard let image = renderer.nsImage else {
-            logger?.warning("Failed to render screenshot for \(demoID)")
-            return
-        }
-        let fileType: NSBitmapImageRep.FileType = options.format == .jpg ? .jpeg : .png
-        guard let tiffData = image.tiffRepresentation,
-              let bitmap = NSBitmapImageRep(data: tiffData),
-              let data = bitmap.representation(using: fileType, properties: [:]) else {
-            logger?.warning("Failed to encode screenshot for \(demoID)")
-            return
-        }
-        let url = options.fileURL(demoID: demoID)
-        do {
-            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try data.write(to: url)
-            logger?.info("Screenshot saved to \(url.path)")
-            if options.reveal {
-                NSWorkspace.shared.activateFileViewerSelecting([url])
-            }
-        } catch {
-            logger?.warning("Failed to write screenshot: \(error.localizedDescription)")
-        }
-        #endif
     }
 
     private func demoLabel(for metadata: DemoMetadata) -> some View {

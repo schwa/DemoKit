@@ -234,7 +234,7 @@ Demo IDs are matched loosely: exact match, kebab-case conversion, case-insensiti
 | `scale` | `2` | Rendering scale factor |
 | `format` | `png` | `png` or `jpg` (`jpeg` accepted) |
 | `destination` | temp directory | A file path, or a directory to write a generated filename into |
-| `reveal` | `true` | Reveal the file in Finder (macOS) |
+| `reveal` | `true` | Reveal the file in Finder (macOS) or present a share sheet (iOS) |
 | `background` | `white` | A named colour (`black`, `clear`, …) or a hex value such as `%23FF8000` |
 
 ```bash

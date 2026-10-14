@@ -385,12 +385,13 @@ When switching between demos in the sidebar, the previously selected demo should
 ## 17: Decide iOS screenshot destination
 
 +++
-status: open
+status: closed
 priority: low
 kind: task
 labels: effort:s, area:ios, area:screenshot
 created: 2026-04-03T22:25:03Z
-updated: 2026-10-14T17:08:04Z
+updated: 2026-10-14T18:04:27Z
+closed: 2026-10-14T18:04:27Z
 +++
 
 The `screenshot` URL action saves to `/tmp` on macOS and reveals via `NSWorkspace`. On iOS we need to decide where screenshots go.
@@ -582,5 +583,18 @@ closed: 2026-10-14T17:27:25Z
 With the description overlay shown, a demo smaller than the detail column (e.g. Pulse) squeezes the overlay into a narrow column the width of the demo, so the text wraps one syllable per line.
 
 Cause: DemoDescriptionContainer attaches .overlay to the demo content at its own size. rxpvzpsky added .frame(maxWidth: .infinity, maxHeight: .infinity) before the overlay to fix this; mslllonsqypv removed it.
+
+---
+
+## 24: Description overlay extends outside safe area and overlaps side panels
+
++++
+status: new
+priority: medium
+kind: bug
+created: 2026-10-14T18:01:08Z
++++
+
+On macOS the description overlay (DemoDescriptionView, `.overlay(alignment: .top)`) is not constrained to the detail view's safe area. It runs under the config/inspector panel and blends into it (e.g. Timer demo: overlay text clips behind the config panel). Expected: keep the overlay inside the detail content's safe area so it never overlaps the sidebar or config panel. Screenshot: ~/Library/Application Support/CleanShot/media/media_f6SpkZSe5P/Screenshot 2026-10-14 at 14.00.29@2x.png
 
 ---
