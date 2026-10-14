@@ -51,11 +51,17 @@ private struct ConfigurationInspectorPresentation<Configuration: View>: ViewModi
     @Binding var showConfiguration: Bool
     @ViewBuilder let configuration: () -> Configuration
 
+    @Environment(\.demoDescriptionMetadata)
+    private var descriptionMetadata
+
     func body(content: Content) -> some View {
         #if os(visionOS)
         content
         #else
         content
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .modifier(DemoDescriptionOverlay(metadata: descriptionMetadata))
+            .preference(key: DescriptionOverlayHandledKey.self, value: descriptionMetadata != nil)
             .inspector(isPresented: $showConfiguration) {
                 configuration()
                     .inspectorColumnWidth(min: 200, ideal: 300, max: 1_200)

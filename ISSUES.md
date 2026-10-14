@@ -589,10 +589,12 @@ Cause: DemoDescriptionContainer attaches .overlay to the demo content at its own
 ## 24: Description overlay extends outside safe area and overlaps side panels
 
 +++
-status: new
+status: closed
 priority: medium
 kind: bug
 created: 2026-10-14T18:01:08Z
+updated: 2026-10-14T18:15:12Z
+closed: 2026-10-14T18:15:12Z
 +++
 
 On macOS the description overlay (DemoDescriptionView, `.overlay(alignment: .top)`) is not constrained to the detail view's safe area. It runs under the config/inspector panel and blends into it (e.g. Timer demo: overlay text clips behind the config panel). Expected: keep the overlay inside the detail content's safe area so it never overlaps the sidebar or config panel. Screenshot: ~/Library/Application Support/CleanShot/media/media_f6SpkZSe5P/Screenshot 2026-10-14 at 14.00.29@2x.png

@@ -5,8 +5,10 @@ import SwiftUI
 import Testing
 
 @MainActor
-private enum SafeAreaProbe {
+private enum LayoutProbe {
     static var topInsets: [String: CGFloat] = [:]
+    static var frames: [String: CGRect] = [:]
+    static var descriptionOverlayFrame: CGRect?
 }
 
 private struct ProbeView: View {
@@ -15,9 +17,15 @@ private struct ProbeView: View {
     var body: some View {
         GeometryReader { proxy in
             Color.clear
-                .onAppear { SafeAreaProbe.topInsets[name] = proxy.safeAreaInsets.top }
-                .onChange(of: proxy.safeAreaInsets.top) { _, value in SafeAreaProbe.topInsets[name] = value }
+                .onAppear { record(proxy) }
+                .onChange(of: proxy.frame(in: .global)) { record(proxy) }
+                .onChange(of: proxy.safeAreaInsets.top) { record(proxy) }
         }
+    }
+
+    private func record(_ proxy: GeometryProxy) {
+        LayoutProbe.topInsets[name] = proxy.safeAreaInsets.top
+        LayoutProbe.frames[name] = proxy.frame(in: .global)
     }
 }
 
@@ -27,7 +35,11 @@ private struct PlainProbeDemo: DemoView {
 }
 
 private struct ConfiguredProbeDemo: DemoView {
-    static let metadata = DemoMetadata(id: .init("configured-probe"), name: "Configured Probe")
+    static let metadata = DemoMetadata(
+        id: .init("configured-probe"),
+        name: "Configured Probe",
+        description: "A demo with a configuration panel"
+    )
     var body: some View {
         ProbeView()
             .demoConfiguration { ProbeView(name: "inspector") }
@@ -35,15 +47,36 @@ private struct ConfiguredProbeDemo: DemoView {
 }
 
 @MainActor
-private func measureTopInset(of demo: any DemoView.Type, probe: String = "demo", showConfiguration: Bool = false) async throws -> CGFloat {
-    SafeAreaProbe.topInsets = [:]
+private func withHostedDemo<T>(
+    _ demo: any DemoView.Type,
+    showConfiguration: Bool = false,
+    showDescription: Bool = false,
+    until ready: () -> Bool,
+    _ body: (NSWindow) throws -> T
+) async throws -> T {
+    LayoutProbe.topInsets = [:]
+    LayoutProbe.frames = [:]
+    LayoutProbe.descriptionOverlayFrame = nil
     let defaults = UserDefaults.standard
-    let previousShowConfiguration = defaults.object(forKey: "showDemoConfiguration")
+    let previous = [
+        "showDemoConfiguration": defaults.object(forKey: "showDemoConfiguration"),
+        "showDemoDescription": defaults.object(forKey: "showDemoDescription")
+    ]
     defaults.set(showConfiguration, forKey: "showDemoConfiguration")
-    defer { defaults.set(previousShowConfiguration, forKey: "showDemoConfiguration") }
+    defaults.set(showDescription, forKey: "showDemoDescription")
+    defer {
+        for (key, value) in previous {
+            defaults.set(value, forKey: key)
+        }
+    }
     let viewModel = DemoPickerViewModel(demos: [demo])
     viewModel.selection = demo.metadata.id
-    let controller = NSHostingController(rootView: DemosNavigationSplitView().environment(viewModel))
+    let rootView = DemosNavigationSplitView()
+        .environment(viewModel)
+        .onPreferenceChange(DescriptionOverlayFrameKey.self) { frame in
+            MainActor.assumeIsolated { LayoutProbe.descriptionOverlayFrame = frame }
+        }
+    let controller = NSHostingController(rootView: rootView)
     let window = NSWindow(
         contentRect: NSRect(x: 0, y: 0, width: 900, height: 600),
         styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
@@ -59,9 +92,20 @@ private func measureTopInset(of demo: any DemoView.Type, probe: String = "demo",
     defer { window.close() }
     for _ in 0..<50 {
         try await Task.sleep(for: .milliseconds(20))
-        if let inset = SafeAreaProbe.topInsets[probe], inset > 0 { break }
+        if ready() { break }
     }
-    return try #require(SafeAreaProbe.topInsets[probe])
+    // Let animations (e.g. the overlay transition) settle.
+    try await Task.sleep(for: .milliseconds(500))
+    return try body(window)
+}
+
+@MainActor
+private func measureTopInset(of demo: any DemoView.Type, probe: String = "demo", showConfiguration: Bool = false) async throws -> CGFloat {
+    try await withHostedDemo(demo, showConfiguration: showConfiguration) {
+        (LayoutProbe.topInsets[probe] ?? 0) > 0
+    } _: { _ in
+        try #require(LayoutProbe.topInsets[probe])
+    }
 }
 
 @Suite(.serialized)
@@ -77,6 +121,21 @@ struct ToolbarSafeAreaTests {
 
     @Test func configurationInspectorContentIsInsetBelowToolbar() async throws {
         #expect(try await measureTopInset(of: ConfiguredProbeDemo.self, probe: "inspector", showConfiguration: true) > 0)
+    }
+
+    @Test func descriptionOverlayStaysLeftOfInspector() async throws {
+        let (overlayMaxX, inspectorMinX) = try await withHostedDemo(
+            ConfiguredProbeDemo.self,
+            showConfiguration: true,
+            showDescription: true
+        ) {
+            LayoutProbe.frames["inspector"] != nil && LayoutProbe.descriptionOverlayFrame != nil
+        } _: { _ in
+            let overlay = try #require(LayoutProbe.descriptionOverlayFrame)
+            let inspector = try #require(LayoutProbe.frames["inspector"])
+            return (overlay.maxX, inspector.minX)
+        }
+        #expect(overlayMaxX <= inspectorMinX)
     }
 }
 #endif
