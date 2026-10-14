@@ -391,6 +391,11 @@ struct GradientBackgroundDemoView: DemoView {
                 )
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay {
+                Rectangle()
+                    .strokeBorder(.red, lineWidth: 2)
+                    .allowsHitTesting(false)
+            }
             .demoConfiguration {
                 Form {
                     LabeledContent("Hue: \(String(format: "%.0f°", hue * 360))") {
