@@ -9,6 +9,7 @@ struct DemoDescriptionContainer<Content: View>: View {
 
     var body: some View {
         content
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .top) {
                 if showDescription, hasDescription {
                     ScrollView {

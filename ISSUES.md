@@ -566,3 +566,21 @@ Suspect: DemosNavigationSplitView.detailView wraps the demo in ZStack { Color.cl
 Related: #21 (same cause in the configuration inspector).
 
 ---
+
+## 23: Description overlay shrinks to the size of small demos
+
++++
+status: closed
+priority: medium
+kind: bug
+labels: effort:xs, area:layout
+created: 2026-10-14T17:21:02Z
+updated: 2026-10-14T17:27:25Z
+closed: 2026-10-14T17:27:25Z
++++
+
+With the description overlay shown, a demo smaller than the detail column (e.g. Pulse) squeezes the overlay into a narrow column the width of the demo, so the text wraps one syllable per line.
+
+Cause: DemoDescriptionContainer attaches .overlay to the demo content at its own size. rxpvzpsky added .frame(maxWidth: .infinity, maxHeight: .infinity) before the overlay to fix this; mslllonsqypv removed it.
+
+---
