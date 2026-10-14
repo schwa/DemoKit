@@ -122,9 +122,9 @@ Key decisions:
 status: new
 priority: low
 kind: feature
-labels: effort:m, needs-info
+labels: effort:m, needs-info, area:screenshot
 created: 2026-04-02T23:02:37Z
-updated: 2026-08-09T18:15:21Z
+updated: 2026-10-14T17:08:04Z
 +++
 
 - `2026-08-09T18:15:21Z`: Related: #18 (screenshot URL action options) and #17 (iOS destination). Needs info: unclear whether this means automatic capture at build/CI time, or just a UI action.
@@ -388,9 +388,9 @@ When switching between demos in the sidebar, the previously selected demo should
 status: open
 priority: low
 kind: task
-labels: ios, screenshot, effort:s
+labels: effort:s, area:ios, area:screenshot
 created: 2026-04-03T22:25:03Z
-updated: 2026-08-09T18:50:34Z
+updated: 2026-10-14T17:08:04Z
 +++
 
 The `screenshot` URL action saves to `/tmp` on macOS and reveals via `NSWorkspace`. On iOS we need to decide where screenshots go.
@@ -519,11 +519,12 @@ Whatever the fix, it is worth a regression test: a demo with a @State-backed sli
 ## 21: Configuration inspector content underlaps the window toolbar
 
 +++
-status: new
+status: open
 priority: medium
 kind: bug
+labels: effort:s, area:layout
 created: 2026-08-11T18:46:47Z
-updated: 2026-10-14T17:06:35Z
+updated: 2026-10-14T17:08:03Z
 +++
 
 In inspector mode (the macOS default), the panel presented by .demoConfiguration clips its first rows under the window's unified toolbar: the inspector's scroll content starts at the top edge of the window instead of below the toolbar, so the top of the form is hidden while empty space remains at the bottom.
@@ -539,10 +540,12 @@ Likely cause: the detail view's content extends edge-to-edge beneath the toolbar
 ## 22: Demo content underlaps the window toolbar
 
 +++
-status: new
+status: open
 priority: medium
 kind: bug
+labels: effort:s, area:layout
 created: 2026-10-14T17:06:35Z
+updated: 2026-10-14T17:08:04Z
 +++
 
 Non-scrolling demo content starts at the top of the window, under the unified toolbar, instead of below it. Overlays aligned to the top (for example a frame-timing overlay with .overlay(alignment: .topTrailing) { ... .padding() }) are partly hidden. Metal views (MTKView via NSViewRepresentable) also start under the toolbar.
