@@ -540,12 +540,13 @@ Likely cause: the detail view's content extends edge-to-edge beneath the toolbar
 ## 22: Demo content underlaps the window toolbar
 
 +++
-status: open
+status: closed
 priority: medium
 kind: bug
 labels: effort:s, area:layout
 created: 2026-10-14T17:06:35Z
-updated: 2026-10-14T17:08:04Z
+updated: 2026-10-14T17:11:43Z
+closed: 2026-10-14T17:11:43Z
 +++
 
 Non-scrolling demo content starts at the top of the window, under the unified toolbar, instead of below it. Overlays aligned to the top (for example a frame-timing overlay with .overlay(alignment: .topTrailing) { ... .padding() }) are partly hidden. Metal views (MTKView via NSViewRepresentable) also start under the toolbar.

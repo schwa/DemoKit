@@ -191,7 +191,7 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
                     content: demoView
                 )
             }
-            .clipped()
+            .mask(Rectangle().ignoresSafeArea())
             .onPreferenceChange(HasDemoConfigurationPreferenceKey.self) { value in
                 hasConfiguration = value
                 if !value {
