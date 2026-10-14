@@ -519,12 +519,13 @@ Whatever the fix, it is worth a regression test: a demo with a @State-backed sli
 ## 21: Configuration inspector content underlaps the window toolbar
 
 +++
-status: open
+status: closed
 priority: medium
 kind: bug
 labels: effort:s, area:layout
 created: 2026-08-11T18:46:47Z
-updated: 2026-10-14T17:08:03Z
+updated: 2026-10-14T17:12:40Z
+closed: 2026-10-14T17:12:40Z
 +++
 
 In inspector mode (the macOS default), the panel presented by .demoConfiguration clips its first rows under the window's unified toolbar: the inspector's scroll content starts at the top edge of the window instead of below the toolbar, so the top of the form is hidden while empty space remains at the bottom.

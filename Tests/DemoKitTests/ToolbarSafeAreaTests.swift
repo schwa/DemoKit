@@ -6,15 +6,17 @@ import Testing
 
 @MainActor
 private enum SafeAreaProbe {
-    static var topInset: CGFloat?
+    static var topInsets: [String: CGFloat] = [:]
 }
 
 private struct ProbeView: View {
+    var name = "demo"
+
     var body: some View {
         GeometryReader { proxy in
             Color.clear
-                .onAppear { SafeAreaProbe.topInset = proxy.safeAreaInsets.top }
-                .onChange(of: proxy.safeAreaInsets.top) { _, value in SafeAreaProbe.topInset = value }
+                .onAppear { SafeAreaProbe.topInsets[name] = proxy.safeAreaInsets.top }
+                .onChange(of: proxy.safeAreaInsets.top) { _, value in SafeAreaProbe.topInsets[name] = value }
         }
     }
 }
@@ -28,13 +30,17 @@ private struct ConfiguredProbeDemo: DemoView {
     static let metadata = DemoMetadata(id: .init("configured-probe"), name: "Configured Probe")
     var body: some View {
         ProbeView()
-            .demoConfiguration { Text("Configuration") }
+            .demoConfiguration { ProbeView(name: "inspector") }
     }
 }
 
 @MainActor
-private func measureTopInset(of demo: any DemoView.Type) async throws -> CGFloat {
-    SafeAreaProbe.topInset = nil
+private func measureTopInset(of demo: any DemoView.Type, probe: String = "demo", showConfiguration: Bool = false) async throws -> CGFloat {
+    SafeAreaProbe.topInsets = [:]
+    let defaults = UserDefaults.standard
+    let previousShowConfiguration = defaults.object(forKey: "showDemoConfiguration")
+    defaults.set(showConfiguration, forKey: "showDemoConfiguration")
+    defer { defaults.set(previousShowConfiguration, forKey: "showDemoConfiguration") }
     let viewModel = DemoPickerViewModel(demos: [demo])
     viewModel.selection = demo.metadata.id
     let controller = NSHostingController(rootView: DemosNavigationSplitView().environment(viewModel))
@@ -53,9 +59,9 @@ private func measureTopInset(of demo: any DemoView.Type) async throws -> CGFloat
     defer { window.close() }
     for _ in 0..<50 {
         try await Task.sleep(for: .milliseconds(20))
-        if let inset = SafeAreaProbe.topInset, inset > 0 { break }
+        if let inset = SafeAreaProbe.topInsets[probe], inset > 0 { break }
     }
-    return try #require(SafeAreaProbe.topInset)
+    return try #require(SafeAreaProbe.topInsets[probe])
 }
 
 @Suite(.serialized)
@@ -67,6 +73,10 @@ struct ToolbarSafeAreaTests {
 
     @Test func configuredDemoContentIsInsetBelowToolbar() async throws {
         #expect(try await measureTopInset(of: ConfiguredProbeDemo.self) > 0)
+    }
+
+    @Test func configurationInspectorContentIsInsetBelowToolbar() async throws {
+        #expect(try await measureTopInset(of: ConfiguredProbeDemo.self, probe: "inspector", showConfiguration: true) > 0)
     }
 }
 #endif
