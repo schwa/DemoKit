@@ -600,3 +600,20 @@ closed: 2026-10-14T18:15:12Z
 On macOS the description overlay (DemoDescriptionView, `.overlay(alignment: .top)`) is not constrained to the detail view's safe area. It runs under the config/inspector panel and blends into it (e.g. Timer demo: overlay text clips behind the config panel). Expected: keep the overlay inside the detail content's safe area so it never overlaps the sidebar or config panel. Screenshot: ~/Library/Application Support/CleanShot/media/media_f6SpkZSe5P/Screenshot 2026-10-14 at 14.00.29@2x.png
 
 ---
+
+## 25: Demos must be types: picker cannot take instances or closures
+
++++
+status: new
+priority: low
+kind: enhancement
+created: 2026-10-15T22:08:44Z
++++
+
+DemoPickerScene, DemoPickerView and DemoPickerViewModel take [any DemoView.Type]. DemoView needs static metadata and init(), so every demo needs its own hand-written wrapper type, even when all demos share one view parameterised by data.
+
+Seen in MetalSprocketsSceneGraph (#116 there): eleven near-identical wrapper structs that each only hold a Demo value and return SceneDemoView(demo:). A list of data-driven demos cannot be passed to the picker directly.
+
+Want: the picker can take demo entries built at runtime (metadata plus a view builder), not only types. Public API can change; no compatibility shims needed.
+
+---
