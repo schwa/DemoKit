@@ -12,6 +12,8 @@ public struct DemoMetadata: Identifiable, Sendable {
     public var color: Color?
     public var isEnabled: Bool
     public var variants: [Self] = []
+    // When false, the toolbar has no description button and the overlay never shows.
+    public var showsDescriptionButton = true
 
     public struct ID: Hashable, Sendable {
         public var rawValue: String

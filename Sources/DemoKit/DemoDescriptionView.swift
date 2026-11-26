@@ -100,6 +100,6 @@ struct DemoDescriptionOverlay: ViewModifier {
 
 extension DemoMetadata {
     var hasDescription: Bool {
-        description != nil || longDescription != nil
+        showsDescriptionButton && (description != nil || longDescription != nil)
     }
 }
