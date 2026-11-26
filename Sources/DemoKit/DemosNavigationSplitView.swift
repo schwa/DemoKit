@@ -65,8 +65,43 @@ struct DemosNavigationSplitView: View { // swiftlint:disable:this type_body_leng
     @AppStorage("showDemoConfiguration")
     private var showConfiguration = false
 
+    @AppStorage("demoSidebarVisibility")
+    private var storedColumnVisibility: String = "automatic"
+
+    private var columnVisibility: Binding<NavigationSplitViewVisibility> {
+        Binding {
+            switch storedColumnVisibility {
+            case "all":
+                .all
+
+            case "doubleColumn":
+                .doubleColumn
+
+            case "detailOnly":
+                .detailOnly
+
+            default:
+                .automatic
+            }
+        } set: { newValue in
+            storedColumnVisibility = switch newValue {
+            case .all:
+                "all"
+
+            case .doubleColumn:
+                "doubleColumn"
+
+            case .detailOnly:
+                "detailOnly"
+
+            default:
+                "automatic"
+            }
+        }
+    }
+
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: columnVisibility) {
             demoList
         } detail: {
             detailView
